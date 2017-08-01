@@ -1,0 +1,6 @@
+node_modules
+.grunt
+.idea
+
+_SpecRunner.html
+require.js
