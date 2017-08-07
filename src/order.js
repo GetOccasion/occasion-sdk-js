@@ -1,5 +1,17 @@
 Occasion.Modules.push(function(library) {
-  library.Order = class Order extends library.Base {};
+  library.Order = class Order extends library.Base {
+    // Creates a transaction with a payment method and an amount
+    //
+    // @param [PaymentMethod] paymentMethod the payment method to charge
+    // @param [Number] amount the amount to charge to the payment method
+    // @return [Transaction] the built transaction representing the charge
+    charge(paymentMethod, amount) {
+      this.transactions().build({
+        amount: amount,
+        paymentMethod: paymentMethod
+      });
+    }
+  };
 
   library.Order.className = 'Order';
   library.Order.queryName = 'orders';
