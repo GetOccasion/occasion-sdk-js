@@ -1,9 +1,13 @@
 class Occasion {
+  static baseUrl = 'https://app.getoccasion.com/api/v1';
+
   static Client(token) {
+    var encodedToken = window.btoa(unescape(encodeURIComponent(token + ':')));
+
     var resourceLibrary =
-      ActiveResource.createResourceLibrary('https://app.getoccasion.com/api/v1', {
+      ActiveResource.createResourceLibrary(Occasion.baseUrl, {
         headers: {
-          Authorization: "Basic #{window.btoa(unescape(encodeURIComponent('" + token + ":')))}",
+          Authorization: "Basic " + encodedToken,
           'User-Agent': 'OccasionSDK'
         }
       });
