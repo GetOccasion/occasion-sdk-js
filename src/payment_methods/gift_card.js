@@ -5,6 +5,5 @@ Occasion.Modules.push(function(library) {
   library.GiftCard.queryName = 'gift_cards';
 
   library.GiftCard.belongsTo('customer');
-  library.GiftCard.hasOne('order');
   library.GiftCard.hasMany('transactions', { as: 'paymentMethod' });
 });
