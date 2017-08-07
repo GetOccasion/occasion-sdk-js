@@ -19,6 +19,7 @@ module.exports = function(grunt) {
     },
     babel: {
       options: {
+        plugins: ['transform-class-properties'],
         presets: ['es2015']
       },
       build: {
