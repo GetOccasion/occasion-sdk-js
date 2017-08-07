@@ -32,9 +32,8 @@ module.exports = function(grunt) {
         options: {
           src: 'build/occasion-sdk.js',
           objectToExport: 'Occasion',
-          amdModuleId: 'occasion',
           deps: {
-            global: ['active-resource']
+            'default': [{ 'active-resource': 'ActiveResource' }]
           }
         }
       },
@@ -42,9 +41,14 @@ module.exports = function(grunt) {
         options: {
           src: 'spec/spec.js',
           objectToExport: 'OccasionSDKSpecs',
-          amdModuleId: 'occasion-sdk-specs',
           deps: {
-            global: ['active-resource']
+            'default': [
+              { 'active-resource': 'ActiveResource' },
+              { 'occasion-sdk': 'Occasion' },
+              { 'underscore': '_' },
+              { 'jasmine-jquery': null },
+              { 'jasmine-ajax': null }
+            ]
           }
         }
       }
