@@ -35,4 +35,17 @@ describe('Occasion.Order', function() {
       expect(this.order.transactions().target().first().paymentMethod()).toEqual(this.paymentMethod);
     });
   });
+
+  describe('editCharge', function() {
+    beforeEach(function() {
+      this.paymentMethod = this.occsnClient.CreditCard.build({ id: 'cc_token' });
+      this.order.charge(this.paymentMethod, 10.0);
+
+      this.order.editCharge(this.paymentMethod, 1000.0)
+    });
+
+    it('changes payment method\'s transaction amount', function() {
+      expect(this.order.transactions().target().first().amount).toEqual(1000.0);
+    });
+  });
 });
