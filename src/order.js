@@ -24,6 +24,17 @@ Occasion.Modules.push(function(library) {
         transaction.amount = amount;
       }
     }
+
+    // Removes a transaction for a given payment method
+    //
+    // @param [PaymentMethod] paymentMethod the payment method to remove the transaction for
+    removeCharge(paymentMethod) {
+      var transaction = this.transactions().target().detect(function(t) { return t.paymentMethod() == paymentMethod; });
+
+      if(transaction) {
+        this.transactions().target().delete(transaction);
+      }
+    }
   };
 
   library.Order.className = 'Order';

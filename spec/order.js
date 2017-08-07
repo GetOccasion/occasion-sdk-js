@@ -11,6 +11,7 @@ describe('Occasion.Order', function() {
     this.occsnClient = Occasion.Client('my_token');
 
     this.order = this.occsnClient.Order.build();
+    this.paymentMethod = this.occsnClient.CreditCard.build({ id: 'cc_token' });
   });
 
   afterEach(function() {
@@ -19,7 +20,6 @@ describe('Occasion.Order', function() {
 
   describe('charge', function() {
     beforeEach(function() {
-      this.paymentMethod = this.occsnClient.CreditCard.build({ id: 'cc_token' });
       this.order.charge(this.paymentMethod, 10.0);
     });
 
@@ -38,14 +38,25 @@ describe('Occasion.Order', function() {
 
   describe('editCharge', function() {
     beforeEach(function() {
-      this.paymentMethod = this.occsnClient.CreditCard.build({ id: 'cc_token' });
       this.order.charge(this.paymentMethod, 10.0);
 
-      this.order.editCharge(this.paymentMethod, 1000.0)
+      this.order.editCharge(this.paymentMethod, 1000.0);
     });
 
     it('changes payment method\'s transaction amount', function() {
       expect(this.order.transactions().target().first().amount).toEqual(1000.0);
+    });
+  });
+
+  describe('removeCharge', function() {
+    beforeEach(function() {
+      this.order.charge(this.paymentMethod, 10.0);
+
+      this.order.removeCharge(this.paymentMethod);
+    });
+
+    it('removes the charge', function() {
+      expect(this.order.transactions().empty()).toBeTruthy();
     });
   });
 });
