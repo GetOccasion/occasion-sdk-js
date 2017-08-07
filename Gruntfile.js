@@ -86,22 +86,10 @@ module.exports = function(grunt) {
       },
       build: {
         src: [
-          'src/client.js',
-          'src/modules.js',
-          'src/answer.js',
-          'src/currency.js',
-          'src/customer.js',
-          'src/merchant.js',
-          'src/option.js',
-          'src/order.js',
-          'src/payment_method.js',
-          'src/payment_methods/credit_card.js',
-          'src/payment_methods/gift_card.js',
-          'src/product.js',
-          'src/question.js',
-          'src/time_slot.js',
-          'src/transaction.js',
-          'src/venue.js'
+          'src/init/client.js',
+          'src/init/modules.js',
+          'src/*.js',
+          'src/**/*.js',
         ],
         dest: 'build/occasion-sdk.js'
       },
