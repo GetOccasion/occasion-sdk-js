@@ -1,5 +1,29 @@
 Occasion.Modules.push(function(library) {
-  library.Order = class Order extends library.Base {};
+  library.Order = class Order extends library.Base {
+    static construct(attributes) {
+      var order = this.build(attributes);
+
+      // TODO: Generate session ID
+      order.sessionIdentifier = order.sessionIdentifier || '';
+
+      if(order.customer() == null) {
+        order.buildCustomer({
+          email: null,
+          firstName: null,
+          lastName: null,
+          zip: null
+        });
+      }
+
+      if(order.product() != null) {
+        order.product().questions().each(function(question) {
+          order.answers().build({
+            question: question
+          });
+        });
+      }
+    }
+  };
 
   library.Order.className = 'Order';
   library.Order.queryName = 'orders';
