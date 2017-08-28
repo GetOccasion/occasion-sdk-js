@@ -35,13 +35,15 @@
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-connect": "0.4.x",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-jasmine": "latest",
+    "grunt-contrib-jasmine": "1.0.3",
     "grunt-contrib-uglify": "0.2.x",
     "grunt-contrib-watch": "0.5.x",
     "grunt-template-jasmine-requirejs": "^0.2.3",
     "grunt-umd": "^2.4.0",
-    "grunt-umd-wrapper": "^0.4.0",
     "jasmine-ajax": "^3.2.0",
-    "jasmine-jquery": "^2.1.1"
+    "jasmine-jquery": "^2.1.1",
+    "jasmine-promises": "^0.4.1",
+    "jquery": "^3.2.1",
+    "moxios": "git+https://github.com/nicklandgrebe/moxios.git"
   }
 }

@@ -34,7 +34,10 @@ module.exports = function(grunt) {
           src: 'build/occasion-sdk.js',
           objectToExport: 'Occasion',
           deps: {
-            'default': [{ 'active-resource': 'ActiveResource' }]
+            'default': [
+              { 'active-resource': 'ActiveResource' },
+              'axios'
+            ]
           }
         }
       },
@@ -47,8 +50,10 @@ module.exports = function(grunt) {
               { 'active-resource': 'ActiveResource' },
               { 'occasion-sdk': 'Occasion' },
               { 'underscore': '_' },
+              'moxios',
+              { 'jquery': '$' },
               { 'jasmine-jquery': null },
-              { 'jasmine-ajax': null }
+              { 'jasmine-promises': null }
             ]
           }
         }
@@ -130,14 +135,18 @@ module.exports = function(grunt) {
             requireConfig: {
               baseUrl: '/',
               paths: {
-                "active-resource": '/node_modules/active-resource/dist/active-resource.min',
-                "jquery": '/node_modules/jquery/dist/jquery.min',
+                "active-resource": '/node_modules/active-resource/build/active-resource.min',
+                "axios": '/node_modules/axios/dist/axios',
+                "qs": '/node_modules/qs/dist/qs',
+                "es6-promise": '/node_modules/es6-promise/dist/es6-promise',
                 "underscore": '/node_modules/underscore/underscore-min',
                 "underscore.string": '/node_modules/underscore.string/dist/underscore.string',
                 "underscore.inflection": '/node_modules/underscore.inflection/lib/underscore.inflection',
                 "occasion-sdk": '/build/occasion-sdk',
+                "moxios": '/node_modules/moxios/dist/moxios.min',
+                "jquery": '/node_modules/jquery/dist/jquery.min',
                 "jasmine-jquery": '/node_modules/jasmine-jquery/lib/jasmine-jquery',
-                "jasmine-ajax": '/node_modules/jasmine-ajax/lib/mock-ajax'
+                "jasmine-promises": '/node_modules/jasmine-promises/dist/jasmine-promises'
               }
             }
           }
@@ -150,7 +159,6 @@ module.exports = function(grunt) {
   // load the tasks
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-umd');
   grunt.loadNpmTasks('grunt-babel');

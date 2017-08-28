@@ -1,0 +1,53 @@
+{
+  "data": [
+    {
+      "id": "1",
+      "type": "questions",
+      "attributes": {
+        "title": "Question number one"
+      },
+      "relationships": {
+        "options": {
+          "data": []
+        }
+      }
+    },
+    {
+      "id": "2",
+      "type": "questions",
+      "attributes": {
+        "title": "Question number two"
+      },
+      "relationships": {
+        "options": {
+          "data": [
+            {
+              "type": "options",
+              "id": "5"
+            },
+            {
+              "type": "options",
+              "id": "6"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "included": [
+    {
+      "type": "options",
+      "id": "5",
+      "attributes": {
+        "title": "Option number one"
+      }
+    },
+    {
+      "type": "options",
+      "id": "6",
+      "attributes": {
+        "title": "Option number two"
+      }
+    }
+  ]
+}

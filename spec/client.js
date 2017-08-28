@@ -2,7 +2,7 @@ var OccasionSDKSpecs = {};
 
 describe('Occasion.Client', function() {
   beforeEach(function() {
-    jasmine.Ajax.install();
+    moxios.install();
 
     window.onSuccess = jasmine.createSpy('onSuccess');
     window.onFailure = jasmine.createSpy('onFailure');
@@ -12,7 +12,7 @@ describe('Occasion.Client', function() {
   });
 
   afterEach(function() {
-    jasmine.Ajax.uninstall();
+    moxios.uninstall();
   });
 
   it('adds resource classes on initialization', function() {
@@ -22,21 +22,21 @@ describe('Occasion.Client', function() {
   describe('when making requests', function() {
     beforeEach(function() {
       this.occsnClient.Product.all()
-      .done(window.onSuccess);
+      .then(window.onSuccess);
     });
 
     it('makes request to base Occasion API URL', function() {
-      expect(jasmine.Ajax.requests.mostRecent().url.indexOf(Occasion.baseUrl)).toEqual(0);
+      expect(moxios.requests.mostRecent().url.indexOf(Occasion.baseUrl)).toEqual(0);
     });
 
     it('adds token to Authorization header', function() {
       var encodedToken = window.btoa(unescape(encodeURIComponent('my_token:')));
 
-      expect(jasmine.Ajax.requests.mostRecent().requestHeaders['Authorization']).toEqual('Basic ' + encodedToken);
+      expect(moxios.requests.mostRecent().headers['Authorization']).toEqual('Basic ' + encodedToken);
     });
 
     it('adds OccasionSDK User-Agent header', function() {
-      expect(jasmine.Ajax.requests.mostRecent().requestHeaders['User-Agent']).toEqual('OccasionSDK');
+      expect(moxios.requests.mostRecent().headers['User-Agent']).toEqual('OccasionSDK');
     });
   });
 });

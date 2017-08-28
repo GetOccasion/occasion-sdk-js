@@ -16,11 +16,20 @@ Occasion.Modules.push(function(library) {
       }
 
       if(order.product() != null) {
-        order.product().questions().each(function(question) {
-          order.answers().build({
-            question: question
+        var promises = []
+
+        promises.push(order.product().questions().includes('options').all());
+
+        return axios.all(promises)
+        .then(axios.spread(function(questions) {
+          questions.each(function(question) {
+            order.answers().build({
+              question: question
+            });
           });
-        });
+
+          return order;
+        }));
       }
     }
 
