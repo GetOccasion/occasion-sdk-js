@@ -41,6 +41,13 @@ describe('Occasion.Order', function() {
       });
     });
 
+    it('assigns a session identifier', function() {
+      var _this = this;
+      return this.promise2.then(function() {
+        expect(_this.order.sessionIdentifier.length).not.toEqual(0);
+      });
+    });
+
     it('builds a customer', function() {
       var _this = this;
       return this.promise2.then(function() {

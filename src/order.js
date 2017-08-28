@@ -3,8 +3,8 @@ Occasion.Modules.push(function(library) {
     static construct(attributes) {
       var order = this.build(attributes);
 
-      // TODO: Generate session ID
-      order.sessionIdentifier = order.sessionIdentifier || '';
+      order.sessionIdentifier = order.sessionIdentifier ||
+        Math.random().toString(36).substring(7) + '-' + Date.now();
 
       if(order.customer() == null) {
         order.buildCustomer({
