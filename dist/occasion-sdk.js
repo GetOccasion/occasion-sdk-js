@@ -7,18 +7,18 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
-    define(["active-resource"], function (a0) {
-      return (root['Occasion'] = factory(a0));
+    define(["active-resource","axios"], function (a0,b1) {
+      return (root['Occasion'] = factory(a0,b1));
     });
   } else if (typeof module === 'object' && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(require("active-resource"));
+    module.exports = factory(require("active-resource"),require("axios"));
   } else {
-    root['Occasion'] = factory(root["active-resource"]);
+    root['Occasion'] = factory(root["active-resource"],root["axios"]);
   }
-}(this, function (ActiveResource) {
+}(this, function (ActiveResource, axios) {
 
 'use strict';
 
@@ -183,6 +183,94 @@ Occasion.Modules.push(function (library) {
 
       return _possibleConstructorReturn(this, (Order.__proto__ || Object.getPrototypeOf(Order)).apply(this, arguments));
     }
+
+    _createClass(Order, [{
+      key: 'charge',
+
+
+      // Creates a transaction with a payment method and an amount
+      //
+      // @param [PaymentMethod] paymentMethod the payment method to charge
+      // @param [Number] amount the amount to charge to the payment method
+      // @return [Transaction] the built transaction representing the charge
+      value: function charge(paymentMethod, amount) {
+        this.transactions().build({
+          amount: amount,
+          paymentMethod: paymentMethod
+        });
+      }
+
+      // Edits a transaction with a given payment method to have a new amount
+      //
+      // @param [PaymentMethod] paymentMethod the payment method to search transactions for
+      // @param [Number] amount the new amount to charge to the payment method
+      // @return [Transaction] the edited transaction representing the charge
+
+    }, {
+      key: 'editCharge',
+      value: function editCharge(paymentMethod, amount) {
+        var transaction = this.transactions().target().detect(function (t) {
+          return t.paymentMethod() == paymentMethod;
+        });
+
+        if (transaction) {
+          transaction.amount = amount;
+        }
+      }
+
+      // Removes a transaction for a given payment method
+      //
+      // @param [PaymentMethod] paymentMethod the payment method to remove the transaction for
+
+    }, {
+      key: 'removeCharge',
+      value: function removeCharge(paymentMethod) {
+        var transaction = this.transactions().target().detect(function (t) {
+          return t.paymentMethod() == paymentMethod;
+        });
+
+        if (transaction) {
+          this.transactions().target().delete(transaction);
+        }
+      }
+    }], [{
+      key: 'construct',
+      value: function construct(attributes) {
+        var order = this.build(attributes);
+
+        order.sessionIdentifier = order.sessionIdentifier || Math.random().toString(36).substring(7) + '-' + Date.now();
+
+        if (order.customer() == null) {
+          order.buildCustomer({
+            email: null,
+            firstName: null,
+            lastName: null,
+            zip: null
+          });
+        }
+
+        var promises = [new Promise(function (resolve) {
+          resolve(order);
+        })];
+
+        if (order.product() != null) {
+          promises.push(order.product().questions().includes('options').all());
+        }
+
+        return axios.all(promises).then(axios.spread(function (order, questions) {
+          // Add blank answer for each question
+          if (questions != undefined) {
+            questions.each(function (question) {
+              order.answers().build({
+                question: question
+              });
+            });
+          }
+
+          return order;
+        }));
+      }
+    }]);
 
     return Order;
   }(library.Base);
