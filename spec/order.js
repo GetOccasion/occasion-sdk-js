@@ -67,6 +67,28 @@ describe('Occasion.Order', function() {
         expect(questionIds).toEqual(["1", "2"]);
       });
     });
+
+    describe('when product blank', function() {
+      beforeEach(function(){
+        this.occsnClient.Order.construct()
+        .then(window.onCompletion);
+
+        var _this = this;
+        this.promise3 = moxios.wait(function() {
+          return moxios.requests.mostRecent().respondWith(JsonApiResponses.Question.all.success)
+          .then(function() {
+            _this.order = window.onCompletion.calls.mostRecent().args[0];
+          });
+        });
+      });
+
+      it('still builds order', function() {
+        var _this = this;
+        return this.promise3.then(function() {
+          expect(_this.order.isA(_this.occsnClient.Order)).toBeTruthy();
+        });
+      });
+    });
   });
 
   describe('transactions', function() {

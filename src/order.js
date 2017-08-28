@@ -15,22 +15,27 @@ Occasion.Modules.push(function(library) {
         });
       }
 
+      var promises = [new Promise(function(resolve) {
+        resolve(order);
+      })];
+
       if(order.product() != null) {
-        var promises = []
-
         promises.push(order.product().questions().includes('options').all());
+      }
 
-        return axios.all(promises)
-        .then(axios.spread(function(questions) {
+      return axios.all(promises)
+      .then(axios.spread(function(order, questions) {
+        // Add blank answer for each question
+        if(questions != undefined) {
           questions.each(function(question) {
             order.answers().build({
               question: question
             });
           });
+        }
 
-          return order;
-        }));
-      }
+        return order;
+      }));
     }
 
     // Creates a transaction with a payment method and an amount
