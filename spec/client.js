@@ -34,9 +34,5 @@ describe('Occasion.Client', function() {
 
       expect(moxios.requests.mostRecent().headers['Authorization']).toEqual('Basic ' + encodedToken);
     });
-
-    it('adds OccasionSDK User-Agent header', function() {
-      expect(moxios.requests.mostRecent().headers['User-Agent']).toEqual('OccasionSDK');
-    });
   });
 });
