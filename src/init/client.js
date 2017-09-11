@@ -7,8 +7,7 @@ class Occasion {
     var resourceLibrary =
       ActiveResource.createResourceLibrary(Occasion.baseUrl, {
         headers: {
-          Authorization: "Basic " + encodedToken,
-          'User-Agent': 'OccasionSDK'
+          Authorization: "Basic " + encodedToken
         }
       });
 
