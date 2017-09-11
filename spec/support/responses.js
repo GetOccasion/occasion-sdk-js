@@ -52,6 +52,10 @@ window.JsonApiResponses = {
         response: getJSONFixture('orders/includes.json')
       }
     },
+    price: {
+      status: 200,
+      response: getJSONFixture('orders/price.json')
+    },
     save: {
       success: {
         status: 200,

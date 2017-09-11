@@ -15,6 +15,33 @@ describe('Occasion.Order', function() {
     moxios.uninstall();
   });
 
+  describe('calculatePrice', function () {
+    beforeEach(function () {
+      this.order = this.occsnClient.Order.build();
+
+      this.order.calculatePrice();
+
+      this.promise = moxios.wait(function() {
+        return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.price);
+      });
+    });
+
+    it('adds price attributes to order', function () {
+      var _this = this;
+      return this.promise.then(function() {
+
+        expect(_this.order.attributes()).toEqual({
+          subtotal: 3.0,
+          couponAmount: 2.0,
+          tax: 1.0,
+          giftCardAmount: 1.0,
+          price: 2.0,
+          outstandingBalance: 1.0
+        })
+      });
+    });
+  });
+
   describe('construct', function() {
     beforeEach(function () {
       this.occsnClient.Product.find('1kbsdf')

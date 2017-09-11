@@ -38,6 +38,10 @@ Occasion.Modules.push(function(library) {
       }));
     }
 
+    calculatePrice() {
+      return this.interface().post(this.klass().links()['related'] + 'price', this);
+    }
+
     // Creates a transaction with a payment method and an amount
     //
     // @param [PaymentMethod] paymentMethod the payment method to charge
