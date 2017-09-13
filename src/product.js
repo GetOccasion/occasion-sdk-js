@@ -9,5 +9,6 @@ Occasion.Modules.push(function(library) {
 
   library.Product.hasMany('orders');
   library.Product.hasMany('questions');
+  library.Product.hasMany('redeemables');
   library.Product.hasMany('timeSlots');
 });
