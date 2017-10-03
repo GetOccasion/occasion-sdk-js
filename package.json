@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kieranklaassen/occasion-sdk.git"
+    "url": "git+https://github.com/nicklandgrebe/occasion-sdk-js.git"
   },
   "keywords": [
     "occasion",
@@ -18,9 +18,9 @@
   "author": "Peak Labs, LLC, DBA Occasion App",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kieranklaassen/occasion-sdk/issues"
+    "url": "https://github.com/nicklandgrebe/occasion-sdk-js/issues"
   },
-  "homepage": "https://github.com/kieranklaassen/occasion-sdk#readme",
+  "homepage": "https://github.com/nicklandgrebe/occasion-sdk-js#readme",
   "dependencies": {
     "active-resource": "git+https://github.com/nicklandgrebe/activeresource.js.git"
   },

@@ -135,7 +135,7 @@ module.exports = function(grunt) {
             requireConfig: {
               baseUrl: '/',
               paths: {
-                "active-resource": '/node_modules/active-resource/build/active-resource.min',
+                "active-resource": '/node_modules/active-resource/build/active-resource',
                 "axios": '/node_modules/axios/dist/axios',
                 "qs": '/node_modules/qs/dist/qs',
                 "es6-promise": '/node_modules/es6-promise/dist/es6-promise',
