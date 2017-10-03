@@ -42,8 +42,7 @@ var Occasion = function () {
 
       var resourceLibrary = ActiveResource.createResourceLibrary(Occasion.baseUrl, {
         headers: {
-          Authorization: "Basic " + encodedToken,
-          'User-Agent': 'OccasionSDK'
+          Authorization: "Basic " + encodedToken
         }
       });
 
@@ -185,14 +184,19 @@ Occasion.Modules.push(function (library) {
     }
 
     _createClass(Order, [{
-      key: 'charge',
-
+      key: 'calculatePrice',
+      value: function calculatePrice() {
+        return this.interface().post(this.klass().links()['related'] + 'price', this);
+      }
 
       // Creates a transaction with a payment method and an amount
       //
       // @param [PaymentMethod] paymentMethod the payment method to charge
       // @param [Number] amount the amount to charge to the payment method
       // @return [Transaction] the built transaction representing the charge
+
+    }, {
+      key: 'charge',
       value: function charge(paymentMethod, amount) {
         this.transactions().build({
           amount: amount,
@@ -327,6 +331,7 @@ Occasion.Modules.push(function (library) {
 
   library.Product.hasMany('orders');
   library.Product.hasMany('questions');
+  library.Product.hasMany('redeemables');
   library.Product.hasMany('timeSlots');
 });
 Occasion.Modules.push(function (library) {
@@ -350,8 +355,27 @@ Occasion.Modules.push(function (library) {
   library.Question.hasMany('options');
 });
 Occasion.Modules.push(function (library) {
-  library.TimeSlot = function (_library$Base11) {
-    _inherits(TimeSlot, _library$Base11);
+  // TODO: Remove ability to directly query redeemables
+  library.Redeemable = function (_library$Base11) {
+    _inherits(Redeemable, _library$Base11);
+
+    function Redeemable() {
+      _classCallCheck(this, Redeemable);
+
+      return _possibleConstructorReturn(this, (Redeemable.__proto__ || Object.getPrototypeOf(Redeemable)).apply(this, arguments));
+    }
+
+    return Redeemable;
+  }(library.Base);
+
+  library.Redeemable.className = 'Redeemable';
+  library.Redeemable.queryName = 'redeemables';
+
+  library.Redeemable.belongsTo('product');
+});
+Occasion.Modules.push(function (library) {
+  library.TimeSlot = function (_library$Base12) {
+    _inherits(TimeSlot, _library$Base12);
 
     function TimeSlot() {
       _classCallCheck(this, TimeSlot);
@@ -369,8 +393,8 @@ Occasion.Modules.push(function (library) {
   library.TimeSlot.belongsTo('venue');
 });
 Occasion.Modules.push(function (library) {
-  library.Transaction = function (_library$Base12) {
-    _inherits(Transaction, _library$Base12);
+  library.Transaction = function (_library$Base13) {
+    _inherits(Transaction, _library$Base13);
 
     function Transaction() {
       _classCallCheck(this, Transaction);
@@ -388,8 +412,8 @@ Occasion.Modules.push(function (library) {
   library.Transaction.belongsTo('paymentMethod', { polymorphic: true });
 });
 Occasion.Modules.push(function (library) {
-  library.Venue = function (_library$Base13) {
-    _inherits(Venue, _library$Base13);
+  library.Venue = function (_library$Base14) {
+    _inherits(Venue, _library$Base14);
 
     function Venue() {
       _classCallCheck(this, Venue);

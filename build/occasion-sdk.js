@@ -7,8 +7,7 @@ class Occasion {
     var resourceLibrary =
       ActiveResource.createResourceLibrary(Occasion.baseUrl, {
         headers: {
-          Authorization: "Basic " + encodedToken,
-          'User-Agent': 'OccasionSDK'
+          Authorization: "Basic " + encodedToken
         }
       });
 
@@ -111,6 +110,10 @@ Occasion.Modules.push(function(library) {
       }));
     }
 
+    calculatePrice() {
+      return this.interface().post(this.klass().links()['related'] + 'price', this);
+    }
+
     // Creates a transaction with a payment method and an amount
     //
     // @param [PaymentMethod] paymentMethod the payment method to charge
@@ -180,6 +183,7 @@ Occasion.Modules.push(function(library) {
 
   library.Product.hasMany('orders');
   library.Product.hasMany('questions');
+  library.Product.hasMany('redeemables');
   library.Product.hasMany('timeSlots');
 });
 Occasion.Modules.push(function(library) {
@@ -191,6 +195,15 @@ Occasion.Modules.push(function(library) {
   library.Question.belongsTo('product');
   library.Question.hasMany('answers');
   library.Question.hasMany('options');
+});
+Occasion.Modules.push(function(library) {
+  // TODO: Remove ability to directly query redeemables
+  library.Redeemable = class Redeemable extends library.Base {};
+
+  library.Redeemable.className = 'Redeemable';
+  library.Redeemable.queryName = 'redeemables';
+
+  library.Redeemable.belongsTo('product');
 });
 Occasion.Modules.push(function(library) {
   library.TimeSlot = class TimeSlot extends library.Base {};
