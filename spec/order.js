@@ -8,7 +8,7 @@ describe('Occasion.Order', function() {
     window.onFailure = jasmine.createSpy('onFailure');
     window.onCompletion = jasmine.createSpy('onCompletion');
 
-    this.occsnClient = Occasion.Client('my_token');
+    this.occsnClient = Occasion.Client({ token: 'my_token' });
   });
 
   afterEach(function() {

@@ -36,7 +36,8 @@ module.exports = function(grunt) {
           deps: {
             'default': [
               { 'active-resource': 'ActiveResource' },
-              'axios'
+              'axios',
+              { 'underscore': '_' }
             ]
           }
         }

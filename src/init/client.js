@@ -1,11 +1,18 @@
 class Occasion {
-  static baseUrl = 'https://app.getoccasion.com/api/v1';
+  static baseUrl = 'https://occ.sn/api/v1';
 
-  static Client(token) {
+  static Client(options = {}) {
+    var url = options.baseUrl || Occasion.baseUrl;
+    var token = options.token;
+
+    if(!_.isString(token)) {
+      throw 'Token must be of type string';
+    }
+
     var encodedToken = window.btoa(unescape(encodeURIComponent(token + ':')));
 
     var resourceLibrary =
-      ActiveResource.createResourceLibrary(Occasion.baseUrl, {
+      ActiveResource.createResourceLibrary(url, {
         headers: {
           Authorization: "Basic " + encodedToken
         }
