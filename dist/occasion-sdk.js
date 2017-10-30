@@ -1,5 +1,5 @@
 /*
-	Occasion Javascript SDK 0.1.0
+	Occasion Javascript SDK 0.1.1
 	(c) 2017 Peak Labs, LLC DBA Occasion App
 	Occasion Javascript SDK may be freely distributed under the MIT license
 */
@@ -7,18 +7,18 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
-    define(["active-resource","axios"], function (a0,b1) {
-      return (root['Occasion'] = factory(a0,b1));
+    define(["active-resource","axios","underscore"], function (a0,b1,c2) {
+      return (root['Occasion'] = factory(a0,b1,c2));
     });
   } else if (typeof module === 'object' && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(require("active-resource"),require("axios"));
+    module.exports = factory(require("active-resource"),require("axios"),require("underscore"));
   } else {
-    root['Occasion'] = factory(root["active-resource"],root["axios"]);
+    root['Occasion'] = factory(root["active-resource"],root["axios"],root["underscore"]);
   }
-}(this, function (ActiveResource, axios) {
+}(this, function (ActiveResource, axios, _) {
 
 'use strict';
 
@@ -37,10 +37,19 @@ var Occasion = function () {
 
   _createClass(Occasion, null, [{
     key: 'Client',
-    value: function Client(token) {
+    value: function Client() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      var url = options.baseUrl || Occasion.baseUrl;
+      var token = options.token;
+
+      if (!_.isString(token)) {
+        throw 'Token must be of type string';
+      }
+
       var encodedToken = window.btoa(unescape(encodeURIComponent(token + ':')));
 
-      var resourceLibrary = ActiveResource.createResourceLibrary(Occasion.baseUrl, {
+      var resourceLibrary = ActiveResource.createResourceLibrary(url, {
         headers: {
           Authorization: "Basic " + encodedToken
         }
@@ -57,7 +66,7 @@ var Occasion = function () {
   return Occasion;
 }();
 
-Occasion.baseUrl = 'https://app.getoccasion.com/api/v1';
+Occasion.baseUrl = 'https://occ.sn/api/v1';
 
 Occasion.Modules = ActiveResource.prototype.Collection.build();
 Occasion.Modules.push(function (library) {
