@@ -1,3 +1,5 @@
+ActiveResource.Interfaces.JsonApi.contentType = 'application/json';
+
 class Occasion {
   static baseUrl = 'https://occ.sn/api/v1';
 
