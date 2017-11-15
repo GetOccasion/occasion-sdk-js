@@ -7,3 +7,4 @@
 # Master
 
 * Use `Content-Type: 'application/json'`
+* Only add answers in `Order.construct` for questions where `category != 'static'`

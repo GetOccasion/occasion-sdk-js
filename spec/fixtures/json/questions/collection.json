@@ -4,19 +4,16 @@
       "id": "1",
       "type": "questions",
       "attributes": {
-        "title": "Question number one"
-      },
-      "relationships": {
-        "options": {
-          "data": []
-        }
+        "title": "Question number one",
+        "category": "info"
       }
     },
     {
       "id": "2",
       "type": "questions",
       "attributes": {
-        "title": "Question number two"
+        "title": "Question number two",
+        "category": "info"
       },
       "relationships": {
         "options": {
@@ -31,6 +28,14 @@
             }
           ]
         }
+      }
+    },
+    {
+      "id": "3",
+      "type": "questions",
+      "attributes": {
+        "title": "Question number three",
+        "category": "static"
       }
     }
   ],
