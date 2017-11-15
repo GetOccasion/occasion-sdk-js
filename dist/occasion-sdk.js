@@ -1,5 +1,5 @@
 /*
-	Occasion Javascript SDK 0.1.1
+	Occasion Javascript SDK 0.2.0
 	(c) 2017 Peak Labs, LLC DBA Occasion App
 	Occasion Javascript SDK may be freely distributed under the MIT license
 */
@@ -29,6 +29,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+ActiveResource.Interfaces.JsonApi.contentType = 'application/json';
 
 var Occasion = function () {
   function Occasion() {
@@ -271,12 +273,15 @@ Occasion.Modules.push(function (library) {
         }
 
         return axios.all(promises).then(axios.spread(function (order, questions) {
-          // Add blank answer for each question
+          // Add blank answer for each question not of category 'static'
           if (questions != undefined) {
             questions.each(function (question) {
-              order.answers().build({
-                question: question
-              });
+
+              if (question.category != 'static') {
+                order.answers().build({
+                  question: question
+                });
+              }
             });
           }
 
