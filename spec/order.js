@@ -42,6 +42,34 @@ describe('Occasion.Order', function() {
     });
   });
 
+  describe('retrieveInformation', function () {
+    beforeEach(function () {
+      this.order = this.occsnClient.Order.build();
+
+      this.order.retrieveInformation();
+
+      this.promise = moxios.wait(function() {
+        return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.information);
+      });
+    });
+
+    it('adds price + quantity attributes to order', function () {
+      var _this = this;
+      return this.promise.then(function() {
+
+        expect(_this.order.attributes()).toEqual({
+          subtotal: 3.0,
+          couponAmount: 2.0,
+          tax: 1.0,
+          giftCardAmount: 1.0,
+          price: 2.0,
+          outstandingBalance: 1.0,
+          quantity: 2
+        })
+      });
+    });
+  });
+
   describe('construct', function() {
     beforeEach(function () {
       this.occsnClient.Product.find('1kbsdf')
