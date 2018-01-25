@@ -92,6 +92,7 @@ Occasion.Modules.push(function(library) {
   library.Order.belongsTo('product');
 
   library.Order.hasMany('answers', { autosave: true });
+  library.Order.hasMany('attendees', { autosave: true });
   library.Order.hasMany('timeSlots');
   library.Order.hasMany('transactions', { autosave: true });
 });
