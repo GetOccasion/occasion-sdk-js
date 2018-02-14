@@ -38,6 +38,7 @@ var Occasion = function () {
 
       var url = options.baseUrl || Occasion.baseUrl;
       var token = options.token;
+      var immutable = options.immutable || false;
 
       if (!_.isString(token)) {
         throw 'Token must be of type string';
@@ -45,11 +46,14 @@ var Occasion = function () {
 
       var encodedToken = window.btoa(unescape(encodeURIComponent(token + ':')));
 
-      var resourceLibrary = ActiveResource.createResourceLibrary(url, {
+      var libraryOptions = {
         headers: {
           Authorization: "Basic " + encodedToken
-        }
-      });
+        },
+        immutable: immutable
+      };
+
+      var resourceLibrary = ActiveResource.createResourceLibrary(url, libraryOptions);
 
       Occasion.Modules.each(function (initializeModule) {
         initializeModule(resourceLibrary);
@@ -63,6 +67,7 @@ var Occasion = function () {
 }();
 
 Occasion.baseUrl = 'https://occ.sn/api/v1';
+
 
 Occasion.Modules = ActiveResource.prototype.Collection.build();
 Occasion.Modules.push(function (library) {

@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/nicklandgrebe/occasion-sdk-js#readme",
   "dependencies": {
-    "active-resource": "git+https://github.com/nicklandgrebe/activeresource.js.git"
+    "active-resource": "git+https://github.com/nicklandgrebe/activeresource.js.git#feature/immutable"
   },
   "engine": "node >= 0.10",
   "devDependencies": {

@@ -8,3 +8,7 @@
 
 * Use `Content-Type: 'application/json'`
 * Only add answers in `Order.construct` for questions where `category != 'static'`
+
+## Master
+
+* Add `immutable` option support for active-resource-immutable

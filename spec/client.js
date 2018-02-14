@@ -58,4 +58,29 @@ describe('Occasion.Client', function() {
       });
     });
   });
+
+  describe('immutable', function() {
+    beforeEach(function() {
+      this.occsnClient = Occasion.Client({ immutable: true, token: 'my_token' });
+    });
+
+    describe('when changing resource', function() {
+      beforeEach(function() {
+        this.resource = this.occsnClient.Product.build({ field: 'original' });
+        this.resource2 = this.resource.assignAttributes({ field: 'new' });
+      });
+
+      it('does not mutate resource', function() {
+        expect(this.resource.field).toEqual('original');
+      });
+
+      it('creates new resource', function() {
+        expect(this.resource).not.toBe(this.resource2);
+      });
+
+      it('adds changes to new resource', function() {
+        expect(this.resource2.field).toEqual('new');
+      });
+    });
+  });
 });

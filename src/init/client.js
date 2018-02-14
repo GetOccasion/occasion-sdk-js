@@ -6,6 +6,7 @@ class Occasion {
   static Client(options = {}) {
     var url = options.baseUrl || Occasion.baseUrl;
     var token = options.token;
+    var immutable = options.immutable || false;
 
     if(!_.isString(token)) {
       throw 'Token must be of type string';
@@ -13,12 +14,15 @@ class Occasion {
 
     var encodedToken = window.btoa(unescape(encodeURIComponent(token + ':')));
 
+    var libraryOptions = {
+      headers: {
+        Authorization: "Basic " + encodedToken
+      },
+      immutable
+    };
+
     var resourceLibrary =
-      ActiveResource.createResourceLibrary(url, {
-        headers: {
-          Authorization: "Basic " + encodedToken
-        }
-      });
+      ActiveResource.createResourceLibrary(url, libraryOptions);
 
     Occasion.Modules.each(function(initializeModule) { initializeModule(resourceLibrary) });
 
