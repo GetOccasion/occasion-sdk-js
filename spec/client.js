@@ -19,6 +19,12 @@ describe('Occasion.Client', function() {
     expect(_.keys(this.occsnClient)).toContain('Product', 'Answer', 'Question', 'Order');
   });
 
+  it('is not immutable', function() {
+    this.resource = this.occsnClient.Product.build({ field: 'original' });
+    this.resource.assignAttributes({ field: 'new' });
+    expect(this.resource.field).toEqual('new');
+  });
+
   describe('when token not of type string', function() {
     it('throws error', function() {
       expect(function() { Occasion.Client() }).toThrow('Token must be of type string');
