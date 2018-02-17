@@ -304,7 +304,7 @@ Occasion.Modules.push(function (library) {
           promises.push(order.product().questions().includes('options').all());
         }
 
-        return axios.all(promises).then(axios.spread(function (order, questions) {
+        return Promise.all(promises).then(axios.spread(function (order, questions) {
           // Add blank answer for each question not of category 'static'
           if (questions != undefined) {
             questions.each(function (question) {
