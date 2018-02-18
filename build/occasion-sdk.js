@@ -422,8 +422,25 @@ Occasion.Modules.push(function (library) {
   library.Redeemable.belongsTo('product');
 });
 Occasion.Modules.push(function (library) {
-  library.TimeSlot = function (_library$Base13) {
-    _inherits(TimeSlot, _library$Base13);
+  library.State = function (_library$Base13) {
+    _inherits(State, _library$Base13);
+
+    function State() {
+      _classCallCheck(this, State);
+
+      return _possibleConstructorReturn(this, (State.__proto__ || Object.getPrototypeOf(State)).apply(this, arguments));
+    }
+
+    return State;
+  }(library.Base);
+
+  library.State.className = 'State';
+  library.State.queryName = 'states';
+});
+
+Occasion.Modules.push(function (library) {
+  library.TimeSlot = function (_library$Base14) {
+    _inherits(TimeSlot, _library$Base14);
 
     function TimeSlot() {
       _classCallCheck(this, TimeSlot);
@@ -441,8 +458,8 @@ Occasion.Modules.push(function (library) {
   library.TimeSlot.belongsTo('venue');
 });
 Occasion.Modules.push(function (library) {
-  library.Transaction = function (_library$Base14) {
-    _inherits(Transaction, _library$Base14);
+  library.Transaction = function (_library$Base15) {
+    _inherits(Transaction, _library$Base15);
 
     function Transaction() {
       _classCallCheck(this, Transaction);
@@ -460,8 +477,8 @@ Occasion.Modules.push(function (library) {
   library.Transaction.belongsTo('paymentMethod', { polymorphic: true });
 });
 Occasion.Modules.push(function (library) {
-  library.Venue = function (_library$Base15) {
-    _inherits(Venue, _library$Base15);
+  library.Venue = function (_library$Base16) {
+    _inherits(Venue, _library$Base16);
 
     function Venue() {
       _classCallCheck(this, Venue);
@@ -476,9 +493,11 @@ Occasion.Modules.push(function (library) {
   library.Venue.queryName = 'venues';
 
   library.Venue.belongsTo('merchant');
+  library.Venue.belongsTo('state');
 
   library.Venue.hasMany('products');
 });
+
 Occasion.Modules.push(function (library) {
   library.CreditCard = function (_library$PaymentMetho) {
     _inherits(CreditCard, _library$PaymentMetho);
