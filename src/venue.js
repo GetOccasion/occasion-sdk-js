@@ -5,6 +5,7 @@ Occasion.Modules.push(function(library) {
   library.Venue.queryName = 'venues';
 
   library.Venue.belongsTo('merchant');
+  library.Venue.belongsTo('state');
 
   library.Venue.hasMany('products');
 });
