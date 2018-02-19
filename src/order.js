@@ -96,7 +96,7 @@ Occasion.Modules.push(function(library) {
 
   library.Order.belongsTo('coupon');
   library.Order.belongsTo('currency');
-  library.Order.belongsTo('customer', { autosave: true });
+  library.Order.belongsTo('customer', { autosave: true, inverseOf: 'orders' });
   library.Order.belongsTo('merchant');
   library.Order.belongsTo('product');
 

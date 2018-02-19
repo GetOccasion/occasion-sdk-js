@@ -163,7 +163,7 @@ Occasion.Modules.push(function (library) {
   library.Customer.className = 'Customer';
   library.Customer.queryName = 'customers';
 
-  library.Customer.hasMany('orders');
+  library.Customer.hasMany('orders', { inverseOf: 'customer' });
 });
 
 Occasion.Modules.push(function (library) {
@@ -333,7 +333,7 @@ Occasion.Modules.push(function (library) {
 
   library.Order.belongsTo('coupon');
   library.Order.belongsTo('currency');
-  library.Order.belongsTo('customer', { autosave: true });
+  library.Order.belongsTo('customer', { autosave: true, inverseOf: 'orders' });
   library.Order.belongsTo('merchant');
   library.Order.belongsTo('product');
 
