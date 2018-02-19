@@ -162,7 +162,10 @@ Occasion.Modules.push(function (library) {
 
   library.Customer.className = 'Customer';
   library.Customer.queryName = 'customers';
+
+  library.Customer.hasMany('orders');
 });
+
 Occasion.Modules.push(function (library) {
   library.Merchant = function (_library$Base6) {
     _inherits(Merchant, _library$Base6);
