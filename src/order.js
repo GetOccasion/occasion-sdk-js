@@ -23,8 +23,11 @@ Occasion.Modules.push(function(library) {
         promises.push(order.product().questions().includes('options').all());
       }
 
-      return axios.all(promises)
-      .then(axios.spread(function(order, questions) {
+      return Promise.all(promises)
+      .then(function(args) {
+        order = args[0];
+        var questions = args[1];
+
         // Add blank answer for each question not of category 'static'
         if(questions != undefined) {
           questions.each(function(question) {
@@ -38,7 +41,7 @@ Occasion.Modules.push(function(library) {
         }
 
         return order;
-      }));
+      });
     }
 
     // POSTs the order to `/orders/price`, which calculates price related fields and adds them to the order
