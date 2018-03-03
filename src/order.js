@@ -97,6 +97,8 @@ Occasion.Modules.push(function(library) {
   library.Order.className = 'Order';
   library.Order.queryName = 'orders';
 
+  library.Order.attributes('sessionIdentifier', 'status');
+
   library.Order.belongsTo('coupon');
   library.Order.belongsTo('currency');
   library.Order.belongsTo('customer', { autosave: true, inverseOf: 'orders' });

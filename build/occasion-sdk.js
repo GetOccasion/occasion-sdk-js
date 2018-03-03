@@ -86,10 +86,13 @@ Occasion.Modules.push(function (library) {
   library.Answer.className = 'Answer';
   library.Answer.queryName = 'answers';
 
+  library.Answer.attributes('value');
+
   library.Answer.belongsTo('question');
   library.Answer.belongsTo('option');
   library.Answer.belongsTo('order');
 });
+
 Occasion.Modules.push(function (library) {
   library.Attendee = function (_library$Base2) {
     _inherits(Attendee, _library$Base2);
@@ -336,6 +339,8 @@ Occasion.Modules.push(function (library) {
   library.Order.className = 'Order';
   library.Order.queryName = 'orders';
 
+  library.Order.attributes('sessionIdentifier', 'status');
+
   library.Order.belongsTo('coupon');
   library.Order.belongsTo('currency');
   library.Order.belongsTo('customer', { autosave: true, inverseOf: 'orders' });
@@ -481,9 +486,12 @@ Occasion.Modules.push(function (library) {
   library.Transaction.className = 'Transaction';
   library.Transaction.queryName = 'transactions';
 
+  library.Transaction.attributes('amount');
+
   library.Transaction.belongsTo('order');
   library.Transaction.belongsTo('paymentMethod', { polymorphic: true });
 });
+
 Occasion.Modules.push(function (library) {
   library.Venue = function (_library$Base16) {
     _inherits(Venue, _library$Base16);

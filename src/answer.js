@@ -4,6 +4,8 @@ Occasion.Modules.push(function(library) {
   library.Answer.className = 'Answer';
   library.Answer.queryName = 'answers';
 
+  library.Answer.attributes('value');
+
   library.Answer.belongsTo('question');
   library.Answer.belongsTo('option');
   library.Answer.belongsTo('order');
