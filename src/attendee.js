@@ -4,5 +4,5 @@ Occasion.Modules.push(function(library) {
   library.Attendee.className = 'Attendee';
   library.Attendee.queryName = 'attendees';
 
-  library.Attendee.belongsTo('order');
+  library.Attendee.belongsTo('order', { inverseOf: 'attendees' });
 });

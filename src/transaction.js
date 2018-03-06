@@ -6,6 +6,6 @@ Occasion.Modules.push(function(library) {
 
   library.Transaction.attributes('amount');
 
-  library.Transaction.belongsTo('order');
+  library.Transaction.belongsTo('order', { inverseOf: 'answers' });
   library.Transaction.belongsTo('paymentMethod', { polymorphic: true });
 });

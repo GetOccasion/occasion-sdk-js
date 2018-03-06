@@ -8,5 +8,5 @@ Occasion.Modules.push(function(library) {
 
   library.Answer.belongsTo('question');
   library.Answer.belongsTo('option');
-  library.Answer.belongsTo('order');
+  library.Answer.belongsTo('order', { inverseOf: 'answers' });
 });

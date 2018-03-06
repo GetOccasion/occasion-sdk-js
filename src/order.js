@@ -105,8 +105,8 @@ Occasion.Modules.push(function(library) {
   library.Order.belongsTo('merchant');
   library.Order.belongsTo('product');
 
-  library.Order.hasMany('answers', { autosave: true });
-  library.Order.hasMany('attendees', { autosave: true });
+  library.Order.hasMany('answers', { autosave: true, inverseOf: 'order' });
+  library.Order.hasMany('attendees', { autosave: true, inverseOf: 'order' });
   library.Order.hasMany('timeSlots');
-  library.Order.hasMany('transactions', { autosave: true });
+  library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' });
 });

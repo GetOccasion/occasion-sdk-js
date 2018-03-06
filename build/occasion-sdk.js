@@ -90,7 +90,7 @@ Occasion.Modules.push(function (library) {
 
   library.Answer.belongsTo('question');
   library.Answer.belongsTo('option');
-  library.Answer.belongsTo('order');
+  library.Answer.belongsTo('order', { inverseOf: 'answers' });
 });
 
 Occasion.Modules.push(function (library) {
@@ -109,7 +109,7 @@ Occasion.Modules.push(function (library) {
   library.Attendee.className = 'Attendee';
   library.Attendee.queryName = 'attendees';
 
-  library.Attendee.belongsTo('order');
+  library.Attendee.belongsTo('order', { inverseOf: 'attendees' });
 });
 
 Occasion.Modules.push(function (library) {
@@ -347,10 +347,10 @@ Occasion.Modules.push(function (library) {
   library.Order.belongsTo('merchant');
   library.Order.belongsTo('product');
 
-  library.Order.hasMany('answers', { autosave: true });
-  library.Order.hasMany('attendees', { autosave: true });
+  library.Order.hasMany('answers', { autosave: true, inverseOf: 'order' });
+  library.Order.hasMany('attendees', { autosave: true, inverseOf: 'order' });
   library.Order.hasMany('timeSlots');
-  library.Order.hasMany('transactions', { autosave: true });
+  library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' });
 });
 
 Occasion.Modules.push(function (library) {
@@ -488,7 +488,7 @@ Occasion.Modules.push(function (library) {
 
   library.Transaction.attributes('amount');
 
-  library.Transaction.belongsTo('order');
+  library.Transaction.belongsTo('order', { inverseOf: 'answers' });
   library.Transaction.belongsTo('paymentMethod', { polymorphic: true });
 });
 
