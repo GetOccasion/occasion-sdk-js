@@ -309,7 +309,7 @@ Occasion.Modules.push(function (library) {
         })];
 
         if (order.product() != null) {
-          promises.push(order.product().questions().includes('options').all());
+          promises.push(order.product().questions().includes('options').load());
         }
 
         return Promise.all(promises).then(function (args) {
