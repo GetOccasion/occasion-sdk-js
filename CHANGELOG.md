@@ -12,3 +12,4 @@
 ## Master
 
 * Add `immutable` option support for active-resource-immutable
+* Add watcher to customer email changes
