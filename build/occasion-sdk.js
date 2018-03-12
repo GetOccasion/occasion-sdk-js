@@ -37,6 +37,14 @@ var Occasion = function () {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       var url = options.baseUrl || Occasion.baseUrl;
+      var host = url.match(/\w+:\/\/[^\/]+/)[0];
+
+      var atlas = document.createElement("script");
+      atlas.type = "text/javascript";
+      atlas.async = true;
+      atlas.src = host + '/p/tracker.js';
+      document.getElementsByTagName('head')[0].appendChild(atlas);
+
       var token = options.token;
       var immutable = options.immutable || false;
 
@@ -52,6 +60,8 @@ var Occasion = function () {
         },
         immutable: immutable
       };
+
+      Occasion.token = token;
 
       var resourceLibrary = ActiveResource.createResourceLibrary(url, libraryOptions);
 
@@ -163,7 +173,12 @@ Occasion.Modules.push(function (library) {
     _createClass(Customer, [{
       key: 'ahoyEmailChanged',
       value: function ahoyEmailChanged() {
-        /* TODO: Align customer data with Ahoy using +this+ */
+        var customer = this;
+        var host = (options.baseUrl || Occasion.baseUrl).match(/\w+:\/\/[^\/]+/)[0];
+        axios.post(host + '/p/ahoy_identify', {
+          email: customer.email,
+          merchant_token: Occasion.token
+        });
       }
     }]);
 

@@ -1,7 +1,12 @@
 Occasion.Modules.push(function(library) {
   library.Customer = class Customer extends library.Base {
     ahoyEmailChanged() {
-      /* TODO: Align customer data with Ahoy using +this+ */
+      var customer = this;
+      var host = (options.baseUrl || Occasion.baseUrl).match(/\w+:\/\/[^\/]+/)[0];
+      axios.post(`${host}/p/ahoy_identify`, {
+        email: customer.email,
+        merchant_token: Occasion.token
+      });
     }
   };
 

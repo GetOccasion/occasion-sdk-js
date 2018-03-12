@@ -5,7 +5,7 @@ class Occasion {
 
   static Client(options = {}) {
     var url = options.baseUrl || Occasion.baseUrl;
-    var host = url.match(/\w+:\/\/[^\/]+/);
+    var host = url.match(/\w+:\/\/[^\/]+/)[0];
 
     var atlas = document.createElement("script");
     atlas.type = "text/javascript";
@@ -28,6 +28,8 @@ class Occasion {
       },
       immutable
     };
+
+    Occasion.token = token;
 
     var resourceLibrary =
       ActiveResource.createResourceLibrary(url, libraryOptions);
