@@ -160,6 +160,13 @@ Occasion.Modules.push(function (library) {
       return _possibleConstructorReturn(this, (Customer.__proto__ || Object.getPrototypeOf(Customer)).apply(this, arguments));
     }
 
+    _createClass(Customer, [{
+      key: 'ahoyEmailChanged',
+      value: function ahoyEmailChanged() {
+        /* TODO: Align customer data with Ahoy using +this+ */
+      }
+    }]);
+
     return Customer;
   }(library.Base);
 
@@ -169,6 +176,20 @@ Occasion.Modules.push(function (library) {
   library.Customer.attributes('email', 'firstName', 'lastName', 'zip');
 
   library.Customer.hasMany('orders', { inverseOf: 'customer' });
+
+  library.Customer.afterBuild(function () {
+    var lastEmail = null;
+    var watchEmail = _.bind(function () {
+      if (lastEmail != this.email) {
+        _.bind(this.ahoyEmailChanged, this)();
+        lastEmail = this.email;
+      }
+
+      setTimeout(watchEmail, 500);
+    }, this);
+
+    setTimeout(watchEmail, 500);
+  });
 });
 
 Occasion.Modules.push(function (library) {
