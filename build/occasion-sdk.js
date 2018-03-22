@@ -37,14 +37,25 @@ var Occasion = function () {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       var url = options.baseUrl || Occasion.baseUrl;
-      var token = options.token;
-      var immutable = options.immutable || false;
+      var host = url.match(/\w+:\/\/[^\/]+/)[0];
+      Occasion.apiHost = host;
 
+      var token = options.token;
       if (!_.isString(token)) {
         throw 'Token must be of type string';
       }
 
       var encodedToken = window.btoa(unescape(encodeURIComponent(token + ':')));
+
+      Occasion.token = token;
+
+      var atlas = document.createElement("script");
+      atlas.type = "text/javascript";
+      atlas.async = true;
+      atlas.src = host + '/p/tracker.js?api_login=' + token;
+      document.getElementsByTagName('head')[0].appendChild(atlas);
+
+      var immutable = options.immutable || false;
 
       var libraryOptions = {
         headers: {
@@ -66,7 +77,7 @@ var Occasion = function () {
   return Occasion;
 }();
 
-Occasion.baseUrl = 'https://occ.sn/api/v1';
+Occasion.baseUrl = 'https://www.occsn.com/api/v1';
 
 
 Occasion.Modules = ActiveResource.prototype.Collection.build();
@@ -157,13 +168,20 @@ Occasion.Modules.push(function (library) {
     function Customer() {
       _classCallCheck(this, Customer);
 
-      return _possibleConstructorReturn(this, (Customer.__proto__ || Object.getPrototypeOf(Customer)).apply(this, arguments));
+      var _this5 = _possibleConstructorReturn(this, (Customer.__proto__ || Object.getPrototypeOf(Customer)).call(this));
+
+      if (typeof window != 'undefined' && window.OccsnTrck != null) {
+        _this5.identify = _.debounce(OccsnTrck.identify, 2000);
+      }
+      return _this5;
     }
 
     _createClass(Customer, [{
       key: 'ahoyEmailChanged',
       value: function ahoyEmailChanged() {
-        /* TODO: Align customer data with Ahoy using +this+ */
+        if (typeof window != 'undefined' && window.OccsnTrck != null) {
+          this.identify(this.email);
+        }
       }
     }]);
 
@@ -180,7 +198,7 @@ Occasion.Modules.push(function (library) {
   library.Customer.afterBuild(function () {
     var lastEmail = null;
     var watchEmail = _.bind(function () {
-      if (lastEmail != this.email) {
+      if (lastEmail !== this.email) {
         _.bind(this.ahoyEmailChanged, this)();
         lastEmail = this.email;
       }

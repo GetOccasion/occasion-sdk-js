@@ -1,7 +1,15 @@
 Occasion.Modules.push(function(library) {
   library.Customer = class Customer extends library.Base {
+    constructor() {
+      super();
+      if (typeof window != 'undefined' && window.OccsnTrck != null) {
+        this.identify = _.debounce(OccsnTrck.identify, 2000);
+      }
+    }
     ahoyEmailChanged() {
-      /* TODO: Align customer data with Ahoy using +this+ */
+      if (typeof window != 'undefined' && window.OccsnTrck != null) {
+        this.identify(this.email);
+      }
     }
   };
 
@@ -15,7 +23,7 @@ Occasion.Modules.push(function(library) {
   library.Customer.afterBuild(function() {
     var lastEmail = null;
     var watchEmail = _.bind(function() {
-      if(lastEmail != this.email) {
+      if(lastEmail !== this.email) {
         _.bind(this.ahoyEmailChanged, this)();
         lastEmail = this.email;
       }
