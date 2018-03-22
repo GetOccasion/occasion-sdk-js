@@ -20,7 +20,7 @@ Occasion.Modules.push(function(library) {
       })];
 
       if(order.product() != null) {
-        promises.push(order.product().questions().includes('options').load());
+        promises.push(order.product().questions().includes('options').perPage(500).load());
       }
 
       return Promise.all(promises)

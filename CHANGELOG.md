@@ -18,3 +18,4 @@
 * Use `product.questions().load()` in `Order.construct` so that product questions stay loaded
 * Add `inverseOf` for autosaving `Order` relationships
 * Add watcher to customer email changes
+* Increase page size of questions loaded in `Order.construct` to 500

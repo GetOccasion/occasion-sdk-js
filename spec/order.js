@@ -117,7 +117,9 @@ describe('Occasion.Order', function() {
 
     it('loads product questions', function() {
       return this.promise2.then(function() {
-        expect(moxios.requests.mostRecent().url).toEqual('https://example.com/api/v1/products/1/questions/?include=options');
+        expect(moxios.requests.mostRecent().url).toEqual(
+          encodeURI('https://example.com/api/v1/products/1/questions/?include=options&page[size]=500')
+        );
       });
     });
 
