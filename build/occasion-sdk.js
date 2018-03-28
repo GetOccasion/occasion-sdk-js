@@ -309,6 +309,15 @@ Occasion.Modules.push(function (library) {
           this.transactions().target().delete(transaction);
         }
       }
+
+      // @private
+
+      // Called by Order.construct, which injects order
+      // @note Must return order
+      //
+      // @param [Occsn.Order] order the order that wants an answer to the question
+      // @param [Occsn.Question] question the question to construct an answer for
+
     }], [{
       key: 'construct',
       value: function construct(attributes) {
@@ -333,24 +342,38 @@ Occasion.Modules.push(function (library) {
           promises.push(order.product().questions().includes('options').perPage(500).load());
         }
 
+        var _this = this;
         return Promise.all(promises).then(function (args) {
           order = args[0];
           var questions = args[1];
 
-          // Add blank answer for each question not of category 'static'
-          if (questions != undefined) {
-            questions.each(function (question) {
-
-              if (question.category != 'static') {
-                order.answers().build({
-                  question: question
-                });
-              }
-            });
-          }
+          if (questions != undefined) questions.inject(order, _this.__constructAnswer);
 
           return order;
         });
+      }
+    }, {
+      key: '__constructAnswer',
+      value: function __constructAnswer(order, question) {
+        if (question.category != 'static') {
+          var answer = order.answers().build({
+            question: question
+          });
+
+          switch (question.formControl) {
+            case 'drop_down':
+            case 'option_list':
+              answer.assignOption(question.options().target().detect(function (o) {
+                return o.default;
+              }));
+              break;
+            case 'spin_button':
+              answer.value = question.min;
+              break;
+          }
+        }
+
+        return order;
       }
     }]);
 

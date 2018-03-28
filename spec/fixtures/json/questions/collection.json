@@ -5,7 +5,19 @@
       "type": "questions",
       "attributes": {
         "title": "Question number one",
-        "category": "info"
+        "category": "info",
+        "display_as_title": null,
+        "form_control": "text_input",
+        "max": null,
+        "min": null,
+        "operation": null,
+        "position": 0,
+        "price": null,
+        "price_calculating": null,
+        "percentage": null,
+        "required": false,
+        "title": "Text Input",
+        "waiver_text": null
       }
     },
     {
@@ -13,7 +25,18 @@
       "type": "questions",
       "attributes": {
         "title": "Question number two",
-        "category": "info"
+        "category": "info",
+        "display_as_title": null,
+        "form_control": "drop_down",
+        "max": null,
+        "min": null,
+        "operation": null,
+        "position": 1,
+        "price": null,
+        "price_calculating": null,
+        "percentage": null,
+        "required": false,
+        "waiver_text": null
       },
       "relationships": {
         "options": {
@@ -35,7 +58,70 @@
       "type": "questions",
       "attributes": {
         "title": "Question number three",
-        "category": "static"
+        "category": "info",
+        "display_as_title": null,
+        "form_control": "option_list",
+        "max": null,
+        "min": null,
+        "operation": null,
+        "position": 1,
+        "price": null,
+        "price_calculating": null,
+        "percentage": null,
+        "required": false,
+        "waiver_text": null
+      },
+      "relationships": {
+        "options": {
+          "data": [
+            {
+              "type": "options",
+              "id": "7"
+            },
+            {
+              "type": "options",
+              "id": "8"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4",
+      "type": "questions",
+      "attributes": {
+        "title": "Question number four",
+        "category": "info",
+        "display_as_title": true,
+        "form_control": "spin_button",
+        "max": 5,
+        "min": 1,
+        "operation": null,
+        "position": 2,
+        "price": null,
+        "price_calculating": null,
+        "percentage": null,
+        "required": false,
+        "waiver_text": null
+      }
+    },
+    {
+      "id": "5",
+      "type": "questions",
+      "attributes": {
+        "title": "Question number five",
+        "category": "static",
+        "display_as_title": true,
+        "form_control": "text_output",
+        "max": null,
+        "min": null,
+        "operation": null,
+        "position": 2,
+        "price": null,
+        "price_calculating": null,
+        "percentage": null,
+        "required": false,
+        "waiver_text": null
       }
     }
   ],
@@ -44,14 +130,32 @@
       "type": "options",
       "id": "5",
       "attributes": {
-        "title": "Option number one"
+        "title": "Option number one",
+        "default": false
       }
     },
     {
       "type": "options",
       "id": "6",
       "attributes": {
-        "title": "Option number two"
+        "title": "Option number two",
+        "default": true
+      }
+    },
+    {
+      "type": "options",
+      "id": "7",
+      "attributes": {
+        "title": "Option number one",
+        "default": true
+      }
+    },
+    {
+      "type": "options",
+      "id": "8",
+      "attributes": {
+        "title": "Option number two",
+        "default": false
       }
     }
   ]

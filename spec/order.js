@@ -128,7 +128,40 @@ describe('Occasion.Order', function() {
       return this.promise2.then(function() {
         var questionIds = _this.order.answers().target().map(function(t) { return t.question().id }).toArray();
 
-        expect(questionIds).toEqual(["1", "2"]);
+        expect(questionIds).toEqual(["1", "2", "3", "4"]);
+      });
+    });
+
+    it('populates answer.option with default option for drop_down', function() {
+      var _this = this;
+      return this.promise2.then(function() {
+        var answer =
+          _this.order.answers().target()
+          .detect(function(t) { return t.question().formControl == 'drop_down' });
+
+        expect(answer.option().default).toEqual(true);
+      });
+    });
+
+    it('populates answer.option with default option for option_list', function() {
+      var _this = this;
+      return this.promise2.then(function() {
+        var answer =
+          _this.order.answers().target()
+          .detect(function(t) { return t.question().formControl == 'option_list' });
+
+        expect(answer.option().default).toEqual(true);
+      });
+    });
+
+    it('populates answer.value with min for spin_button', function() {
+      var _this = this;
+      return this.promise2.then(function() {
+        var answer =
+          _this.order.answers().target()
+          .detect(function(t) { return t.question().formControl == 'spin_button' });
+
+        expect(answer.value).toEqual(1);
       });
     });
 
