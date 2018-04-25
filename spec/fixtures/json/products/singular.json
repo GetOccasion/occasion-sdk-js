@@ -3,6 +3,7 @@
     "id": "1kbsdf",
     "type": "products",
     "attributes": {
+      "attendee_questions": ["first_name", "last_name"],
       "title": "A product title",
       "description": "A product description"
     },

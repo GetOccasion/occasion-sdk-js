@@ -42,7 +42,8 @@ module.exports = function(grunt) {
             'default': [
               { 'active-resource': 'ActiveResource' },
               'axios',
-              { 'underscore': '_' }
+              { 'underscore': '_' },
+              { 'underscore.string': 's' }
             ]
           }
         }

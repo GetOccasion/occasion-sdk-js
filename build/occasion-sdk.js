@@ -1,18 +1,18 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
-    define(["active-resource","axios","underscore"], function (a0,b1,c2) {
-      return (root['Occasion'] = factory(a0,b1,c2));
+    define(["active-resource","axios","underscore","underscore.string"], function (a0,b1,c2,d3) {
+      return (root['Occasion'] = factory(a0,b1,c2,d3));
     });
   } else if (typeof module === 'object' && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(require("active-resource"),require("axios"),require("underscore"));
+    module.exports = factory(require("active-resource"),require("axios"),require("underscore"),require("underscore.string"));
   } else {
-    root['Occasion'] = factory(root["active-resource"],root["axios"],root["underscore"]);
+    root['Occasion'] = factory(root["active-resource"],root["axios"],root["underscore"],root["underscore.string"]);
   }
-}(this, function (ActiveResource, axios, _) {
+}(this, function (ActiveResource, axios, _, s) {
 
 'use strict';
 
@@ -438,7 +438,14 @@ Occasion.Modules.push(function (library) {
   library.Product.hasMany('questions');
   library.Product.hasMany('redeemables');
   library.Product.hasMany('timeSlots');
+
+  library.Product.afterRequest(function () {
+    this.attendeeQuestions = ActiveResource.Collection.build(this.attendeeQuestions).map(function (q) {
+      return s.camelize(q, true);
+    });
+  });
 });
+
 Occasion.Modules.push(function (library) {
   library.Question = function (_library$Base11) {
     _inherits(Question, _library$Base11);

@@ -1,5 +1,3 @@
-var OccasionSDKSpecs = {};
-
 describe('Occasion.Order', function() {
   beforeEach(function() {
     moxios.install();

@@ -21,3 +21,4 @@
 * Increase page size of questions loaded in `Order.construct` to 500
 * Set `answer.option` to default option for `drop_down` and `option_list` questions in `Order.construct`
 * Set `answer.value` to `min` for `spin_button` questions in `Order.construct`
+* Add afterRequest callback to transform `product.attendeeQuestions` to `ActiveResource.Collection` with camelized values
