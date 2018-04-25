@@ -26,6 +26,11 @@ module.exports = function(grunt) {
         files: {
           'build/occasion-sdk.js': 'build/occasion-sdk.js'
         }
+      },
+      specs: {
+        files: {
+          'spec/spec.js': 'spec/spec.js'
+        }
       }
     },
     umd: {
@@ -177,7 +182,7 @@ module.exports = function(grunt) {
   grunt.registerTask(
     'spec',
     'Compiles and runs the Javascript spec files to test source code.',
-    [ 'clean:specs', 'concat:specs', 'umd:specs', 'connect:test', 'jasmine:build' ]
+    [ 'clean:specs', 'concat:specs', 'babel:specs', 'umd:specs', 'connect:test', 'jasmine:build' ]
   )
 
   grunt.registerTask(
