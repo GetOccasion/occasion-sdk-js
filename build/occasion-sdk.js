@@ -397,7 +397,6 @@ Occasion.Modules.push(function (library) {
   library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' });
 
   library.Order.afterRequest(function () {
-    debugger;
     if (this.product().quantityAware && !this.product().attendeeQuestions.empty()) {
       var diff = this.quantity - this.attendees().size();
 
