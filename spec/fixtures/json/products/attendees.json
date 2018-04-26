@@ -3,9 +3,10 @@
     "id": "1kbsdf",
     "type": "products",
     "attributes": {
-      "attendee_questions": [],
+      "attendee_questions": ["first_name", "last_name"],
       "title": "A product title",
-      "description": "A product description"
+      "description": "A product description",
+      "quantity_aware": true
     },
     "relationships": {
       "questions": {

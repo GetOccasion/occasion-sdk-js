@@ -19,7 +19,7 @@ describe('Occasion.Product', function() {
       .then(window.onSuccess);
 
       this.promise = moxios.wait(() => {
-        return moxios.requests.mostRecent().respondWith(JsonApiResponses.Product.find.success)
+        return moxios.requests.mostRecent().respondWith(JsonApiResponses.Product.attendees)
         .then(() => {
           this.product = window.onSuccess.calls.mostRecent().args[0];
         });

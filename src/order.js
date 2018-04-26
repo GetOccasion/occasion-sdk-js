@@ -127,4 +127,21 @@ Occasion.Modules.push(function(library) {
   library.Order.hasMany('attendees', { autosave: true, inverseOf: 'order' });
   library.Order.hasMany('timeSlots');
   library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' });
+
+  library.Order.afterRequest(function() {
+    debugger;
+    if(this.product().quantityAware && !this.product().attendeeQuestions.empty()) {
+      var diff = this.quantity - this.attendees().size();
+
+      if(diff != 0) {
+        for(var i = 0; i < diff; i++) {
+          if(diff > 0) {
+            this.attendees().build();
+          } else {
+            this.attendees().target().pop();
+          }
+        }
+      }
+    }
+  });
 });

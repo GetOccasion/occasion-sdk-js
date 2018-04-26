@@ -52,6 +52,10 @@ window.JsonApiResponses = {
         response: getJSONFixture('orders/includes.json')
       }
     },
+    attendees: {
+      status: 200,
+      response: getJSONFixture('orders/attendees/missing.json')
+    },
     information: {
       status: 200,
       response: getJSONFixture('orders/information.json')
@@ -114,7 +118,11 @@ window.JsonApiResponses = {
         status: 403,
         response: getJSONFixture('products/403_forbidden.json')
       }
-    }
+    },
+    attendees: {
+      status: 200,
+      response: getJSONFixture('products/attendees.json')
+    },
   },
   Venue: {
     find: {

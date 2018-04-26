@@ -13,6 +13,37 @@ describe('Occasion.Order', function() {
     moxios.uninstall();
   });
 
+  describe('attendees / quantity matching', function () {
+    beforeEach(function () {
+      this.occsnClient.Product.find('1kbsdf')
+      .then(window.onSuccess);
+
+      this.promise = moxios.wait(() => {
+        return moxios.requests.mostRecent().respondWith(JsonApiResponses.Product.attendees)
+        .then(() => {
+          this.product = window.onSuccess.calls.mostRecent().args[0];
+        });
+      });
+
+      this.promise2 = this.promise.then(() => {
+        this.occsnClient.Order.create({ product: this.product }).then(window.onSuccess);
+
+        return moxios.wait(() => {
+          return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.attendees)
+          .then(() => {
+            this.order = window.onSuccess.calls.mostRecent().args[0];
+          });
+        });
+      });
+    });
+
+    it('adds attendees to match size to quantity', function () {
+      return this.promise2.then(() => {
+        expect(this.order.attendees().size()).toEqual(2);
+      });
+    });
+  });
+
   describe('calculatePrice', function () {
     beforeEach(function () {
       this.order = this.occsnClient.Order.build();
