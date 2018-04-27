@@ -23,3 +23,4 @@
 * Set `answer.value` to `min` for `spin_button` questions in `Order.construct`
 * Add afterRequest callback to transform `product.attendeeQuestions` to `ActiveResource.Collection` with camelized values
 * Add order afterRequest for matching attendee collection size to order quantity
+* Add attributes for `Attendee` resource
