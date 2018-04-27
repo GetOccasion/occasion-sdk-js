@@ -10,9 +10,9 @@ Occasion.Modules.push(function(library) {
     'city',
     'country',
     'email',
-    'first_name',
+    'firstName',
     'gender',
-    'last_name',
+    'lastName',
     'phone',
     'state',
     'zip'
