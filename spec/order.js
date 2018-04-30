@@ -37,9 +37,30 @@ describe('Occasion.Order', function() {
       });
     });
 
-    it('adds attendees to match size to quantity', function () {
+    it('builds attendees to match size to quantity', function () {
       return this.promise2.then(() => {
         expect(this.order.attendees().size()).toEqual(2);
+      });
+    });
+
+    describe('lowering quantity', () => {
+      beforeEach(function() {
+        this.promise3 = this.promise2.then(() => {
+          this.order.save().then(window.onSuccess);
+
+          return moxios.wait(() => {
+            return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.no_attendees)
+            .then(() => {
+              this.order = window.onSuccess.calls.mostRecent().args[0];
+            });
+          });
+        });
+      });
+
+      it('pops attendees to match size to quantity', function () {
+        return this.promise3.then(() => {
+          expect(this.order.attendees().size()).toEqual(0);
+        });
       });
     });
   });

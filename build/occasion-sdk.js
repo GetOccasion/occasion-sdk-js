@@ -403,7 +403,7 @@ Occasion.Modules.push(function (library) {
       var diff = this.quantity - this.attendees().size();
 
       if (diff != 0) {
-        for (var i = 0; i < diff; i++) {
+        for (var i = 0; i < Math.abs(diff); i++) {
           if (diff > 0) {
             this.attendees().build();
           } else {
