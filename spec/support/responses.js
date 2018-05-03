@@ -126,6 +126,10 @@ window.JsonApiResponses = {
     attendees: {
       status: 200,
       response: getJSONFixture('products/attendees.json')
+  TimeSlot: {
+    index: {
+      status: 200,
+      response: getJSONFixture('time_slots/index.json')
     }
   },
   Venue: {

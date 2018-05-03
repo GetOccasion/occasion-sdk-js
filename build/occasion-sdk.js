@@ -1,18 +1,18 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
-    define(["active-resource","axios","underscore","underscore.string"], function (a0,b1,c2,d3) {
-      return (root['Occasion'] = factory(a0,b1,c2,d3));
+    define(["active-resource","axios","moment","underscore","underscore.string","moment-timezone-with-data-2010-2020"], function (a0,b1,c2,d3,e4,f5) {
+      return (root['Occasion'] = factory(a0,b1,c2,d3,e4,f5));
     });
   } else if (typeof module === 'object' && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(require("active-resource"),require("axios"),require("underscore"),require("underscore.string"));
+    module.exports = factory(require("active-resource"),require("axios"),require("moment"),require("underscore"),require("underscore.string"),require("moment-timezone-with-data-2010-2020"));
   } else {
-    root['Occasion'] = factory(root["active-resource"],root["axios"],root["underscore"],root["underscore.string"]);
+    root['Occasion'] = factory(root["active-resource"],root["axios"],root["moment"],root["underscore"],root["underscore.string"],root["moment-timezone-with-data-2010-2020"]);
   }
-}(this, function (ActiveResource, axios, _, s) {
+}(this, function (ActiveResource, axios, moment, _, s) {
 
 'use strict';
 
@@ -461,6 +461,14 @@ Occasion.Modules.push(function (library) {
     this.attendeeQuestions = ActiveResource.Collection.build(this.attendeeQuestions).map(function (q) {
       return s.camelize(q, true);
     });
+
+    if (this.firstTimeSlotStartsAt) {
+      if (this.merchant()) {
+        this.firstTimeSlotStartsAt = moment.tz(this.firstTimeSlotStartsAt, this.merchant().timeZone);
+      } else {
+        throw 'Product has timeslots - but merchant.timeZone is not available; include merchant in response.';
+      }
+    }
   });
 });
 
@@ -538,7 +546,16 @@ Occasion.Modules.push(function (library) {
 
   library.TimeSlot.belongsTo('product');
   library.TimeSlot.belongsTo('venue');
+
+  library.TimeSlot.afterRequest(function () {
+    if (this.product().merchant()) {
+      this.startsAt = moment.tz(this.startsAt, this.product().merchant().timeZone);
+    } else {
+      throw 'Must use includes({ product: \'merchant\' }) in timeSlot request';
+    }
+  });
 });
+
 Occasion.Modules.push(function (library) {
   library.Transaction = function (_library$Base15) {
     _inherits(Transaction, _library$Base15);

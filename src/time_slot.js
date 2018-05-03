@@ -6,4 +6,12 @@ Occasion.Modules.push(function(library) {
 
   library.TimeSlot.belongsTo('product');
   library.TimeSlot.belongsTo('venue');
+
+  library.TimeSlot.afterRequest(function() {
+    if(this.product().merchant()) {
+      this.startsAt = moment.tz(this.startsAt, this.product().merchant().timeZone);
+    } else {
+      throw 'Must use includes({ product: \'merchant\' }) in timeSlot request';
+    }
+  });
 });
