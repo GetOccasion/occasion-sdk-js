@@ -15,14 +15,13 @@ describe('Occasion.Product', function() {
 
   describe('attendeeQuestions', function() {
     beforeEach(function () {
+      moxios.stubRequest(/.+\/products\/1kbsdf.*/, JsonApiResponses.Product.attendees);
+
       this.occsnClient.Product.find('1kbsdf')
       .then(window.onSuccess);
 
       this.promise = moxios.wait(() => {
-        return moxios.requests.mostRecent().respondWith(JsonApiResponses.Product.attendees)
-        .then(() => {
-          this.product = window.onSuccess.calls.mostRecent().args[0];
-        });
+        this.product = window.onSuccess.calls.mostRecent().args[0];
       });
     });
 
