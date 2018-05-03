@@ -22,7 +22,9 @@
   },
   "homepage": "https://github.com/nicklandgrebe/occasion-sdk-js#readme",
   "dependencies": {
-    "active-resource": "git+https://github.com/nicklandgrebe/activeresource.js.git#feature/immutable"
+    "active-resource": "git+https://github.com/nicklandgrebe/activeresource.js.git#feature/immutable",
+    "moment": "^2.22.1",
+    "moment-timezone-with-data-2010-2020": "^0.4.0"
   },
   "engine": "node >= 0.10",
   "devDependencies": {
@@ -41,6 +43,7 @@
     "grunt-template-jasmine-requirejs": "^0.2.3",
     "grunt-umd": "^2.4.0",
     "jasmine-ajax": "^3.2.0",
+    "jasmine-expect-moment": "^0.1.1",
     "jasmine-jquery": "^2.1.1",
     "jasmine-promises": "^0.4.1",
     "jquery": "^3.2.1",

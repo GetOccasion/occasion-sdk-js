@@ -13,6 +13,24 @@ describe('Occasion.Product', function() {
     moxios.uninstall();
   });
 
+  describe('default timeZone', function() {
+    beforeEach(function () {
+      moxios.stubRequest(/.+\/products\/1kbsdf.*/, JsonApiResponses.Product.find.includes);
+      this.promise = this.occsnClient.Product.includes('merchant').find('1kbsdf')
+      .then(window.onSuccess);
+
+      this.promise = moxios.wait(() => {
+        this.product = window.onSuccess.calls.mostRecent().args[0];
+      });
+    });
+
+    it('adds timeZone to product.firstTimeSlotStartsAt', function() {
+      return this.promise.then(() => {
+        expect(this.product.firstTimeSlotStartsAt.format('z')).toEqual('PDT');
+      });
+    });
+  });
+
   describe('attendeeQuestions', function() {
     beforeEach(function () {
       this.occsnClient.Product.find('1kbsdf')

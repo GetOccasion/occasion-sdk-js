@@ -16,5 +16,13 @@ Occasion.Modules.push(function(library) {
     this.attendeeQuestions =
       ActiveResource.Collection.build(this.attendeeQuestions)
       .map((q) => { return s.camelize(q, true); });
+
+    if(this.firstTimeSlotStartsAt) {
+      if(this.merchant()) {
+        this.firstTimeSlotStartsAt = moment.tz(this.firstTimeSlotStartsAt, this.merchant().timeZone);
+      } else {
+        throw 'Product has timeslots - but merchant.timeZone is not available; include merchant in response.';
+      }
+    }
   });
 });
