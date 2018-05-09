@@ -3,7 +3,7 @@ Occasion.Modules.push(function(library) {
     constructCalendar(month) {
       var timeZone = this.merchant().timeZone;
 
-      var today = moment().tz(timeZone);
+      var today = moment.tz(timeZone);
       var lowerRange;
       if(month) {
         lowerRange = month.isSame(today, 'month') ? today : month.tz(timeZone).startOf('month');

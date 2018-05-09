@@ -59,8 +59,6 @@ describe('Occasion.Product', function() {
 
   describe('constructCalendar(month)', function() {
     beforeEach(function () {
-      jasmine.clock().mockDate(moment('2018-05-01').toDate());
-
       this.occsnClient.Product.find('1kbsdf')
       .then(window.onSuccess);
 
@@ -76,8 +74,56 @@ describe('Occasion.Product', function() {
       jasmine.clock().uninstall();
     });
 
-    describe('month arg', function() {
+    describe('no month arg', function() {
       beforeEach(function() {
+        jasmine.clock().mockDate(moment.tz('2018-05-09', 'America/Los_Angeles').toDate());
+
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-09.+/, JsonApiResponses.TimeSlot.calendar[1]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-16.+/, JsonApiResponses.TimeSlot.calendar[2]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-23.+/, JsonApiResponses.TimeSlot.calendar[3]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-30.+/, JsonApiResponses.TimeSlot.calendar[4]);
+
+        this.promise2 = this.promise.then(() => {
+          return this.product.constructCalendar().then((collection) => {
+            this.calendarCollection = collection;
+          });
+        });
+      });
+
+      it('starts at current day and adds all days in current month as items to collection', function() {
+        return this.promise2.then(() => {
+          expect(this.calendarCollection.size()).toBe(31);
+        });
+      });
+    });
+
+    describe('current month as arg', function() {
+      beforeEach(function() {
+        jasmine.clock().mockDate(moment('2018-05-09').toDate());
+
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-09.+/, JsonApiResponses.TimeSlot.calendar[1]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-16.+/, JsonApiResponses.TimeSlot.calendar[2]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-23.+/, JsonApiResponses.TimeSlot.calendar[3]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-30.+/, JsonApiResponses.TimeSlot.calendar[4]);
+
+        this.promise2 = this.promise.then(() => {
+          return this.product.constructCalendar(moment('2018-05-01')).then((collection) => {
+            this.calendarCollection = collection;
+          });
+        });
+      });
+
+      it('starts at current day and adds all days in current month as items to collection', function() {
+        return this.promise2.then(() => {
+          expect(this.calendarCollection.size()).toBe(31);
+        });
+      });
+    });
+
+    describe('other month as arg', function() {
+      beforeEach(function() {
+        jasmine.clock().mockDate(moment('2018-04-01').toDate());
+
         moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-01.+/, JsonApiResponses.TimeSlot.calendar[0]);
         moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-08.+/, JsonApiResponses.TimeSlot.calendar[1]);
         moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-15.+/, JsonApiResponses.TimeSlot.calendar[2]);
