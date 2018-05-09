@@ -45,7 +45,7 @@ module.exports = function(grunt) {
               'moment',
               { 'underscore': '_' },
               { 'underscore.string': 's' },
-              { 'moment-timezone-with-data-2010-2020': null },
+              { 'moment-timezone-with-data-2010-2020': null }
             ]
           }
         }
@@ -61,6 +61,7 @@ module.exports = function(grunt) {
               { 'occasion-sdk': 'Occasion' },
               { 'underscore': '_' },
               { 'jquery': '$' },
+              'moment',
               { 'jasmine-jquery': null },
               { 'jasmine-promises': null },
               { 'moment-timezone-with-data-2010-2020': null },
