@@ -118,6 +118,38 @@ describe('Occasion.Product', function() {
           expect(this.calendarCollection.size()).toBe(31);
         });
       });
+
+      describe('nextPage()', function() {
+        beforeEach(function() {
+          this.promise3 = this.promise2.then(() => {
+            this.product.constructCalendar = window.mockConstructCalendar = jasmine.createSpy('constructCalendar');
+
+            return this.calendarCollection.nextPage();
+          });
+        });
+
+        it('calls next month of timeSlots', function() {
+          return this.promise3.then(() => {
+            expect(window.mockConstructCalendar.calls.mostRecent().args[0].isSame(moment('2018-06-01'))).toBeTruthy();
+          });
+        });
+      });
+
+      describe('prevPage()', function() {
+        beforeEach(function() {
+          this.promise3 = this.promise2.then(() => {
+            this.product.constructCalendar = window.mockConstructCalendar = jasmine.createSpy('constructCalendar');
+
+            return this.calendarCollection.prevPage();
+          });
+        });
+
+        it('does not call prev month of timeSlots', function() {
+          return this.promise3.then(() => {
+            expect(window.mockConstructCalendar.calls.count()).toEqual(0);
+          });
+        });
+      });
     });
 
     describe('other month as arg', function() {
@@ -172,6 +204,38 @@ describe('Occasion.Product', function() {
         return this.promise2.then(() => {
           expect(this.calendarCollection.first().timeSlots.size()).toBe(2);
           expect(this.calendarCollection.last().timeSlots.size()).toBe(5);
+        });
+      });
+
+      describe('nextPage()', function() {
+        beforeEach(function() {
+          this.promise3 = this.promise2.then(() => {
+            this.product.constructCalendar = window.mockConstructCalendar = jasmine.createSpy('constructCalendar');
+
+            return this.calendarCollection.nextPage();
+          });
+        });
+
+        it('calls next month of timeSlots', function() {
+          return this.promise3.then(() => {
+            expect(window.mockConstructCalendar.calls.mostRecent().args[0].isSame(moment('2018-06-01'))).toBeTruthy();
+          });
+        });
+      });
+
+      describe('prevPage()', function() {
+        beforeEach(function() {
+          this.promise3 = this.promise2.then(() => {
+            this.product.constructCalendar = window.mockConstructCalendar = jasmine.createSpy('constructCalendar');
+
+            return this.calendarCollection.prevPage();
+          });
+        });
+
+        it('calls prev month of timeSlots', function() {
+          return this.promise3.then(() => {
+            expect(window.mockConstructCalendar.calls.mostRecent().args[0].isSame(moment('2018-04-01'))).toBeTruthy();
+          });
         });
       });
     });

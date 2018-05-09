@@ -21,7 +21,7 @@ Occasion.Modules.push(function(library) {
       var lower = lowerRange.clone();
       var upper = lowerRange.clone().add(this.monthlyTimeSlotDaysBatchSize, 'days');
       while(i < numRequests) {
-        if(i + 1 == numRequests) upper = upperRange;
+        if(i + 1 == numRequests) upper = upperRange.clone();
 
         requests.push(this.timeSlots().where({
           startsAt: {
@@ -35,6 +35,8 @@ Occasion.Modules.push(function(library) {
         upper.add(this.monthlyTimeSlotDaysBatchSize, 'days');
         i++;
       }
+
+      var product = this;
 
       return Promise.all(requests)
       .then(function(timeSlotsArray) {
@@ -56,6 +58,16 @@ Occasion.Modules.push(function(library) {
           });
 
           day = day.clone().add(1, 'days');
+        }
+
+        response.nextPage = function() {
+          this.promise = this.promise || product.constructCalendar(moment(upperRange).add(1, 'days').startOf('month'));
+        };
+
+        if(month && !month.isSame(today, 'month')) {
+          response.prevPage = function() {
+            this.promise = this.promise || product.constructCalendar(moment(lowerRange).subtract(1, 'months'));
+          };
         }
 
         return response;
