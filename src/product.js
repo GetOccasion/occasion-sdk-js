@@ -1,6 +1,6 @@
 Occasion.Modules.push(function(library) {
   library.Product = class Product extends library.Base {
-    constructCalendar(month) {
+    constructCalendar(month, preload) {
       var timeZone = this.merchant().timeZone;
 
       var today = moment.tz(timeZone);
@@ -60,14 +60,24 @@ Occasion.Modules.push(function(library) {
           day = day.clone().add(1, 'days');
         }
 
-        response.nextPage = function() {
-          this.promise = this.promise || product.constructCalendar(moment(upperRange).add(1, 'days').startOf('month'));
+        response.nextPage = function(preload_count) {
+          this.promise = this.promise || product.constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), preload_count);
+          return this.promise;
         };
 
         if(month && !month.isSame(today, 'month')) {
           response.prevPage = function() {
             this.promise = this.promise || product.constructCalendar(moment(lowerRange).subtract(1, 'months'));
+            return this.promise;
           };
+        }
+
+        if(product.monthlyTimeSlotPreloadSize > 0) {
+          if(_.isUndefined(preload)) {
+            response.nextPage(product.monthlyTimeSlotPreloadSize - 1);
+          } else if(preload > 0) {
+            response.nextPage(--preload);
+          }
         }
 
         return response;

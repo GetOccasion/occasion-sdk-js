@@ -7,7 +7,7 @@
       "title": "A product title",
       "description": "A product description",
       "monthly_time_slot_days_batch_size": 7,
-      "monthly_time_slot_preload_size": 3
+      "monthly_time_slot_preload_size": 2
     },
     "relationships": {
       "merchant": {
