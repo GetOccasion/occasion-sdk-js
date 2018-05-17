@@ -13,5 +13,7 @@ Occasion.Modules.push(function(library) {
     } else {
       throw 'Must use includes({ product: \'merchant\' }) in timeSlot request';
     }
+
+    this.duration = moment.duration(this.duration, 'minutes');
   });
 });
