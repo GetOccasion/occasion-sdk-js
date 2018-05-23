@@ -2,13 +2,13 @@ var OccasionSDKSpecs = {};
 
 describe('Occasion.Client', function() {
   beforeEach(function() {
-    moxios.install();
+    this.occsnClient = Occasion.Client({ token: 'my_token' });
+
+    moxios.install(this.occsnClient.interface.axios);
 
     window.onSuccess = jasmine.createSpy('onSuccess');
     window.onFailure = jasmine.createSpy('onFailure');
     window.onCompletion = jasmine.createSpy('onCompletion');
-
-    this.occsnClient = Occasion.Client({ token: 'my_token' });
   });
 
   afterEach(function() {
@@ -51,6 +51,7 @@ describe('Occasion.Client', function() {
   describe('override baseUrl', function() {
     beforeEach(function() {
       this.occsnClient = Occasion.Client({ baseUrl: 'http://occasion.lvh.me:3000/', token: 'my_token' });
+      moxios.install(this.occsnClient.interface.axios);
     });
 
     describe('when making requests', function() {

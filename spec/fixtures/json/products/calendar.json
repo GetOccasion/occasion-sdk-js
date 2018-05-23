@@ -1,0 +1,55 @@
+{
+  "data": {
+    "id": "1kbsdf",
+    "type": "products",
+    "attributes": {
+      "attendee_questions": [],
+      "title": "A product title",
+      "description": "A product description",
+      "monthly_time_slot_days_batch_size": 7,
+      "monthly_time_slot_preload_size": 2
+    },
+    "relationships": {
+      "merchant": {
+        "data": {
+          "id": "1",
+          "type": "merchants"
+        }
+      },
+      "questions": {
+        "links": {
+          "self": "https://example.com/api/v1/products/1/relationships/questions/",
+          "related": "https://example.com/api/v1/products/1/questions/"
+        }
+      },
+      "orders": {
+        "data": [
+          {
+            "id": 1,
+            "type": "orders"
+          },
+          {
+            "id": 2,
+            "type": "orders"
+          }
+        ],
+        "links": {
+          "self": "https://example.com/api/v1/products/1/relationships/orders/",
+          "related": "https://example.com/api/v1/products/1/orders/"
+        }
+      }
+    },
+    "links": {
+      "self": "https://example.com/api/v1/products/1/"
+    }
+  },
+  "included": [
+    {
+      "id": "1",
+      "type": "merchants",
+      "attributes": {
+        "time_zone": "America/Chicago"
+      }
+    }
+  ]
+}

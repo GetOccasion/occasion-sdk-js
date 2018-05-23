@@ -1,12 +1,12 @@
 describe('Occasion.Order', function() {
   beforeEach(function() {
-    moxios.install();
+    this.occsnClient = Occasion.Client({ token: 'my_token' });
+
+    moxios.install(this.occsnClient.interface.axios);
 
     window.onSuccess = jasmine.createSpy('onSuccess');
     window.onFailure = jasmine.createSpy('onFailure');
     window.onCompletion = jasmine.createSpy('onCompletion');
-
-    this.occsnClient = Occasion.Client({ token: 'my_token' });
   });
 
   afterEach(function() {

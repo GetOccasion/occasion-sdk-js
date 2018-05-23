@@ -42,8 +42,10 @@ module.exports = function(grunt) {
             'default': [
               { 'active-resource': 'ActiveResource' },
               'axios',
+              'moment',
               { 'underscore': '_' },
-              { 'underscore.string': 's' }
+              { 'underscore.string': 's' },
+              { 'moment-timezone-with-data-2010-2020': null }
             ]
           }
         }
@@ -54,13 +56,15 @@ module.exports = function(grunt) {
           objectToExport: 'OccasionSDKSpecs',
           deps: {
             'default': [
+              'moxios',
               { 'active-resource': 'ActiveResource' },
               { 'occasion-sdk': 'Occasion' },
               { 'underscore': '_' },
-              'moxios',
               { 'jquery': '$' },
+              'moment',
               { 'jasmine-jquery': null },
-              { 'jasmine-promises': null }
+              { 'jasmine-promises': null },
+              { 'moment-timezone-with-data-2010-2020': null },
             ]
           }
         }
@@ -150,6 +154,8 @@ module.exports = function(grunt) {
                 "underscore.string": '/node_modules/underscore.string/dist/underscore.string',
                 "underscore.inflection": '/node_modules/underscore.inflection/lib/underscore.inflection',
                 "occasion-sdk": '/build/occasion-sdk',
+                "moment": '/node_modules/moment/min/moment.min',
+                "moment-timezone-with-data-2010-2020": '/node_modules/moment-timezone-with-data-2010-2020/index',
                 "moxios": '/node_modules/moxios/dist/moxios.min',
                 "jquery": '/node_modules/jquery/dist/jquery.min',
                 "jasmine-jquery": '/node_modules/jasmine-jquery/lib/jasmine-jquery',

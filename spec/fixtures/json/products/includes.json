@@ -3,24 +3,16 @@
     "id": "1",
     "type": "products",
     "attributes": {
+      "attendee_questions": [],
       "title": "A product title",
-      "description": "A product description"
+      "description": "A product description",
+      "first_time_slot_starts_at": "2018-05-01T15:00:00.000-06:00"
     },
     "relationships": {
-      "orders": {
-        "data": [
-          {
-            "id": 1,
-            "type": "orders"
-          },
-          {
-            "id": 2,
-            "type": "orders"
-          }
-        ],
-        "links": {
-          "self": "https://example.com/api/v1/products/1/relationships/orders/",
-          "related": "https://example.com/api/v1/products/1/orders/"
+      "merchant": {
+        "data": {
+          "id": "1",
+          "type": "merchants"
         }
       }
     },
@@ -30,57 +22,10 @@
   },
   "included": [
     {
-      "id": 1,
-      "type": "orders",
+      "id": "1",
+      "type": "merchants",
       "attributes": {
-        "price": 1.0
-      },
-      "relationships": {
-        "comments": {
-          "data": [
-            {
-              "id": 1,
-              "type": "comments"
-            }
-          ]
-        }
-      },
-      "links": {
-        "self": "https://example.com/api/v1/orders/1/"
-      }
-    },
-    {
-      "id": 2,
-      "type": "orders",
-      "attributes": {
-        "price": 2.0
-      },
-      "relationships": {
-        "comments": {
-          "data": [
-            {
-              "id": 1,
-              "type": "comments"
-            }
-          ]
-        }
-      },
-      "links": {
-        "self": "https://example.com/api/v1/orders/2/"
-      }
-    },
-    {
-      "id": 1,
-      "type": "comments",
-      "attributes": {
-        "body": "Comment 1"
-      }
-    },
-    {
-      "id": 2,
-      "type": "comments",
-      "attributes": {
-        "body": "Comment 2"
+        "time_zone": "America/Los_Angeles"
       }
     }
   ]

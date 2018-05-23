@@ -126,6 +126,38 @@ window.JsonApiResponses = {
     attendees: {
       status: 200,
       response: getJSONFixture('products/attendees.json')
+    },
+    calendar: {
+      status: 200,
+      response: getJSONFixture('products/calendar.json')
+    },
+  },
+  TimeSlot: {
+    calendar: [
+      {
+        status: 200,
+        response: getJSONFixture('time_slots/week1.json')
+      },
+      {
+        status: 200,
+        response: getJSONFixture('time_slots/week2.json')
+      },
+      {
+        status: 200,
+        response: getJSONFixture('time_slots/week3.json')
+      },
+      {
+        status: 200,
+        response: getJSONFixture('time_slots/week4.json')
+      },
+      {
+        status: 200,
+        response: getJSONFixture('time_slots/week5.json')
+      },
+    ],
+    index: {
+      status: 200,
+      response: getJSONFixture('time_slots/index.json')
     }
   },
   Venue: {
