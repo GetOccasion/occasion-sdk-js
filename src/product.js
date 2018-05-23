@@ -4,6 +4,8 @@ Occasion.Modules.push(function(library) {
       return this.__constructCalendar(month);
     }
 
+    // @todo Remove includes({ product: 'merchant' }) when AR supports owner assignment to has_many children
+    //   in non-load queries
     __constructCalendar(month, preload, prevPagePromise) {
       var timeZone = this.merchant().timeZone;
 
@@ -27,13 +29,19 @@ Occasion.Modules.push(function(library) {
       while(i < numRequests) {
         if(i + 1 == numRequests) upper = upperRange.clone();
 
-        requests.push(this.timeSlots().where({
-          startsAt: {
-            ge: lower.toDate(),
-            le: upper.toDate()
-          },
-          status: 'bookable'
-        }).all());
+        requests.push(
+          this.timeSlots()
+          .includes({
+            product: 'merchant'
+          })
+          .where({
+            startsAt: {
+              ge: lower.toDate(),
+              le: upper.toDate()
+            },
+            status: 'bookable'
+          }).all()
+        );
 
         lower.add(this.monthlyTimeSlotDaysBatchSize, 'days');
         upper.add(this.monthlyTimeSlotDaysBatchSize, 'days');
