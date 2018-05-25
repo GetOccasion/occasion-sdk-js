@@ -521,9 +521,9 @@ Occasion.Modules.push(function (library) {
           };
 
           response.nextPage = function (preloadCount) {
-            this.promise = this.promise || product.__constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), preloadCount, currentPromise);
+            this.nextPromise = this.nextPromise || product.__constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), preloadCount, currentPromise);
 
-            return this.promise;
+            return this.nextPromise;
           };
 
           if (month && !month.isSame(today, 'month')) {
@@ -532,9 +532,9 @@ Occasion.Modules.push(function (library) {
             };
 
             response.prevPage = function () {
-              this.promise = this.promise || prevPagePromise || product.__constructCalendar(moment(lowerRange).subtract(1, 'months'), 0);
+              this.prevPromise = this.prevPromise || prevPagePromise || product.__constructCalendar(moment(lowerRange).subtract(1, 'months'), 0);
 
-              return this.promise;
+              return this.prevPromise;
             };
           }
 

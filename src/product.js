@@ -75,23 +75,23 @@ Occasion.Modules.push(function(library) {
         response.hasNextPage = function() { return true; };
 
         response.nextPage = function(preloadCount) {
-          this.promise = this.promise || product.__constructCalendar(
+          this.nextPromise = this.nextPromise || product.__constructCalendar(
             moment(upperRange).add(1, 'days').startOf('month'),
             preloadCount,
             currentPromise
           );
 
-          return this.promise;
+          return this.nextPromise;
         };
 
         if(month && !month.isSame(today, 'month')) {
           response.hasPrevPage = function() { return true; };
 
           response.prevPage = function() {
-            this.promise = this.promise || prevPagePromise ||
+            this.prevPromise = this.prevPromise || prevPagePromise ||
               product.__constructCalendar(moment(lowerRange).subtract(1, 'months'), 0);
 
-            return this.promise;
+            return this.prevPromise;
           };
         }
 
