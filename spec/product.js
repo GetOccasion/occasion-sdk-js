@@ -143,6 +143,14 @@ describe('Occasion.Product', function() {
         });
       });
 
+      describe('hasNextPage()', function() {
+        it('returns true', function() {
+          return this.promise2.then(() => {
+            expect(this.calendarCollection.hasNextPage()).toBeTruthy();
+          });
+        });
+      });
+
       describe('nextPage()', function() {
         beforeEach(function() {
           this.promise3 = this.promise2.then(() => {
@@ -178,6 +186,14 @@ describe('Occasion.Product', function() {
             return this.promise4.then(() => {
               expect(this.product.__constructCalendar.calls.count()).toEqual(this.constructCalendarCount);
             });
+          });
+        });
+      });
+
+      describe('hasPrevPage()', function() {
+        it('it returns false', function() {
+          return this.promise2.then(() => {
+            expect(this.calendarCollection.hasPrevPage()).toBeFalsy();
           });
         });
       });
@@ -254,6 +270,14 @@ describe('Occasion.Product', function() {
         });
       });
 
+      describe('hasNextPage()', function() {
+        it('returns true', function() {
+          return this.promise2.then(() => {
+            expect(this.calendarCollection.hasNextPage()).toBeTruthy();
+          });
+        });
+      });
+
       describe('nextPage()', function() {
         beforeEach(function() {
           this.promise3 = this.promise2.then(() => {
@@ -273,6 +297,14 @@ describe('Occasion.Product', function() {
         it('preloads next next month of timeSlots', function() {
           return this.promise3.then(() => {
             expect(this.product.__constructCalendar.calls.mostRecent().args[0].isSame(moment.tz('2018-07-01', this.product.merchant().timeZone))).toBeTruthy();
+          });
+        });
+      });
+
+      describe('hasPrevPage()', function() {
+        it('returns true', function() {
+          return this.promise2.then(() => {
+            expect(this.calendarCollection.hasPrevPage()).toBeTruthy();
           });
         });
       });

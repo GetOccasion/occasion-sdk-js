@@ -516,6 +516,10 @@ Occasion.Modules.push(function (library) {
             day = day.clone().add(1, 'days');
           }
 
+          response.hasNextPage = function () {
+            return true;
+          };
+
           response.nextPage = function (preloadCount) {
             this.promise = this.promise || product.__constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), preloadCount, currentPromise);
 
@@ -523,6 +527,10 @@ Occasion.Modules.push(function (library) {
           };
 
           if (month && !month.isSame(today, 'month')) {
+            response.hasPrevPage = function () {
+              return true;
+            };
+
             response.prevPage = function () {
               this.promise = this.promise || prevPagePromise || product.__constructCalendar(moment(lowerRange).subtract(1, 'months'), 0);
 
