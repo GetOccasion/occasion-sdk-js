@@ -5,7 +5,8 @@
     "attributes": {
       "attendee_questions": ["first_name", "last_name"],
       "title": "A product title",
-      "description": "A product description"
+      "description": "A product description",
+      "requires_time_slot_selection": true
     },
     "relationships": {
       "questions": {

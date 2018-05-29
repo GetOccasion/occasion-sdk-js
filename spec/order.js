@@ -121,97 +121,165 @@ describe('Occasion.Order', function() {
   });
 
   describe('construct', function() {
-    beforeEach(function () {
-      this.occsnClient.Product.find('1kbsdf')
-      .then(window.onSuccess);
-
-      var _this = this;
-      this.promise = moxios.wait(function() {
-        return moxios.requests.mostRecent().respondWith(JsonApiResponses.Product.find.success)
-        .then(function() {
-          _this.product = window.onSuccess.calls.mostRecent().args[0];
-        });
-      });
-
-      this.promise2 = this.promise.then(function() {
-        _this.occsnClient.Order.construct({ product: _this.product })
+    describe('when product requires time slot selection', function() {
+      beforeEach(function () {
+        this.occsnClient.Product.find('1kbsdf')
         .then(window.onSuccess);
 
-        return moxios.wait(function() {
-          return moxios.requests.mostRecent().respondWith(JsonApiResponses.Question.all.success)
+        var _this = this;
+        this.promise = moxios.wait(function() {
+          return moxios.requests.mostRecent().respondWith(JsonApiResponses.Product.find.success)
           .then(function() {
-            _this.order = window.onSuccess.calls.mostRecent().args[0];
+            _this.product = window.onSuccess.calls.mostRecent().args[0];
+          });
+        });
+
+        this.promise2 = this.promise.then(function() {
+          _this.occsnClient.Order.construct({ product: _this.product })
+          .then(window.onSuccess);
+
+          return moxios.wait(function() {
+            return moxios.requests.mostRecent().respondWith(JsonApiResponses.Question.all.success)
+            .then(function() {
+              _this.order = window.onSuccess.calls.mostRecent().args[0];
+            });
           });
         });
       });
-    });
 
-    it('assigns a session identifier', function() {
-      var _this = this;
-      return this.promise2.then(function() {
-        expect(_this.order.sessionIdentifier.length).not.toEqual(0);
+      it('assigns a session identifier', function() {
+        var _this = this;
+        return this.promise2.then(function() {
+          expect(_this.order.sessionIdentifier.length).not.toEqual(0);
+        });
       });
-    });
 
-    it('builds a customer', function() {
-      var _this = this;
-      return this.promise2.then(function() {
-        expect(_this.order.customer().attributes()).toEqual({
-          email: null,
-          firstName: null,
-          lastName: null,
-          zip: null
+      it('builds a customer', function() {
+        var _this = this;
+        return this.promise2.then(function() {
+          expect(_this.order.customer().attributes()).toEqual({
+            email: null,
+            firstName: null,
+            lastName: null,
+            zip: null
+          });
+        });
+      });
+
+      it('loads product questions', function() {
+        return this.promise2.then(function() {
+          expect(moxios.requests.mostRecent().url).toEqual(
+            encodeURI('https://example.com/api/v1/products/1/questions/?include=options&page[size]=500')
+          );
+        });
+      });
+
+      it('populates blank answers for each question', function() {
+        var _this = this;
+        return this.promise2.then(function() {
+          var questionIds = _this.order.answers().target().map(function(t) { return t.question().id }).toArray();
+
+          expect(questionIds).toEqual(["1", "2", "3", "4"]);
+        });
+      });
+
+      it('populates answer.option with default option for drop_down', function() {
+        var _this = this;
+        return this.promise2.then(function() {
+          var answer =
+            _this.order.answers().target()
+            .detect(function(t) { return t.question().formControl == 'drop_down' });
+
+          expect(answer.option().default).toEqual(true);
+        });
+      });
+
+      it('populates answer.option with default option for option_list', function() {
+        var _this = this;
+        return this.promise2.then(function() {
+          var answer =
+            _this.order.answers().target()
+            .detect(function(t) { return t.question().formControl == 'option_list' });
+
+          expect(answer.option().default).toEqual(true);
+        });
+      });
+
+      it('populates answer.value with min for spin_button', function() {
+        var _this = this;
+        return this.promise2.then(function() {
+          var answer =
+            _this.order.answers().target()
+            .detect(function(t) { return t.question().formControl == 'spin_button' });
+
+          expect(answer.value).toEqual(1);
         });
       });
     });
 
-    it('loads product questions', function() {
-      return this.promise2.then(function() {
-        expect(moxios.requests.mostRecent().url).toEqual(
-          encodeURI('https://example.com/api/v1/products/1/questions/?include=options&page[size]=500')
-        );
+    describe('when product does not require time slot selection', function() {
+      describe('when timeSlots.size == 1', function() {
+        beforeEach(function () {
+          this.occsnClient.Product.find('1kbsdf')
+          .then(window.onSuccess);
+
+          this.promise = moxios.wait(() => {
+            return moxios.requests.mostRecent().respondWith(JsonApiResponses.Product.one_time_slot)
+            .then(() => {
+              this.product = window.onSuccess.calls.mostRecent().args[0];
+            });
+          });
+
+          moxios.stubRequest(/.+\/questions.*/, JsonApiResponses.Question.all.success);
+          moxios.stubRequest(/.+\/time_slots.*/, JsonApiResponses.TimeSlot.single);
+
+          this.promise2 = this.promise.then(() => {
+            this.occsnClient.Order.construct({ product: this.product })
+            .then(window.onSuccess);
+
+            return moxios.wait(() => {
+              this.order = window.onSuccess.calls.mostRecent().args[0];
+            });
+          });
+        });
+
+        it('assigns order.timeSlots to the only product timeSlot', function() {
+          return this.promise2.then(() => {
+            expect(this.order.timeSlots().size()).toEqual(1);
+          });
+        });
       });
-    });
 
-    it('populates blank answers for each question', function() {
-      var _this = this;
-      return this.promise2.then(function() {
-        var questionIds = _this.order.answers().target().map(function(t) { return t.question().id }).toArray();
+      describe('when sellsSessions', function() {
+        beforeEach(function () {
+          this.occsnClient.Product.find('1kbsdf')
+          .then(window.onSuccess);
 
-        expect(questionIds).toEqual(["1", "2", "3", "4"]);
-      });
-    });
+          this.promise = moxios.wait(() => {
+            return moxios.requests.mostRecent().respondWith(JsonApiResponses.Product.session)
+            .then(() => {
+              this.product = window.onSuccess.calls.mostRecent().args[0];
+            });
+          });
 
-    it('populates answer.option with default option for drop_down', function() {
-      var _this = this;
-      return this.promise2.then(function() {
-        var answer =
-          _this.order.answers().target()
-          .detect(function(t) { return t.question().formControl == 'drop_down' });
+          moxios.stubRequest(/.+\/questions.*/, JsonApiResponses.Question.all.success);
+          moxios.stubRequest(/.+\/time_slots.*/, JsonApiResponses.TimeSlot.index);
 
-        expect(answer.option().default).toEqual(true);
-      });
-    });
+          this.promise2 = this.promise.then(() => {
+            this.occsnClient.Order.construct({ product: this.product })
+            .then(window.onSuccess);
 
-    it('populates answer.option with default option for option_list', function() {
-      var _this = this;
-      return this.promise2.then(function() {
-        var answer =
-          _this.order.answers().target()
-          .detect(function(t) { return t.question().formControl == 'option_list' });
+            return moxios.wait(() => {
+              this.order = window.onSuccess.calls.mostRecent().args[0];
+            });
+          });
+        });
 
-        expect(answer.option().default).toEqual(true);
-      });
-    });
-
-    it('populates answer.value with min for spin_button', function() {
-      var _this = this;
-      return this.promise2.then(function() {
-        var answer =
-          _this.order.answers().target()
-          .detect(function(t) { return t.question().formControl == 'spin_button' });
-
-        expect(answer.value).toEqual(1);
+        it('assigns order.timeSlots to all product timeSlots', function() {
+          return this.promise2.then(() => {
+            expect(this.order.timeSlots().size()).toEqual(10);
+          });
+        });
       });
     });
 
@@ -220,19 +288,14 @@ describe('Occasion.Order', function() {
         this.occsnClient.Order.construct()
         .then(window.onCompletion);
 
-        var _this = this;
-        this.promise3 = moxios.wait(function() {
-          return moxios.requests.mostRecent().respondWith(JsonApiResponses.Question.all.success)
-          .then(function() {
-            _this.order = window.onCompletion.calls.mostRecent().args[0];
-          });
+        this.promise3 = moxios.wait(() => {
+          this.order = window.onCompletion.calls.mostRecent().args[0];
         });
       });
 
       it('still builds order', function() {
-        var _this = this;
-        return this.promise3.then(function() {
-          expect(_this.order.isA(_this.occsnClient.Order)).toBeTruthy();
+        return this.promise3.then(() => {
+          expect(this.order.isA(this.occsnClient.Order)).toBeTruthy();
         });
       });
     });

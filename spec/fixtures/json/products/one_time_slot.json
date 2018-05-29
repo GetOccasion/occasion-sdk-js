@@ -1,21 +1,29 @@
 {
   "data": {
-    "id": "1",
+    "id": "1kbsdf",
     "type": "products",
     "attributes": {
-      "title": "Another title",
-      "description": "Another description",
-      "requires_time_slot_selection": true
+      "attendee_questions": [],
+      "title": "A product title",
+      "description": "A product description",
+      "requires_time_slot_selection": false,
+      "sells_sessions": false
     },
     "relationships": {
+      "questions": {
+        "links": {
+          "self": "https://example.com/api/v1/products/1/relationships/questions/",
+          "related": "https://example.com/api/v1/products/1/questions/"
+        }
+      },
       "orders": {
         "data": [
           {
-            "id": 3,
+            "id": 1,
             "type": "orders"
           },
           {
-            "id": 4,
+            "id": 2,
             "type": "orders"
           }
         ],
@@ -28,21 +36,5 @@
     "links": {
       "self": "https://example.com/api/v1/products/1/"
     }
-  },
-  "included": [
-    {
-      "id": 3,
-      "type": "orders",
-      "attributes": {
-        "price": 1.0
-      }
-    },
-    {
-      "id": 4,
-      "type": "orders",
-      "attributes": {
-        "price": 2.0
-      }
-    }
-  ]
+  }
 }
