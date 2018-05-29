@@ -25,3 +25,4 @@
 * Add order afterRequest for matching attendee collection size to order quantity
 * Add attributes for `Attendee` resource
 * Add `Product#constructCalendar` for loading months of timeSlots with `nextPage()` and `prevPage()` support
+* Auto-select `order.timeSlots` in `Order.construct` when `!product.requiresTimeSlotSelection`
