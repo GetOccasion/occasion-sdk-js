@@ -21,6 +21,10 @@ Occasion.Modules.push(function(library) {
 
       if(order.product() != null) {
         promises.push(order.product().questions().includes('options').perPage(500).load());
+
+        if(!order.product().requiresTimeSlotSelection) {
+          promises.push(order.product().timeSlots().includes({ product: 'merchant' }).perPage(500).load());
+        }
       }
 
       var _this = this;
@@ -28,8 +32,10 @@ Occasion.Modules.push(function(library) {
       .then(function(args) {
         order = args[0];
         var questions = args[1];
+        var timeSlots = args[2];
 
         if(questions != undefined) questions.inject(order, _this.__constructAnswer);
+        if(timeSlots != undefined) order.timeSlots().assign(timeSlots, false);
 
         return order;
       });

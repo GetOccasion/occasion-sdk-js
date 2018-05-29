@@ -6,7 +6,8 @@
       "attendee_questions": [],
       "title": "A product title",
       "description": "A product description",
-      "first_time_slot_starts_at": "2018-05-01T15:00:00.000-06:00"
+      "first_time_slot_starts_at": "2018-05-01T15:00:00.000-06:00",
+      "requires_time_slot_selection": true
     },
     "relationships": {
       "merchant": {

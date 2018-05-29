@@ -131,6 +131,14 @@ window.JsonApiResponses = {
       status: 200,
       response: getJSONFixture('products/calendar.json')
     },
+    one_time_slot: {
+      status: 200,
+      response: getJSONFixture('products/one_time_slot.json')
+    },
+    session: {
+      status: 200,
+      response: getJSONFixture('products/session.json')
+    },
   },
   TimeSlot: {
     calendar: [
@@ -158,6 +166,10 @@ window.JsonApiResponses = {
     index: {
       status: 200,
       response: getJSONFixture('time_slots/index.json')
+    },
+    single: {
+      status: 200,
+      response: getJSONFixture('time_slots/single.json')
     }
   },
   Venue: {

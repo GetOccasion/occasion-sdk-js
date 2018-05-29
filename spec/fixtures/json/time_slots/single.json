@@ -1,0 +1,48 @@
+{
+  "data": [
+    {
+      "id": "ga8v42hMd9",
+      "type": "time_slots",
+      "attributes": {
+        "starts_at": "2018-05-01T15:00:00.000-06:00",
+        "duration": 60,
+        "spots_available": 20
+      },
+      "relationships": {
+        "product": {
+          "data": {
+            "type": "products",
+            "id": "7sbs0dc5"
+          }
+        }
+      },
+      "links": {
+        "self": "https://www.occsn.com/api/v1/time_slots/gua8v4T2hMd9"
+      }
+    }
+  ],
+  "included": [
+    {
+      "type": "products",
+      "id": "7sbs0dc5",
+      "relationships": {
+        "merchant": {
+          "data": {
+            "type": "merchants",
+            "id": "ncvt5ak9"
+          }
+        }
+      }
+    },
+    {
+      "type": "merchants",
+      "id": "ncvt5ak9",
+      "attributes": {
+        "time_zone": "America/Los_Angeles"
+      }
+    }
+  ],
+  "links": {
+    "self": "https://app.getoccasion.com/api/v1/products/7sbs0dc5/time_slots?filter[status]=bookable"
+  }
+}
