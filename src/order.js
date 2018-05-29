@@ -23,7 +23,12 @@ Occasion.Modules.push(function(library) {
         promises.push(order.product().questions().includes('options').perPage(500).load());
 
         if(!order.product().requiresTimeSlotSelection) {
-          promises.push(order.product().timeSlots().includes({ product: 'merchant' }).perPage(500).load());
+          promises.push(
+            order.product().timeSlots()
+            .includes({ product: 'merchant' })
+            .where({ status: 'bookable' })
+            .perPage(500).all()
+          );
         }
       }
 
