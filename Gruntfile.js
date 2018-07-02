@@ -42,6 +42,7 @@ module.exports = function(grunt) {
             'default': [
               { 'active-resource': 'ActiveResource' },
               'axios',
+              { 'decimal.js-light': 'Decimal' },
               'moment',
               { 'underscore': '_' },
               { 'underscore.string': 's' },
@@ -61,6 +62,7 @@ module.exports = function(grunt) {
               { 'occasion-sdk': 'Occasion' },
               { 'underscore': '_' },
               { 'jquery': '$' },
+              { 'decimal.js-light': 'Decimal' },
               'moment',
               { 'jasmine-jquery': null },
               { 'jasmine-promises': null },
@@ -148,6 +150,7 @@ module.exports = function(grunt) {
               paths: {
                 "active-resource": '/node_modules/active-resource/build/active-resource',
                 "axios": '/node_modules/axios/dist/axios',
+                "decimal.js-light": '/node_modules/decimal.js-light/decimal.min',
                 "qs": '/node_modules/qs/dist/qs',
                 "es6-promise": '/node_modules/es6-promise/dist/es6-promise',
                 "underscore": '/node_modules/underscore/underscore-min',

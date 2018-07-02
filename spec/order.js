@@ -79,15 +79,14 @@ describe('Occasion.Order', function() {
     it('adds price attributes to order', function () {
       var _this = this;
       return this.promise.then(function() {
-
-        expect(_this.order.attributes()).toEqual({
-          subtotal: 3.0,
-          couponAmount: 2.0,
-          tax: 1.0,
-          giftCardAmount: 1.0,
-          price: 2.0,
-          outstandingBalance: 1.0
-        })
+        expect(_.keys(_this.order.attributes())).toContain(
+          'subtotal',
+          'couponAmount',
+          'tax',
+          'giftCardAmount',
+          'price',
+          'outstandingBalance'
+        );
       });
     });
   });
@@ -107,15 +106,15 @@ describe('Occasion.Order', function() {
       var _this = this;
       return this.promise.then(function() {
 
-        expect(_this.order.attributes()).toEqual({
-          subtotal: 3.0,
-          couponAmount: 2.0,
-          tax: 1.0,
-          giftCardAmount: 1.0,
-          price: 2.0,
-          outstandingBalance: 1.0,
-          quantity: 2
-        })
+        expect(_.keys(_this.order.attributes())).toContain(
+          'subtotal',
+          'couponAmount',
+          'tax',
+          'giftCardAmount',
+          'price',
+          'outstandingBalance',
+          'quantity'
+        );
       });
     });
   });
@@ -301,51 +300,110 @@ describe('Occasion.Order', function() {
     });
   });
 
-  describe('transactions', function() {
+  describe('decimal attributes', function() {
     beforeEach(function() {
-      this.order = this.occsnClient.Order.build();
-      this.paymentMethod = this.occsnClient.CreditCard.build({ id: 'cc_token' });
+      this.occsnClient.Order.create()
+      .then(window.onCompletion);
+
+      this.promise = moxios.wait(() => {
+        return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.price)
+        .then(() => {
+          this.order = window.onCompletion.calls.mostRecent().args[0];
+        });
+      })
     });
 
-    describe('charge', function() {
-      beforeEach(function() {
-        this.order.charge(this.paymentMethod, 10.0);
-      });
-
-      it('adds transaction', function() {
-        expect(this.order.transactions().size()).toEqual(1);
-      });
-
-      it('adds amount to transaction', function() {
-        expect(this.order.transactions().target().first().amount).toEqual(10.0);
-      });
-
-      it('adds paymentMethod transaction', function() {
-        expect(this.order.transactions().target().first().paymentMethod()).toEqual(this.paymentMethod);
+    it('wraps subtotal in Decimal', function() {
+      return this.promise.then(() => {
+        expect(this.order.subtotal.toFixed).toBeDefined();
       });
     });
 
-    describe('editCharge', function() {
-      beforeEach(function() {
-        this.order.charge(this.paymentMethod, 10.0);
-
-        this.order.editCharge(this.paymentMethod, 1000.0);
-      });
-
-      it('changes payment method\'s transaction amount', function() {
-        expect(this.order.transactions().target().first().amount).toEqual(1000.0);
+    it('wraps couponAmount in Decimal', function() {
+      return this.promise.then(() => {
+        expect(this.order.couponAmount.toFixed).toBeDefined();
       });
     });
 
-    describe('removeCharge', function() {
-      beforeEach(function() {
-        this.order.charge(this.paymentMethod, 10.0);
+    it('wraps tax in Decimal', function() {
+      return this.promise.then(() => {
+        expect(this.order.tax.toFixed).toBeDefined();
+      });
+    });
 
-        this.order.removeCharge(this.paymentMethod);
+    it('wraps giftCardAmount in Decimal', function() {
+      return this.promise.then(() => {
+        expect(this.order.giftCardAmount.toFixed).toBeDefined();
+      });
+    });
+
+    it('wraps price in Decimal', function() {
+      return this.promise.then(() => {
+        expect(this.order.price.toFixed).toBeDefined();
+      });
+    });
+
+    it('wraps outstandingBalance in Decimal', function() {
+      return this.promise.then(() => {
+        expect(this.order.outstandingBalance.toFixed).toBeDefined();
+      });
+    });
+  });
+
+  describe('transactions', function() {
+    describe('charging', function() {
+      beforeEach(function() {
+        this.order = this.occsnClient.Order.build();
+        this.paymentMethod = this.occsnClient.CreditCard.build({ id: 'cc_token' });
       });
 
-      it('removes the charge', function() {
-        expect(this.order.transactions().empty()).toBeTruthy();
+      describe('charge', function() {
+        beforeEach(function() {
+          this.order.charge(this.paymentMethod, 10.0);
+        });
+
+        it('adds transaction', function() {
+          expect(this.order.transactions().size()).toEqual(1);
+        });
+
+        it('adds amount to transaction', function() {
+          expect(this.order.transactions().target().first().amount).toEqual(10.0);
+        });
+
+        it('adds paymentMethod transaction', function() {
+          expect(this.order.transactions().target().first().paymentMethod()).toEqual(this.paymentMethod);
+        });
+      });
+
+      describe('editCharge', function() {
+        beforeEach(function() {
+          this.order.charge(this.paymentMethod, 10.0);
+
+          this.order.editCharge(this.paymentMethod, 1000.0);
+        });
+
+        it('changes payment method\'s transaction amount', function() {
+          expect(this.order.transactions().target().first().amount).toEqual(1000.0);
+        });
+      });
+
+      describe('removeCharge', function() {
+        beforeEach(function() {
+          this.order.charge(this.paymentMethod, 10.0);
+
+          this.order.removeCharge(this.paymentMethod);
+        });
+
+        it('removes the charge', function() {
+          expect(this.order.transactions().empty()).toBeTruthy();
+        });
+      });
+    });
+
+      beforeEach(function() {
+
+      });
+
       });
     });
   });

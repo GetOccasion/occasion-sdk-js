@@ -153,5 +153,18 @@ Occasion.Modules.push(function(library) {
         }
       }
     }
+
+    ActiveResource.Collection.build([
+      'subtotal',
+      'couponAmount',
+      'tax',
+      'giftCardAmount',
+      'price',
+      'outstandingBalance'
+    ])
+    .select((attr) => this[attr])
+    .each((attr) => {
+      this[attr] = new Decimal(this[attr]);
+    });
   });
 });
