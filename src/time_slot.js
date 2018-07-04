@@ -4,6 +4,7 @@ Occasion.Modules.push(function(library) {
   library.TimeSlot.className = 'TimeSlot';
   library.TimeSlot.queryName = 'time_slots';
 
+  library.TimeSlot.belongsTo('order');
   library.TimeSlot.belongsTo('product');
   library.TimeSlot.belongsTo('venue');
 
