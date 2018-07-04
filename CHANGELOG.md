@@ -26,3 +26,7 @@
 * Add attributes for `Attendee` resource
 * Add `Product#constructCalendar` for loading months of timeSlots with `nextPage()` and `prevPage()` support
 * Auto-select `order.timeSlots` in `Order.construct` when `!product.requiresTimeSlotSelection`
+* Add TimeSlot belongsTo order relationship
+* Use strictAttributes mode, meaning that only attributes defined by the SDK will be returned by attributes()
+* Wrap Order price-related attributes in Decimal.js objects
+* Rebalance changed outstandingBalance across gift card and other payment transactions

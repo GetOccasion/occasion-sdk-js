@@ -1,18 +1,18 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
-    define(["active-resource","axios","moment","underscore","underscore.string","moment-timezone-with-data-2010-2020"], function (a0,b1,c2,d3,e4,f5) {
-      return (root['Occasion'] = factory(a0,b1,c2,d3,e4,f5));
+    define(["active-resource","axios","decimal.js-light","moment","underscore","underscore.string","moment-timezone-with-data-2010-2020"], function (a0,b1,c2,d3,e4,f5,g6) {
+      return (root['Occasion'] = factory(a0,b1,c2,d3,e4,f5,g6));
     });
   } else if (typeof module === 'object' && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(require("active-resource"),require("axios"),require("moment"),require("underscore"),require("underscore.string"),require("moment-timezone-with-data-2010-2020"));
+    module.exports = factory(require("active-resource"),require("axios"),require("decimal.js-light"),require("moment"),require("underscore"),require("underscore.string"),require("moment-timezone-with-data-2010-2020"));
   } else {
-    root['Occasion'] = factory(root["active-resource"],root["axios"],root["moment"],root["underscore"],root["underscore.string"],root["moment-timezone-with-data-2010-2020"]);
+    root['Occasion'] = factory(root["active-resource"],root["axios"],root["decimal.js-light"],root["moment"],root["underscore"],root["underscore.string"],root["moment-timezone-with-data-2010-2020"]);
   }
-}(this, function (ActiveResource, axios, moment, _, s) {
+}(this, function (ActiveResource, axios, Decimal, moment, _, s) {
 
 'use strict';
 
@@ -50,7 +50,8 @@ var Occasion = function () {
         headers: {
           Authorization: "Basic " + encodedToken
         },
-        immutable: immutable
+        immutable: immutable,
+        strictAttributes: true
       };
 
       var resourceLibrary = ActiveResource.createResourceLibrary(url, libraryOptions);
@@ -405,7 +406,9 @@ Occasion.Modules.push(function (library) {
   library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' });
 
   library.Order.afterRequest(function () {
-    if (!this.product().attendeeQuestions.empty()) {
+    var _this10 = this;
+
+    if (this.product() && !this.product().attendeeQuestions.empty()) {
       var diff = this.quantity - this.attendees().size();
 
       if (diff != 0) {
@@ -416,6 +419,67 @@ Occasion.Modules.push(function (library) {
             this.attendees().target().pop();
           }
         }
+      }
+    }
+
+    ActiveResource.Collection.build(['subtotal', 'couponAmount', 'tax', 'giftCardAmount', 'price', 'outstandingBalance']).select(function (attr) {
+      return _this10[attr];
+    }).each(function (attr) {
+      _this10[attr] = new Decimal(_this10[attr]);
+    });
+
+    if (this.outstandingBalance && !this.outstandingBalance.isZero()) {
+      var giftCardTransactions = this.transactions().target().select(function (t) {
+        return t.paymentMethod().isA(library.GiftCard);
+      });
+      var remainingBalanceTransaction = this.transactions().target().detect(function (t) {
+        return !t.paymentMethod().isA(library.GiftCard);
+      });
+
+      if (this.outstandingBalance.isPositive()) {
+        if (!giftCardTransactions.empty()) {
+          giftCardTransactions.each(function (t) {
+            if (_this10.outstandingBalance.isZero()) return;
+
+            var amount = new Decimal(t.amount);
+            var giftCardValue = new Decimal(t.paymentMethod().value);
+            var remainingGiftCardBalance = giftCardValue.minus(amount);
+
+            if (remainingGiftCardBalance.isZero()) return;
+
+            if (remainingGiftCardBalance.greaterThanOrEqualTo(_this10.outstandingBalance)) {
+              amount = amount.plus(_this10.outstandingBalance);
+              _this10.outstandingBalance = new Decimal(0);
+            } else {
+              amount = remainingGiftCardBalance;
+              _this10.outstandingBalance = _this10.outstandingBalance.minus(remainingGiftCardBalance);
+            }
+
+            t.amount = amount.toString();
+          });
+        }
+      } else {
+        if (!giftCardTransactions.empty()) {
+          ActiveResource.Collection.build(giftCardTransactions.toArray().reverse()).each(function (t) {
+            if (_this10.outstandingBalance.isZero()) return;
+
+            var amount = new Decimal(t.amount);
+
+            if (amount.greaterThanOrEqualTo(_this10.outstandingBalance.abs())) {
+              amount = amount.plus(_this10.outstandingBalance);
+              _this10.outstandingBalance = new Decimal(0);
+            } else {
+              _this10.outstandingBalance = _this10.outstandingBalance.plus(amount);
+              amount = new Decimal(0);
+            }
+
+            t.amount = amount.toString();
+          });
+        }
+      }
+
+      if (remainingBalanceTransaction) {
+        remainingBalanceTransaction.amount = this.outstandingBalance.toString();
       }
     }
   });
@@ -660,6 +724,7 @@ Occasion.Modules.push(function (library) {
   library.TimeSlot.className = 'TimeSlot';
   library.TimeSlot.queryName = 'time_slots';
 
+  library.TimeSlot.belongsTo('order');
   library.TimeSlot.belongsTo('product');
   library.TimeSlot.belongsTo('venue');
 
