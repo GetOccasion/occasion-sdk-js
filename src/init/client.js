@@ -18,7 +18,8 @@ class Occasion {
       headers: {
         Authorization: "Basic " + encodedToken
       },
-      immutable
+      immutable,
+      strictAttributes: true
     };
 
     var resourceLibrary =
