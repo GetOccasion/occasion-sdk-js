@@ -79,7 +79,7 @@ describe('Occasion.Order', function() {
     it('adds price attributes to order', function () {
       var _this = this;
       return this.promise.then(function() {
-        expect(_.keys(_this.order.attributes())).toContain(
+        expect(_.keys(_this.order)).toContain(
           'subtotal',
           'couponAmount',
           'tax',
@@ -106,7 +106,7 @@ describe('Occasion.Order', function() {
       var _this = this;
       return this.promise.then(function() {
 
-        expect(_.keys(_this.order.attributes())).toContain(
+        expect(_.keys(_this.order)).toContain(
           'subtotal',
           'couponAmount',
           'tax',
@@ -400,10 +400,229 @@ describe('Occasion.Order', function() {
       });
     });
 
+    describe('changing outstandingBalance', function() {
       beforeEach(function() {
+        this.occsnClient.Product.find('1kbsdf')
+        .then(window.onSuccess);
 
+        this.promise = moxios.wait(() => {
+          return moxios.requests.mostRecent().respondWith(JsonApiResponses.Product.find.success)
+          .then(() => {
+            this.product = window.onSuccess.calls.mostRecent().args[0];
+          });
+        });
       });
 
+      describe('one gift card', function() {
+        beforeEach(function() {
+          this.promise2 = this.promise.then(() => {
+            this.occsnClient.Order.create({ product: this.product }).then(window.onSuccess);
+
+            return moxios.wait(() => {
+              return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.gift_cards)
+              .then(() => {
+                this.order = window.onSuccess.calls.mostRecent().args[0];
+              });
+            });
+          });
+        });
+
+        describe('raising balance', function() {
+          describe('sufficient gift card value', function() {
+            beforeEach(function() {
+              this.promise3 = this.promise2.then(() => {
+                this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 3.0 }), '2.0');
+                this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0.0');
+
+                this.order.save().then(window.onSuccess);
+
+                return moxios.wait(() => {
+                  return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.higher_price)
+                  .then(() => {
+                    this.order = window.onSuccess.calls.mostRecent().args[0];
+                  });
+                });
+              });
+            });
+
+            it('charges gift card more', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().first().amount).toEqual('3');
+              });
+            });
+
+            it('does not charge credit card more', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().last().amount).toEqual('0');
+              });
+            });
+          });
+
+          describe('insufficient gift card value', function() {
+            beforeEach(function() {
+              this.promise3 = this.promise2.then(() => {
+                this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 2.0 }), '2');
+                this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0');
+
+                this.order.save().then(window.onSuccess);
+
+                return moxios.wait(() => {
+                  return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.higher_price)
+                  .then(() => {
+                    this.order = window.onSuccess.calls.mostRecent().args[0];
+                  });
+                });
+              });
+            });
+
+            it('does not charge gift card more', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().first().amount).toEqual('2');
+              });
+            });
+
+            it('charges credit card more', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().last().amount).toEqual('1');
+              });
+            });
+          });
+        });
+
+        describe('lowering balance', function() {
+          beforeEach(function() {
+            this.promise3 = this.promise2.then(() => {
+              this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 3.0 }), '2');
+              this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0');
+
+              this.order.save().then(window.onSuccess);
+
+              return moxios.wait(() => {
+                return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.lower_price)
+                .then(() => {
+                  this.order = window.onSuccess.calls.mostRecent().args[0];
+                });
+              });
+            });
+          });
+
+          it('charges gift card less', function() {
+            return this.promise3.then(() => {
+              expect(this.order.transactions().target().first().amount).toEqual('0');
+            });
+          });
+        });
+      });
+
+      describe('two gift cards', function() {
+        beforeEach(function() {
+          this.promise2 = this.promise.then(() => {
+            this.occsnClient.Order.create({ product: this.product }).then(window.onSuccess);
+
+            return moxios.wait(() => {
+              return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.gift_cards)
+              .then(() => {
+                this.order = window.onSuccess.calls.mostRecent().args[0];
+              });
+            });
+          });
+        });
+
+        describe('raising balance', function() {
+          describe('sufficient gift card value', function() {
+            beforeEach(function() {
+              this.promise3 = this.promise2.then(() => {
+                this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 1.0 }), '1');
+                this.order.charge(this.occsnClient.GiftCard.build({ id: '2', value: 2.0 }), '1');
+                this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0');
+
+                this.order.save().then(window.onSuccess);
+
+                return moxios.wait(() => {
+                  return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.higher_price)
+                  .then(() => {
+                    this.order = window.onSuccess.calls.mostRecent().args[0];
+                  });
+                });
+              });
+            });
+
+            it('charges last gift card more', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().get(1).amount).toEqual('2');
+              });
+            });
+
+            it('does not charge credit card more', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().last().amount).toEqual('0');
+              });
+            });
+          });
+
+          describe('insufficient gift card value', function() {
+            beforeEach(function() {
+              this.promise3 = this.promise2.then(() => {
+                this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 1.0 }), '1');
+                this.order.charge(this.occsnClient.GiftCard.build({ id: '2', value: 1.0 }), '1');
+                this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0');
+
+                this.order.save().then(window.onSuccess);
+
+                return moxios.wait(() => {
+                  return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.higher_price)
+                  .then(() => {
+                    this.order = window.onSuccess.calls.mostRecent().args[0];
+                  });
+                });
+              });
+            });
+
+            it('does not charge gift card more', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().get(1).amount).toEqual('1');
+              });
+            });
+
+            it('charges credit card more', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().last().amount).toEqual('1');
+              });
+            });
+          });
+        });
+
+        describe('lowering balance', function() {
+          beforeEach(function() {
+            this.promise3 = this.promise2.then(() => {
+              this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 1.0 }), '1');
+              this.order.charge(this.occsnClient.GiftCard.build({ id: '2', value: 1.0 }), '1');
+              this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0');
+
+              this.order.save().then(window.onSuccess);
+
+              return moxios.wait(() => {
+                return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.lower_price)
+                .then(() => {
+                  this.order = window.onSuccess.calls.mostRecent().args[0];
+                });
+              });
+            });
+          });
+
+          it('charges gift cards less', function() {
+            return this.promise3.then(() => {
+              expect(this.order.transactions().target().get(0).amount).toEqual('0');
+              expect(this.order.transactions().target().get(1).amount).toEqual('0');
+            });
+          });
+
+          it('does not charge credit card more', function() {
+            return this.promise3.then(() => {
+              expect(this.order.transactions().target().last().amount).toEqual('0');
+            });
+          });
+        });
       });
     });
   });

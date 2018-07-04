@@ -1,0 +1,13 @@
+{
+  "data": {
+    "type": "orders",
+    "attributes": {
+      "subtotal": 4.0,
+      "couponAmount": 2.0,
+      "tax": 1.0,
+      "giftCardAmount": 2.0,
+      "price": 3.0,
+      "outstandingBalance": 1.0
+    }
+  }
+}

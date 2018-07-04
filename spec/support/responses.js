@@ -68,6 +68,18 @@ window.JsonApiResponses = {
       status: 200,
       response: getJSONFixture('orders/price.json')
     },
+    higher_price: {
+      status: 200,
+      response: getJSONFixture('orders/higher_price.json')
+    },
+    lower_price: {
+      status: 200,
+      response: getJSONFixture('orders/lower_price.json')
+    },
+    gift_cards: {
+      status: 200,
+      response: getJSONFixture('orders/gift_cards.json')
+    },
     save: {
       success: {
         status: 200,

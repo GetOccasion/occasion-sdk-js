@@ -166,5 +166,58 @@ Occasion.Modules.push(function(library) {
     .each((attr) => {
       this[attr] = new Decimal(this[attr]);
     });
+
+    if(this.outstandingBalance && !this.outstandingBalance.isZero()) {
+      var giftCardTransactions = this.transactions().target().select((t) => t.paymentMethod().isA(library.GiftCard));
+      var remainingBalanceTransaction = this.transactions().target().detect((t) => !t.paymentMethod().isA(library.GiftCard));
+
+      if(this.outstandingBalance.isPositive()) {
+        if(!giftCardTransactions.empty()) {
+          giftCardTransactions
+          .each((t) => {
+            if(this.outstandingBalance.isZero()) return;
+
+            let amount = new Decimal(t.amount);
+            let giftCardValue = new Decimal(t.paymentMethod().value);
+            let remainingGiftCardBalance = giftCardValue.minus(amount);
+
+            if(remainingGiftCardBalance.isZero()) return;
+
+            if(remainingGiftCardBalance.greaterThanOrEqualTo(this.outstandingBalance)) {
+              amount = amount.plus(this.outstandingBalance);
+              this.outstandingBalance = new Decimal(0);
+            } else {
+              amount = remainingGiftCardBalance;
+              this.outstandingBalance = this.outstandingBalance.minus(remainingGiftCardBalance);
+            }
+
+            t.amount = amount.toString();
+          });
+        }
+      } else {
+        if(!giftCardTransactions.empty()) {
+          ActiveResource.Collection.build(giftCardTransactions.toArray().reverse())
+          .each((t) => {
+            if(this.outstandingBalance.isZero()) return;
+
+            let amount = new Decimal(t.amount);
+
+            if(amount.greaterThanOrEqualTo(this.outstandingBalance.abs())) {
+              amount = amount.plus(this.outstandingBalance);
+              this.outstandingBalance = new Decimal(0);
+            } else {
+              this.outstandingBalance = this.outstandingBalance.plus(amount);
+              amount = new Decimal(0);
+            }
+
+            t.amount = amount.toString();
+          });
+        }
+      }
+
+      if(remainingBalanceTransaction) {
+        remainingBalanceTransaction.amount = this.outstandingBalance.toString();
+      }
+    }
   });
 });
