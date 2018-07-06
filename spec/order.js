@@ -468,6 +468,12 @@ describe('Occasion.Order', function() {
                 expect(this.order.transactions().target().last().amount).toEqual('0');
               });
             });
+
+            it('changes order.giftCardAmount to match new total', function() {
+              return this.promise3.then(() => {
+                expect(this.order.giftCardAmount.toString()).toEqual('3');
+              });
+            });
           });
 
           describe('insufficient gift card value', function() {
@@ -517,6 +523,11 @@ describe('Occasion.Order', function() {
               });
             });
 
+            it('does not change order.giftCardAmount', function() {
+              return this.promise3.then(() => {
+                expect(this.order.giftCardAmount.toString()).toEqual('2');
+              });
+            });
           });
         });
 
@@ -552,6 +563,12 @@ describe('Occasion.Order', function() {
           it('uses original order as cloned transaction inverse', function() {
             return this.promise3.then(() => {
               expect(this.order.transactions().target().first().order()).toBe(this.order);
+            });
+          });
+
+          it('changes order.giftCardAmount to match new total', function() {
+            return this.promise3.then(() => {
+              expect(this.order.giftCardAmount.toString()).toEqual('0');
             });
           });
         });
@@ -613,6 +630,12 @@ describe('Occasion.Order', function() {
                 expect(this.order.transactions().target().last().amount).toEqual('0');
               });
             });
+
+            it('changes order.giftCardAmount to match new total', function() {
+              return this.promise3.then(() => {
+                expect(this.order.giftCardAmount.toString()).toEqual('3');
+              });
+            });
           });
 
           describe('insufficient gift card value', function() {
@@ -648,6 +671,12 @@ describe('Occasion.Order', function() {
             it('charges credit card more', function() {
               return this.promise3.then(() => {
                 expect(this.order.transactions().target().last().amount).toEqual('1');
+              });
+            });
+
+            it('does not change order.giftCardAmount', function() {
+              return this.promise3.then(() => {
+                expect(this.order.giftCardAmount.toString()).toEqual('2');
               });
             });
           });
@@ -688,6 +717,12 @@ describe('Occasion.Order', function() {
           it('does not charge credit card more', function() {
             return this.promise3.then(() => {
               expect(this.order.transactions().target().last().amount).toEqual('0');
+            });
+          });
+
+          it('changes order.giftCardAmount to match new total', function() {
+            return this.promise3.then(() => {
+              expect(this.order.giftCardAmount.toString()).toEqual('0');
             });
           });
         });

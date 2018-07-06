@@ -481,6 +481,14 @@ Occasion.Modules.push(function (library) {
         }
       }
 
+      if (!giftCardTransactions.empty()) {}
+
+      this.giftCardAmount = this.transactions().target().select(function (t) {
+        return t.paymentMethod().isA(library.GiftCard);
+      }).inject(new Decimal(0), function (total, transaction) {
+        return total.plus(transaction.amount);
+      });
+
       if (remainingBalanceTransaction) {
         remainingBalanceTransaction.amount = this.outstandingBalance.toString();
         this.transactions().target().replace(remainingBalanceTransaction, remainingBalanceTransaction.__createClone({ cloner: this }));

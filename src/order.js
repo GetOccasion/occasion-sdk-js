@@ -218,6 +218,15 @@ Occasion.Modules.push(function(library) {
         }
       }
 
+      if(!giftCardTransactions.empty()) {
+        this.giftCardAmount = this.transactions().target()
+          .select((t) => t.paymentMethod().isA(library.GiftCard))
+          .inject(
+            new Decimal(0),
+            (total, transaction) => total.plus(transaction.amount)
+          );
+      }
+
       if(remainingBalanceTransaction) {
         remainingBalanceTransaction.amount = this.outstandingBalance.toString();
         this.transactions().target().replace(
