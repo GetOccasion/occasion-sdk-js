@@ -65,7 +65,7 @@ Occasion.Modules.push(function(library) {
     // @param [Number] amount the amount to charge to the payment method
     // @return [Transaction] the built transaction representing the charge
     charge(paymentMethod, amount) {
-      this.transactions().build({
+      return this.transactions().build({
         amount: amount,
         paymentMethod: paymentMethod
       });
@@ -192,6 +192,8 @@ Occasion.Modules.push(function(library) {
             }
 
             t.amount = amount.toString();
+
+            this.transactions().target().replace(t, t.__createClone({ cloner: this }));
           });
         }
       } else {
@@ -211,12 +213,17 @@ Occasion.Modules.push(function(library) {
             }
 
             t.amount = amount.toString();
+            this.transactions().target().replace(t, t.__createClone({ cloner: this }));
           });
         }
       }
 
       if(remainingBalanceTransaction) {
         remainingBalanceTransaction.amount = this.outstandingBalance.toString();
+        this.transactions().target().replace(
+          remainingBalanceTransaction,
+          remainingBalanceTransaction.__createClone({ cloner: this })
+        );
       }
     }
   });

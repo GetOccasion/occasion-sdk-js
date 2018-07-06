@@ -273,7 +273,7 @@ Occasion.Modules.push(function (library) {
     }, {
       key: 'charge',
       value: function charge(paymentMethod, amount) {
-        this.transactions().build({
+        return this.transactions().build({
           amount: amount,
           paymentMethod: paymentMethod
         });
@@ -456,6 +456,8 @@ Occasion.Modules.push(function (library) {
             }
 
             t.amount = amount.toString();
+
+            _this10.transactions().target().replace(t, t.__createClone({ cloner: _this10 }));
           });
         }
       } else {
@@ -474,12 +476,14 @@ Occasion.Modules.push(function (library) {
             }
 
             t.amount = amount.toString();
+            _this10.transactions().target().replace(t, t.__createClone({ cloner: _this10 }));
           });
         }
       }
 
       if (remainingBalanceTransaction) {
         remainingBalanceTransaction.amount = this.outstandingBalance.toString();
+        this.transactions().target().replace(remainingBalanceTransaction, remainingBalanceTransaction.__createClone({ cloner: this }));
       }
     }
   });

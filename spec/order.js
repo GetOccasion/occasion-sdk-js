@@ -431,7 +431,7 @@ describe('Occasion.Order', function() {
           describe('sufficient gift card value', function() {
             beforeEach(function() {
               this.promise3 = this.promise2.then(() => {
-                this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 3.0 }), '2.0');
+                this.giftCardTransaction = this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 3.0 }), '2.0');
                 this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0.0');
 
                 this.order.save().then(window.onSuccess);
@@ -451,6 +451,18 @@ describe('Occasion.Order', function() {
               });
             });
 
+            it('clones transaction', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().first()).not.toBe(this.giftCardTransaction);
+              });
+            });
+
+            it('uses original order as cloned transaction inverse', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().first().order()).toBe(this.order);
+              });
+            });
+
             it('does not charge credit card more', function() {
               return this.promise3.then(() => {
                 expect(this.order.transactions().target().last().amount).toEqual('0');
@@ -461,8 +473,8 @@ describe('Occasion.Order', function() {
           describe('insufficient gift card value', function() {
             beforeEach(function() {
               this.promise3 = this.promise2.then(() => {
-                this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 2.0 }), '2');
-                this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0');
+                this.giftCardTransaction = this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 2.0 }), '2');
+                this.creditCardTransaction = this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0');
 
                 this.order.save().then(window.onSuccess);
 
@@ -481,18 +493,37 @@ describe('Occasion.Order', function() {
               });
             });
 
+            it('does not clone gift card transaction', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().first()).toBe(this.giftCardTransaction);
+              });
+            });
+
             it('charges credit card more', function() {
               return this.promise3.then(() => {
                 expect(this.order.transactions().target().last().amount).toEqual('1');
               });
             });
+
+            it('clones credit card transaction', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().last()).not.toBe(this.creditCardTransaction);
+              });
+            });
+
+            it('uses original order as cloned transaction inverse', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().last().order()).toBe(this.order);
+              });
+            });
+
           });
         });
 
         describe('lowering balance', function() {
           beforeEach(function() {
             this.promise3 = this.promise2.then(() => {
-              this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 3.0 }), '2');
+              this.giftCardTransaction = this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 3.0 }), '2');
               this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0');
 
               this.order.save().then(window.onSuccess);
@@ -509,6 +540,18 @@ describe('Occasion.Order', function() {
           it('charges gift card less', function() {
             return this.promise3.then(() => {
               expect(this.order.transactions().target().first().amount).toEqual('0');
+            });
+          });
+
+          it('clones gift card transaction', function() {
+            return this.promise3.then(() => {
+              expect(this.order.transactions().target().first()).not.toBe(this.giftCardTransaction);
+            });
+          });
+
+          it('uses original order as cloned transaction inverse', function() {
+            return this.promise3.then(() => {
+              expect(this.order.transactions().target().first().order()).toBe(this.order);
             });
           });
         });
@@ -533,7 +576,7 @@ describe('Occasion.Order', function() {
             beforeEach(function() {
               this.promise3 = this.promise2.then(() => {
                 this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 1.0 }), '1');
-                this.order.charge(this.occsnClient.GiftCard.build({ id: '2', value: 2.0 }), '1');
+                this.giftCardTransaction = this.order.charge(this.occsnClient.GiftCard.build({ id: '2', value: 2.0 }), '1');
                 this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0');
 
                 this.order.save().then(window.onSuccess);
@@ -553,6 +596,18 @@ describe('Occasion.Order', function() {
               });
             });
 
+            it('clones gift card transaction', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().get(1)).not.toBe(this.giftCardTransaction);
+              });
+            });
+
+            it('uses original order as cloned transaction inverse', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().get(1).order()).toBe(this.order);
+              });
+            });
+
             it('does not charge credit card more', function() {
               return this.promise3.then(() => {
                 expect(this.order.transactions().target().last().amount).toEqual('0');
@@ -564,7 +619,7 @@ describe('Occasion.Order', function() {
             beforeEach(function() {
               this.promise3 = this.promise2.then(() => {
                 this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 1.0 }), '1');
-                this.order.charge(this.occsnClient.GiftCard.build({ id: '2', value: 1.0 }), '1');
+                this.giftCardTransaction = this.order.charge(this.occsnClient.GiftCard.build({ id: '2', value: 1.0 }), '1');
                 this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0');
 
                 this.order.save().then(window.onSuccess);
@@ -584,6 +639,12 @@ describe('Occasion.Order', function() {
               });
             });
 
+            it('does not clone gift card transaction', function() {
+              return this.promise3.then(() => {
+                expect(this.order.transactions().target().get(1)).toBe(this.giftCardTransaction);
+              });
+            });
+
             it('charges credit card more', function() {
               return this.promise3.then(() => {
                 expect(this.order.transactions().target().last().amount).toEqual('1');
@@ -595,8 +656,8 @@ describe('Occasion.Order', function() {
         describe('lowering balance', function() {
           beforeEach(function() {
             this.promise3 = this.promise2.then(() => {
-              this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 1.0 }), '1');
-              this.order.charge(this.occsnClient.GiftCard.build({ id: '2', value: 1.0 }), '1');
+              this.giftCardTransaction1 = this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 1.0 }), '1');
+              this.giftCardTransaction2 = this.order.charge(this.occsnClient.GiftCard.build({ id: '2', value: 1.0 }), '1');
               this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0');
 
               this.order.save().then(window.onSuccess);
@@ -614,6 +675,13 @@ describe('Occasion.Order', function() {
             return this.promise3.then(() => {
               expect(this.order.transactions().target().get(0).amount).toEqual('0');
               expect(this.order.transactions().target().get(1).amount).toEqual('0');
+            });
+          });
+
+          it('clones gift card transactions', function() {
+            return this.promise3.then(() => {
+              expect(this.order.transactions().target().get(0)).not.toBe(this.giftCardTransaction1);
+              expect(this.order.transactions().target().get(1)).not.toBe(this.giftCardTransaction2);
             });
           });
 
