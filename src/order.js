@@ -193,7 +193,8 @@ Occasion.Modules.push(function(library) {
 
             t.amount = amount.toString();
 
-            this.transactions().target().replace(t, t.__createClone({ cloner: this }));
+            this.transactions().target().delete(t);
+            t.__createClone({ cloner: this });
           });
         }
       } else {
@@ -213,7 +214,8 @@ Occasion.Modules.push(function(library) {
             }
 
             t.amount = amount.toString();
-            this.transactions().target().replace(t, t.__createClone({ cloner: this }));
+            this.transactions().target().delete(t);
+            t.__createClone({ cloner: this });
           });
         }
       }
@@ -229,10 +231,9 @@ Occasion.Modules.push(function(library) {
 
       if(remainingBalanceTransaction) {
         remainingBalanceTransaction.amount = this.outstandingBalance.toString();
-        this.transactions().target().replace(
-          remainingBalanceTransaction,
-          remainingBalanceTransaction.__createClone({ cloner: this })
-        );
+
+        this.transactions().target().delete(remainingBalanceTransaction);
+        remainingBalanceTransaction.__createClone({ cloner: this });
       }
     }
   });

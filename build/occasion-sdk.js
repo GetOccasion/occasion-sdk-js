@@ -457,7 +457,8 @@ Occasion.Modules.push(function (library) {
 
             t.amount = amount.toString();
 
-            _this10.transactions().target().replace(t, t.__createClone({ cloner: _this10 }));
+            _this10.transactions().target().delete(t);
+            t.__createClone({ cloner: _this10 });
           });
         }
       } else {
@@ -476,22 +477,25 @@ Occasion.Modules.push(function (library) {
             }
 
             t.amount = amount.toString();
-            _this10.transactions().target().replace(t, t.__createClone({ cloner: _this10 }));
+            _this10.transactions().target().delete(t);
+            t.__createClone({ cloner: _this10 });
           });
         }
       }
 
-      if (!giftCardTransactions.empty()) {}
-
-      this.giftCardAmount = this.transactions().target().select(function (t) {
-        return t.paymentMethod().isA(library.GiftCard);
-      }).inject(new Decimal(0), function (total, transaction) {
-        return total.plus(transaction.amount);
-      });
+      if (!giftCardTransactions.empty()) {
+        this.giftCardAmount = this.transactions().target().select(function (t) {
+          return t.paymentMethod().isA(library.GiftCard);
+        }).inject(new Decimal(0), function (total, transaction) {
+          return total.plus(transaction.amount);
+        });
+      }
 
       if (remainingBalanceTransaction) {
         remainingBalanceTransaction.amount = this.outstandingBalance.toString();
-        this.transactions().target().replace(remainingBalanceTransaction, remainingBalanceTransaction.__createClone({ cloner: this }));
+
+        this.transactions().target().delete(remainingBalanceTransaction);
+        remainingBalanceTransaction.__createClone({ cloner: this });
       }
     }
   });
@@ -769,7 +773,7 @@ Occasion.Modules.push(function (library) {
 
   library.Transaction.attributes('amount');
 
-  library.Transaction.belongsTo('order', { inverseOf: 'answers' });
+  library.Transaction.belongsTo('order', { inverseOf: 'transactions' });
   library.Transaction.belongsTo('paymentMethod', { polymorphic: true });
 });
 
