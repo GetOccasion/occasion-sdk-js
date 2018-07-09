@@ -205,12 +205,14 @@ Occasion.Modules.push(function(library) {
 
             let amount = new Decimal(t.amount);
 
-            if(amount.greaterThanOrEqualTo(this.outstandingBalance.abs())) {
+            if(amount.greaterThan(this.outstandingBalance.abs())) {
               amount = amount.plus(this.outstandingBalance);
               this.outstandingBalance = new Decimal(0);
             } else {
               this.outstandingBalance = this.outstandingBalance.plus(amount);
-              amount = new Decimal(0);
+
+              this.removeCharge(t.paymentMethod());
+              return;
             }
 
             t.amount = amount.toString();

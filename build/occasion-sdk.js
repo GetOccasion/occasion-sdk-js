@@ -468,12 +468,14 @@ Occasion.Modules.push(function (library) {
 
             var amount = new Decimal(t.amount);
 
-            if (amount.greaterThanOrEqualTo(_this10.outstandingBalance.abs())) {
+            if (amount.greaterThan(_this10.outstandingBalance.abs())) {
               amount = amount.plus(_this10.outstandingBalance);
               _this10.outstandingBalance = new Decimal(0);
             } else {
               _this10.outstandingBalance = _this10.outstandingBalance.plus(amount);
-              amount = new Decimal(0);
+
+              _this10.removeCharge(t.paymentMethod());
+              return;
             }
 
             t.amount = amount.toString();

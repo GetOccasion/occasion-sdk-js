@@ -568,7 +568,7 @@ describe('Occasion.Order', function() {
 
           it('charges gift card less', function() {
             return this.promise3.then(() => {
-              expect(this.giftCardTransaction2.amount).toEqual('0');
+              expect(this.giftCardTransaction2.amount).toEqual('1');
             });
           });
 
@@ -581,6 +581,36 @@ describe('Occasion.Order', function() {
           it('uses original order as cloned transaction inverse', function() {
             return this.promise3.then(() => {
               expect(this.giftCardTransaction2.order()).toBe(this.order);
+            });
+          });
+
+          it('changes order.giftCardAmount to match new total', function() {
+            return this.promise3.then(() => {
+              expect(this.order.giftCardAmount.toString()).toEqual('1');
+            });
+          });
+        });
+
+        describe('removing balance', function() {
+          beforeEach(function() {
+            this.promise3 = this.promise2.then(() => {
+              this.giftCardTransaction = this.order.charge(this.occsnClient.GiftCard.build({ id: '1', value: 3.0 }), '2');
+              this.creditCardTransaction = this.order.charge(this.occsnClient.CreditCard.build({ id: 'cc_token' }), '0');
+
+              this.order.save().then(window.onSuccess);
+
+              return moxios.wait(() => {
+                return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.no_balance)
+                .then(() => {
+                  this.order = window.onSuccess.calls.mostRecent().args[0];
+                });
+              });
+            });
+          });
+
+          it('removes gift card charge', function() {
+            return this.promise3.then(() => {
+              expect(this.order.transactions().target().detect((t) => t.paymentMethod().isA(this.occsnClient.GiftCard))).toBeUndefined();
             });
           });
 
@@ -726,7 +756,7 @@ describe('Occasion.Order', function() {
               this.order.save().then(window.onSuccess);
 
               return moxios.wait(() => {
-                return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.lower_price)
+                return moxios.requests.mostRecent().respondWith(JsonApiResponses.Order.lower_price2)
                 .then(() => {
                   this.order = window.onSuccess.calls.mostRecent().args[0];
 
@@ -740,15 +770,19 @@ describe('Occasion.Order', function() {
 
           it('charges gift cards less', function() {
             return this.promise3.then(() => {
-              expect(this.giftCardTransaction3.amount).toEqual('0');
-              expect(this.giftCardTransaction4.amount).toEqual('0');
+              expect(this.giftCardTransaction3.amount).toEqual('0.5');
             });
           });
 
-          it('clones gift card transactions', function() {
+          it('removes gift card with no balance', function() {
+            return this.promise3.then(() => {
+              expect(this.giftCardTransaction4).toBeUndefined();
+            });
+          });
+
+          it('clones changed gift card transaction', function() {
             return this.promise3.then(() => {
               expect(this.giftCardTransaction3).not.toBe(this.giftCardTransaction1);
-              expect(this.giftCardTransaction4).not.toBe(this.giftCardTransaction2);
             });
           });
 
@@ -760,7 +794,7 @@ describe('Occasion.Order', function() {
 
           it('changes order.giftCardAmount to match new total', function() {
             return this.promise3.then(() => {
-              expect(this.order.giftCardAmount.toString()).toEqual('0');
+              expect(this.order.giftCardAmount.toString()).toEqual('0.5');
             });
           });
         });
