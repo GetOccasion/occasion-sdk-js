@@ -1,24 +1,24 @@
 /*
-	Occasion Javascript SDK 0.2.0
-	(c) 2017 Peak Labs, LLC DBA Occasion App
+	Occasion Javascript SDK 0.2.1
+	(c) 2018 Peak Labs, LLC DBA Occasion App
 	Occasion Javascript SDK may be freely distributed under the MIT license
 */
 
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
-    define(["active-resource","axios","underscore"], function (a0,b1,c2) {
-      return (root['Occasion'] = factory(a0,b1,c2));
+    define(["active-resource","axios","decimal.js-light","moment","underscore","underscore.string","moment-timezone-with-data-2010-2020"], function (a0,b1,c2,d3,e4,f5,g6) {
+      return (root['Occasion'] = factory(a0,b1,c2,d3,e4,f5,g6));
     });
   } else if (typeof module === 'object' && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(require("active-resource"),require("axios"),require("underscore"));
+    module.exports = factory(require("active-resource"),require("axios"),require("decimal.js-light"),require("moment"),require("underscore"),require("underscore.string"),require("moment-timezone-with-data-2010-2020"));
   } else {
-    root['Occasion'] = factory(root["active-resource"],root["axios"],root["underscore"]);
+    root['Occasion'] = factory(root["active-resource"],root["axios"],root["decimal.js-light"],root["moment"],root["underscore"],root["underscore.string"],root["moment-timezone-with-data-2010-2020"]);
   }
-}(this, function (ActiveResource, axios, _) {
+}(this, function (ActiveResource, axios, Decimal, moment, _, s) {
 
 'use strict';
 
@@ -44,6 +44,7 @@ var Occasion = function () {
 
       var url = options.baseUrl || Occasion.baseUrl;
       var token = options.token;
+      var immutable = options.immutable || false;
 
       if (!_.isString(token)) {
         throw 'Token must be of type string';
@@ -51,11 +52,15 @@ var Occasion = function () {
 
       var encodedToken = window.btoa(unescape(encodeURIComponent(token + ':')));
 
-      var resourceLibrary = ActiveResource.createResourceLibrary(url, {
+      var libraryOptions = {
         headers: {
           Authorization: "Basic " + encodedToken
-        }
-      });
+        },
+        immutable: immutable,
+        strictAttributes: true
+      };
+
+      var resourceLibrary = ActiveResource.createResourceLibrary(url, libraryOptions);
 
       Occasion.Modules.each(function (initializeModule) {
         initializeModule(resourceLibrary);
@@ -69,6 +74,7 @@ var Occasion = function () {
 }();
 
 Occasion.baseUrl = 'https://occ.sn/api/v1';
+
 
 Occasion.Modules = ActiveResource.prototype.Collection.build();
 Occasion.Modules.push(function (library) {
@@ -87,13 +93,37 @@ Occasion.Modules.push(function (library) {
   library.Answer.className = 'Answer';
   library.Answer.queryName = 'answers';
 
+  library.Answer.attributes('value');
+
   library.Answer.belongsTo('question');
   library.Answer.belongsTo('option');
-  library.Answer.belongsTo('order');
+  library.Answer.belongsTo('order', { inverseOf: 'answers' });
 });
+
 Occasion.Modules.push(function (library) {
-  library.Coupon = function (_library$Base2) {
-    _inherits(Coupon, _library$Base2);
+  library.Attendee = function (_library$Base2) {
+    _inherits(Attendee, _library$Base2);
+
+    function Attendee() {
+      _classCallCheck(this, Attendee);
+
+      return _possibleConstructorReturn(this, (Attendee.__proto__ || Object.getPrototypeOf(Attendee)).apply(this, arguments));
+    }
+
+    return Attendee;
+  }(library.Base);
+
+  library.Attendee.className = 'Attendee';
+  library.Attendee.queryName = 'attendees';
+
+  library.Attendee.attributes('address', 'age', 'city', 'country', 'email', 'firstName', 'gender', 'lastName', 'phone', 'state', 'zip');
+
+  library.Attendee.belongsTo('order', { inverseOf: 'attendees' });
+});
+
+Occasion.Modules.push(function (library) {
+  library.Coupon = function (_library$Base3) {
+    _inherits(Coupon, _library$Base3);
 
     function Coupon() {
       _classCallCheck(this, Coupon);
@@ -111,8 +141,8 @@ Occasion.Modules.push(function (library) {
   library.Coupon.hasMany('orders');
 });
 Occasion.Modules.push(function (library) {
-  library.Currency = function (_library$Base3) {
-    _inherits(Currency, _library$Base3);
+  library.Currency = function (_library$Base4) {
+    _inherits(Currency, _library$Base4);
 
     function Currency() {
       _classCallCheck(this, Currency);
@@ -130,8 +160,8 @@ Occasion.Modules.push(function (library) {
   library.Currency.hasMany('orders');
 });
 Occasion.Modules.push(function (library) {
-  library.Customer = function (_library$Base4) {
-    _inherits(Customer, _library$Base4);
+  library.Customer = function (_library$Base5) {
+    _inherits(Customer, _library$Base5);
 
     function Customer() {
       _classCallCheck(this, Customer);
@@ -139,15 +169,41 @@ Occasion.Modules.push(function (library) {
       return _possibleConstructorReturn(this, (Customer.__proto__ || Object.getPrototypeOf(Customer)).apply(this, arguments));
     }
 
+    _createClass(Customer, [{
+      key: 'ahoyEmailChanged',
+      value: function ahoyEmailChanged() {
+        /* TODO: Align customer data with Ahoy using +this+ */
+      }
+    }]);
+
     return Customer;
   }(library.Base);
 
   library.Customer.className = 'Customer';
   library.Customer.queryName = 'customers';
+
+  library.Customer.attributes('email', 'firstName', 'lastName', 'zip');
+
+  library.Customer.hasMany('orders', { inverseOf: 'customer' });
+
+  library.Customer.afterBuild(function () {
+    var lastEmail = null;
+    var watchEmail = _.bind(function () {
+      if (lastEmail != this.email) {
+        _.bind(this.ahoyEmailChanged, this)();
+        lastEmail = this.email;
+      }
+
+      setTimeout(watchEmail, 500);
+    }, this);
+
+    setTimeout(watchEmail, 500);
+  });
 });
+
 Occasion.Modules.push(function (library) {
-  library.Merchant = function (_library$Base5) {
-    _inherits(Merchant, _library$Base5);
+  library.Merchant = function (_library$Base6) {
+    _inherits(Merchant, _library$Base6);
 
     function Merchant() {
       _classCallCheck(this, Merchant);
@@ -166,8 +222,8 @@ Occasion.Modules.push(function (library) {
   library.Merchant.hasMany('venues');
 });
 Occasion.Modules.push(function (library) {
-  library.Option = function (_library$Base6) {
-    _inherits(Option, _library$Base6);
+  library.Option = function (_library$Base7) {
+    _inherits(Option, _library$Base7);
 
     function Option() {
       _classCallCheck(this, Option);
@@ -185,8 +241,8 @@ Occasion.Modules.push(function (library) {
   library.Option.belongsTo('question');
 });
 Occasion.Modules.push(function (library) {
-  library.Order = function (_library$Base7) {
-    _inherits(Order, _library$Base7);
+  library.Order = function (_library$Base8) {
+    _inherits(Order, _library$Base8);
 
     function Order() {
       _classCallCheck(this, Order);
@@ -196,8 +252,22 @@ Occasion.Modules.push(function (library) {
 
     _createClass(Order, [{
       key: 'calculatePrice',
+
+
+      // POSTs the order to `/orders/price`, which calculates price related fields and adds them to the order
+      // @return [Promise] a promise for the order with price-related fields
       value: function calculatePrice() {
         return this.interface().post(this.klass().links()['related'] + 'price', this);
+      }
+
+      // POSTs the order to `/orders/information`, which calculates price + quantity related fields and adds them to the
+      //   order
+      // @return [Promise] a promise for the order with price & quantity related fields
+
+    }, {
+      key: 'retrieveInformation',
+      value: function retrieveInformation() {
+        return this.interface().post(this.klass().links()['related'] + 'information', this);
       }
 
       // Creates a transaction with a payment method and an amount
@@ -209,7 +279,7 @@ Occasion.Modules.push(function (library) {
     }, {
       key: 'charge',
       value: function charge(paymentMethod, amount) {
-        this.transactions().build({
+        return this.transactions().build({
           amount: amount,
           paymentMethod: paymentMethod
         });
@@ -248,6 +318,15 @@ Occasion.Modules.push(function (library) {
           this.transactions().target().delete(transaction);
         }
       }
+
+      // @private
+
+      // Called by Order.construct, which injects order
+      // @note Must return order
+      //
+      // @param [Occsn.Order] order the order that wants an answer to the question
+      // @param [Occsn.Question] question the question to construct an answer for
+
     }], [{
       key: 'construct',
       value: function construct(attributes) {
@@ -269,24 +348,47 @@ Occasion.Modules.push(function (library) {
         })];
 
         if (order.product() != null) {
-          promises.push(order.product().questions().includes('options').all());
+          promises.push(order.product().questions().includes('options').perPage(500).load());
+
+          if (!order.product().requiresTimeSlotSelection) {
+            promises.push(order.product().timeSlots().includes({ product: 'merchant' }).where({ status: 'bookable' }).perPage(500).all());
+          }
         }
 
-        return axios.all(promises).then(axios.spread(function (order, questions) {
-          // Add blank answer for each question not of category 'static'
-          if (questions != undefined) {
-            questions.each(function (question) {
+        var _this = this;
+        return Promise.all(promises).then(function (args) {
+          order = args[0];
+          var questions = args[1];
+          var timeSlots = args[2];
 
-              if (question.category != 'static') {
-                order.answers().build({
-                  question: question
-                });
-              }
-            });
-          }
+          if (questions != undefined) questions.inject(order, _this.__constructAnswer);
+          if (timeSlots != undefined) order.timeSlots().assign(timeSlots, false);
 
           return order;
-        }));
+        });
+      }
+    }, {
+      key: '__constructAnswer',
+      value: function __constructAnswer(order, question) {
+        if (question.category != 'static') {
+          var answer = order.answers().build({
+            question: question
+          });
+
+          switch (question.formControl) {
+            case 'drop_down':
+            case 'option_list':
+              answer.assignOption(question.options().target().detect(function (o) {
+                return o.default;
+              }));
+              break;
+            case 'spin_button':
+              answer.value = question.min;
+              break;
+          }
+        }
+
+        return order;
       }
     }]);
 
@@ -296,19 +398,120 @@ Occasion.Modules.push(function (library) {
   library.Order.className = 'Order';
   library.Order.queryName = 'orders';
 
+  library.Order.attributes('sessionIdentifier', 'status');
+
   library.Order.belongsTo('coupon');
   library.Order.belongsTo('currency');
-  library.Order.belongsTo('customer', { autosave: true });
+  library.Order.belongsTo('customer', { autosave: true, inverseOf: 'orders' });
   library.Order.belongsTo('merchant');
   library.Order.belongsTo('product');
 
-  library.Order.hasMany('answers', { autosave: true });
+  library.Order.hasMany('answers', { autosave: true, inverseOf: 'order' });
+  library.Order.hasMany('attendees', { autosave: true, inverseOf: 'order' });
   library.Order.hasMany('timeSlots');
-  library.Order.hasMany('transactions', { autosave: true });
+  library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' });
+
+  library.Order.afterRequest(function () {
+    var _this10 = this;
+
+    if (this.product() && !this.product().attendeeQuestions.empty()) {
+      var diff = this.quantity - this.attendees().size();
+
+      if (diff != 0) {
+        for (var i = 0; i < Math.abs(diff); i++) {
+          if (diff > 0) {
+            this.attendees().build();
+          } else {
+            this.attendees().target().pop();
+          }
+        }
+      }
+    }
+
+    ActiveResource.Collection.build(['subtotal', 'couponAmount', 'tax', 'giftCardAmount', 'price', 'outstandingBalance']).select(function (attr) {
+      return _this10[attr];
+    }).each(function (attr) {
+      _this10[attr] = new Decimal(_this10[attr]);
+    });
+
+    if (this.outstandingBalance && !this.outstandingBalance.isZero()) {
+      var giftCardTransactions = this.transactions().target().select(function (t) {
+        return t.paymentMethod().isA(library.GiftCard);
+      });
+      var remainingBalanceTransaction = this.transactions().target().detect(function (t) {
+        return !t.paymentMethod().isA(library.GiftCard);
+      });
+
+      if (this.outstandingBalance.isPositive()) {
+        if (!giftCardTransactions.empty()) {
+          giftCardTransactions.each(function (t) {
+            if (_this10.outstandingBalance.isZero()) return;
+
+            var amount = new Decimal(t.amount);
+            var giftCardValue = new Decimal(t.paymentMethod().value);
+            var remainingGiftCardBalance = giftCardValue.minus(amount);
+
+            if (remainingGiftCardBalance.isZero()) return;
+
+            if (remainingGiftCardBalance.greaterThanOrEqualTo(_this10.outstandingBalance)) {
+              amount = amount.plus(_this10.outstandingBalance);
+              _this10.outstandingBalance = new Decimal(0);
+            } else {
+              amount = remainingGiftCardBalance;
+              _this10.outstandingBalance = _this10.outstandingBalance.minus(remainingGiftCardBalance);
+            }
+
+            t.amount = amount.toString();
+
+            _this10.transactions().target().delete(t);
+            t.__createClone({ cloner: _this10 });
+          });
+        }
+      } else {
+        if (!giftCardTransactions.empty()) {
+          ActiveResource.Collection.build(giftCardTransactions.toArray().reverse()).each(function (t) {
+            if (_this10.outstandingBalance.isZero()) return;
+
+            var amount = new Decimal(t.amount);
+
+            if (amount.greaterThan(_this10.outstandingBalance.abs())) {
+              amount = amount.plus(_this10.outstandingBalance);
+              _this10.outstandingBalance = new Decimal(0);
+            } else {
+              _this10.outstandingBalance = _this10.outstandingBalance.plus(amount);
+
+              _this10.removeCharge(t.paymentMethod());
+              return;
+            }
+
+            t.amount = amount.toString();
+            _this10.transactions().target().delete(t);
+            t.__createClone({ cloner: _this10 });
+          });
+        }
+      }
+
+      if (!giftCardTransactions.empty()) {
+        this.giftCardAmount = this.transactions().target().select(function (t) {
+          return t.paymentMethod().isA(library.GiftCard);
+        }).inject(new Decimal(0), function (total, transaction) {
+          return total.plus(transaction.amount);
+        });
+      }
+
+      if (remainingBalanceTransaction) {
+        remainingBalanceTransaction.amount = this.outstandingBalance.toString();
+
+        this.transactions().target().delete(remainingBalanceTransaction);
+        remainingBalanceTransaction.__createClone({ cloner: this });
+      }
+    }
+  });
 });
+
 Occasion.Modules.push(function (library) {
-  library.PaymentMethod = function (_library$Base8) {
-    _inherits(PaymentMethod, _library$Base8);
+  library.PaymentMethod = function (_library$Base9) {
+    _inherits(PaymentMethod, _library$Base9);
 
     function PaymentMethod() {
       _classCallCheck(this, PaymentMethod);
@@ -325,14 +528,124 @@ Occasion.Modules.push(function (library) {
   library.PaymentMethod.hasMany('transactions', { as: 'paymentMethod' });
 });
 Occasion.Modules.push(function (library) {
-  library.Product = function (_library$Base9) {
-    _inherits(Product, _library$Base9);
+  library.Product = function (_library$Base10) {
+    _inherits(Product, _library$Base10);
 
     function Product() {
       _classCallCheck(this, Product);
 
       return _possibleConstructorReturn(this, (Product.__proto__ || Object.getPrototypeOf(Product)).apply(this, arguments));
     }
+
+    _createClass(Product, [{
+      key: 'constructCalendar',
+      value: function constructCalendar(month) {
+        return this.__constructCalendar(month);
+      }
+
+      // @todo Remove includes({ product: 'merchant' }) when AR supports owner assignment to has_many children
+      //   in non-load queries
+
+    }, {
+      key: '__constructCalendar',
+      value: function __constructCalendar(month, preload, prevPagePromise) {
+        var timeZone = this.merchant().timeZone;
+
+        var today = moment.tz(timeZone);
+        var lowerRange;
+        if (month) {
+          lowerRange = month.isSame(today, 'month') ? today : month.tz(timeZone).startOf('month');
+        } else {
+          lowerRange = today;
+        }
+        var upperRange = lowerRange.clone().endOf('month');
+
+        var numRequests = Math.ceil(upperRange.diff(lowerRange, 'days') / this.monthlyTimeSlotDaysBatchSize);
+        if (numRequests < 1) numRequests = 1;
+
+        var i = 0;
+        var requests = [];
+
+        var lower = lowerRange.clone();
+        var upper = lowerRange.clone().add(this.monthlyTimeSlotDaysBatchSize, 'days');
+        while (i < numRequests) {
+          if (i + 1 == numRequests) upper = upperRange.clone();
+
+          requests.push(this.timeSlots().includes({
+            product: 'merchant'
+          }).where({
+            startsAt: {
+              ge: lower.toDate(),
+              le: upper.toDate()
+            },
+            status: 'bookable'
+          }).all());
+
+          lower.add(this.monthlyTimeSlotDaysBatchSize, 'days');
+          upper.add(this.monthlyTimeSlotDaysBatchSize, 'days');
+          i++;
+        }
+
+        var product = this;
+
+        var currentPromise = Promise.all(requests).then(function (timeSlotsArray) {
+          var allTimeSlots = ActiveResource.Collection.build(timeSlotsArray).map(function (ts) {
+            return ts.toArray();
+          }).flatten();
+
+          var startDate = moment(lowerRange).startOf('month');
+          var endDate = moment(lowerRange).endOf('month');
+
+          var response = ActiveResource.CollectionResponse.build();
+
+          var day = startDate;
+          while (day.isSameOrBefore(endDate)) {
+            response.push({
+              day: day,
+              timeSlots: allTimeSlots.select(function (timeSlot) {
+                return timeSlot.startsAt.isSame(day, 'day');
+              })
+            });
+
+            day = day.clone().add(1, 'days');
+          }
+
+          response.hasNextPage = function () {
+            return true;
+          };
+
+          response.nextPage = function (preloadCount) {
+            this.nextPromise = this.nextPromise || product.__constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), preloadCount, currentPromise);
+
+            return this.nextPromise;
+          };
+
+          if (month && !month.isSame(today, 'month')) {
+            response.hasPrevPage = function () {
+              return true;
+            };
+
+            response.prevPage = function () {
+              this.prevPromise = this.prevPromise || prevPagePromise || product.__constructCalendar(moment(lowerRange).subtract(1, 'months'), 0);
+
+              return this.prevPromise;
+            };
+          }
+
+          if (product.monthlyTimeSlotPreloadSize > 0) {
+            if (_.isUndefined(preload)) {
+              response.nextPage(product.monthlyTimeSlotPreloadSize - 1);
+            } else if (preload > 0) {
+              response.nextPage(--preload);
+            }
+          }
+
+          return response;
+        });
+
+        return currentPromise;
+      }
+    }]);
 
     return Product;
   }(library.Base);
@@ -347,10 +660,25 @@ Occasion.Modules.push(function (library) {
   library.Product.hasMany('questions');
   library.Product.hasMany('redeemables');
   library.Product.hasMany('timeSlots');
+
+  library.Product.afterRequest(function () {
+    this.attendeeQuestions = ActiveResource.Collection.build(this.attendeeQuestions).map(function (q) {
+      return s.camelize(q, true);
+    });
+
+    if (this.firstTimeSlotStartsAt) {
+      if (this.merchant()) {
+        this.firstTimeSlotStartsAt = moment.tz(this.firstTimeSlotStartsAt, this.merchant().timeZone);
+      } else {
+        throw 'Product has timeslots - but merchant.timeZone is not available; include merchant in response.';
+      }
+    }
+  });
 });
+
 Occasion.Modules.push(function (library) {
-  library.Question = function (_library$Base10) {
-    _inherits(Question, _library$Base10);
+  library.Question = function (_library$Base11) {
+    _inherits(Question, _library$Base11);
 
     function Question() {
       _classCallCheck(this, Question);
@@ -370,8 +698,8 @@ Occasion.Modules.push(function (library) {
 });
 Occasion.Modules.push(function (library) {
   // TODO: Remove ability to directly query redeemables
-  library.Redeemable = function (_library$Base11) {
-    _inherits(Redeemable, _library$Base11);
+  library.Redeemable = function (_library$Base12) {
+    _inherits(Redeemable, _library$Base12);
 
     function Redeemable() {
       _classCallCheck(this, Redeemable);
@@ -388,8 +716,25 @@ Occasion.Modules.push(function (library) {
   library.Redeemable.belongsTo('product');
 });
 Occasion.Modules.push(function (library) {
-  library.TimeSlot = function (_library$Base12) {
-    _inherits(TimeSlot, _library$Base12);
+  library.State = function (_library$Base13) {
+    _inherits(State, _library$Base13);
+
+    function State() {
+      _classCallCheck(this, State);
+
+      return _possibleConstructorReturn(this, (State.__proto__ || Object.getPrototypeOf(State)).apply(this, arguments));
+    }
+
+    return State;
+  }(library.Base);
+
+  library.State.className = 'State';
+  library.State.queryName = 'states';
+});
+
+Occasion.Modules.push(function (library) {
+  library.TimeSlot = function (_library$Base14) {
+    _inherits(TimeSlot, _library$Base14);
 
     function TimeSlot() {
       _classCallCheck(this, TimeSlot);
@@ -403,12 +748,24 @@ Occasion.Modules.push(function (library) {
   library.TimeSlot.className = 'TimeSlot';
   library.TimeSlot.queryName = 'time_slots';
 
+  library.TimeSlot.belongsTo('order');
   library.TimeSlot.belongsTo('product');
   library.TimeSlot.belongsTo('venue');
+
+  library.TimeSlot.afterRequest(function () {
+    if (this.product().merchant()) {
+      this.startsAt = moment.tz(this.startsAt, this.product().merchant().timeZone);
+    } else {
+      throw 'Must use includes({ product: \'merchant\' }) in timeSlot request';
+    }
+
+    this.duration = moment.duration(this.duration, 'minutes');
+  });
 });
+
 Occasion.Modules.push(function (library) {
-  library.Transaction = function (_library$Base13) {
-    _inherits(Transaction, _library$Base13);
+  library.Transaction = function (_library$Base15) {
+    _inherits(Transaction, _library$Base15);
 
     function Transaction() {
       _classCallCheck(this, Transaction);
@@ -422,12 +779,15 @@ Occasion.Modules.push(function (library) {
   library.Transaction.className = 'Transaction';
   library.Transaction.queryName = 'transactions';
 
-  library.Transaction.belongsTo('order');
+  library.Transaction.attributes('amount');
+
+  library.Transaction.belongsTo('order', { inverseOf: 'transactions' });
   library.Transaction.belongsTo('paymentMethod', { polymorphic: true });
 });
+
 Occasion.Modules.push(function (library) {
-  library.Venue = function (_library$Base14) {
-    _inherits(Venue, _library$Base14);
+  library.Venue = function (_library$Base16) {
+    _inherits(Venue, _library$Base16);
 
     function Venue() {
       _classCallCheck(this, Venue);
@@ -442,9 +802,11 @@ Occasion.Modules.push(function (library) {
   library.Venue.queryName = 'venues';
 
   library.Venue.belongsTo('merchant');
+  library.Venue.belongsTo('state');
 
   library.Venue.hasMany('products');
 });
+
 Occasion.Modules.push(function (library) {
   library.CreditCard = function (_library$PaymentMetho) {
     _inherits(CreditCard, _library$PaymentMetho);

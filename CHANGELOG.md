@@ -9,7 +9,7 @@
 * Use `Content-Type: 'application/json'`
 * Only add answers in `Order.construct` for questions where `category != 'static'`
 
-## Master
+## 0.2.1
 
 * Add `Attendee` model and `Order#hasMany('attendees')`
 * Add `immutable` option support for active-resource-immutable
