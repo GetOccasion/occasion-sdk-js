@@ -33,4 +33,5 @@
 
 ## Master
 
-* Add `Answer#valid()` for determing if each `formControl` permutation has a valid `value`
+* Add `Answer#valid()` for determining if each `formControl` permutation has a valid `value`
+* Add `Customer#complete()` and `Attendee#complete()` for determining if all fields are filled out for them

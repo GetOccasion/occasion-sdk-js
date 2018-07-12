@@ -3,6 +3,11 @@ Occasion.Modules.push(function(library) {
     ahoyEmailChanged() {
       /* TODO: Align customer data with Ahoy using +this+ */
     }
+
+    complete() {
+      return this.email && this.firstName && this.lastName &&
+        this.email.length > 0 && this.firstName.length > 0 && this.lastName.length > 0;
+    }
   };
 
   library.Customer.className = 'Customer';

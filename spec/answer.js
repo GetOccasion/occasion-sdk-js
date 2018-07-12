@@ -1,4 +1,4 @@
-describe('Occasion.TimeSlot', function() {
+describe('Occasion.Answer', function() {
   beforeEach(function () {
     this.occsnClient = Occasion.Client({ token: 'my_token' });
 
