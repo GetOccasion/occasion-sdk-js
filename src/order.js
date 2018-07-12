@@ -168,8 +168,8 @@ Occasion.Modules.push(function(library) {
     });
 
     if(this.outstandingBalance && !this.outstandingBalance.isZero()) {
-      var giftCardTransactions = this.transactions().target().select((t) => t.paymentMethod().isA(library.GiftCard));
-      var remainingBalanceTransaction = this.transactions().target().detect((t) => !t.paymentMethod().isA(library.GiftCard));
+      var giftCardTransactions = this.transactions().target().select((t) => t.paymentMethod() && t.paymentMethod().isA(library.GiftCard));
+      var remainingBalanceTransaction = this.transactions().target().detect((t) => !(t.paymentMethod() && t.paymentMethod().isA(library.GiftCard)));
 
       if(this.outstandingBalance.isPositive()) {
         if(!giftCardTransactions.empty()) {

@@ -459,10 +459,10 @@ Occasion.Modules.push(function (library) {
 
     if (this.outstandingBalance && !this.outstandingBalance.isZero()) {
       var giftCardTransactions = this.transactions().target().select(function (t) {
-        return t.paymentMethod().isA(library.GiftCard);
+        return t.paymentMethod() && t.paymentMethod().isA(library.GiftCard);
       });
       var remainingBalanceTransaction = this.transactions().target().detect(function (t) {
-        return !t.paymentMethod().isA(library.GiftCard);
+        return !(t.paymentMethod() && t.paymentMethod().isA(library.GiftCard));
       });
 
       if (this.outstandingBalance.isPositive()) {
