@@ -30,3 +30,7 @@
 * Use strictAttributes mode, meaning that only attributes defined by the SDK will be returned by attributes()
 * Wrap Order price-related attributes in Decimal.js objects
 * Rebalance changed outstandingBalance across gift card and other payment transactions
+
+## Master
+
+* Add `Answer#valid()` for determing if each `formControl` permutation has a valid `value`
