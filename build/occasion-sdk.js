@@ -423,6 +423,8 @@ Occasion.Modules.push(function (library) {
 
   library.Order.attributes('sessionIdentifier', 'status');
 
+  library.Order.attributes('couponAmount', 'giftCardAmount', 'outstandingBalance', 'price', 'quantity', 'subtotal', 'tax', 'taxPercentage', 'total', { readOnly: true });
+
   library.Order.belongsTo('coupon');
   library.Order.belongsTo('currency');
   library.Order.belongsTo('customer', { autosave: true, inverseOf: 'orders' });
@@ -451,7 +453,7 @@ Occasion.Modules.push(function (library) {
       }
     }
 
-    ActiveResource.Collection.build(['subtotal', 'couponAmount', 'tax', 'giftCardAmount', 'price', 'outstandingBalance']).select(function (attr) {
+    ActiveResource.Collection.build(['subtotal', 'couponAmount', 'tax', 'giftCardAmount', 'price', 'total', 'outstandingBalance']).select(function (attr) {
       return _this11[attr];
     }).each(function (attr) {
       _this11[attr] = new Decimal(_this11[attr]);

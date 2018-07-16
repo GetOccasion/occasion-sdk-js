@@ -126,7 +126,23 @@ Occasion.Modules.push(function(library) {
   library.Order.className = 'Order';
   library.Order.queryName = 'orders';
 
-  library.Order.attributes('sessionIdentifier', 'status');
+  library.Order.attributes(
+    'sessionIdentifier',
+    'status'
+  );
+
+  library.Order.attributes(
+    'couponAmount',
+    'giftCardAmount',
+    'outstandingBalance',
+    'price',
+    'quantity',
+    'subtotal',
+    'tax',
+    'taxPercentage',
+    'total',
+    { readOnly: true }
+  );
 
   library.Order.belongsTo('coupon');
   library.Order.belongsTo('currency');
@@ -160,6 +176,7 @@ Occasion.Modules.push(function(library) {
       'tax',
       'giftCardAmount',
       'price',
+      'total',
       'outstandingBalance'
     ])
     .select((attr) => this[attr])
