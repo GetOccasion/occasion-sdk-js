@@ -1,5 +1,28 @@
 Occasion.Modules.push(function(library) {
-  library.TimeSlot = class TimeSlot extends library.Base {};
+  library.TimeSlot = class TimeSlot extends library.Base {
+    toString(format) {
+      var output;
+
+      if(this.product().showTimeSlotDuration) {
+        var durationTimeSlot = this.startsAt.clone().add(this.duration);
+        var durationFormat;
+
+        if(durationTimeSlot.isSame(this.startsAt, 'day')) {
+          durationFormat = 'LT';
+        } else {
+          durationFormat = 'LLLL';
+        }
+
+        output = timeSlot.startsAt.format(format);
+        output += ' - ';
+        output += durationTimeSlot.format(durationFormat);
+      } else {
+        output = timeSlot.startsAt.format(format);
+      }
+
+      return output;
+    }
+  };
 
   library.TimeSlot.className = 'TimeSlot';
   library.TimeSlot.queryName = 'time_slots';

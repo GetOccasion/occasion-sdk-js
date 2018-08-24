@@ -767,6 +767,32 @@ Occasion.Modules.push(function (library) {
       return _possibleConstructorReturn(this, (TimeSlot.__proto__ || Object.getPrototypeOf(TimeSlot)).apply(this, arguments));
     }
 
+    _createClass(TimeSlot, [{
+      key: 'toString',
+      value: function toString(format) {
+        var output;
+
+        if (this.product().showTimeSlotDuration) {
+          var durationTimeSlot = this.startsAt.clone().add(this.duration);
+          var durationFormat;
+
+          if (durationTimeSlot.isSame(this.startsAt, 'day')) {
+            durationFormat = 'LT';
+          } else {
+            durationFormat = 'LLLL';
+          }
+
+          output = timeSlot.startsAt.format(format);
+          output += ' - ';
+          output += durationTimeSlot.format(durationFormat);
+        } else {
+          output = timeSlot.startsAt.format(format);
+        }
+
+        return output;
+      }
+    }]);
+
     return TimeSlot;
   }(library.Base);
 
