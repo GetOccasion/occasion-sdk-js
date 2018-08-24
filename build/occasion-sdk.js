@@ -782,11 +782,11 @@ Occasion.Modules.push(function (library) {
             durationFormat = 'LLLL';
           }
 
-          output = timeSlot.startsAt.format(format);
+          output = this.startsAt.format(format);
           output += ' - ';
           output += durationTimeSlot.format(durationFormat);
         } else {
-          output = timeSlot.startsAt.format(format);
+          output = this.startsAt.format(format);
         }
 
         return output;
