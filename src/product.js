@@ -49,6 +49,10 @@ Occasion.Modules.push(function(library) {
       }
 
       var product = this;
+      if(_.isUndefined(product.__currentCalendarPage)) product.__currentCalendarPage = 0;
+      if(_.isUndefined(product.__preloadedCalendarPages)) product.__preloadedCalendarPages = 0;
+
+      product.__preloadingCalendar = true;
 
       var currentPromise = Promise.all(requests)
       .then(function(timeSlotsArray) {
@@ -75,11 +79,22 @@ Occasion.Modules.push(function(library) {
         response.hasNextPage = function() { return true; };
 
         response.nextPage = function(preloadCount) {
-          this.nextPromise = this.nextPromise || product.__constructCalendar(
-            moment(upperRange).add(1, 'days').startOf('month'),
-            preloadCount,
-            currentPromise
-          );
+          if(!this.nextPromise) {
+            this.nextPromise = product.__constructCalendar(
+              moment(upperRange).add(1, 'days').startOf('month'),
+              preloadCount,
+              currentPromise
+            );
+          }
+
+          if(_.isUndefined(preloadCount)) {
+            product.__currentCalendarPage += 1;
+
+            if(!product.__preloadingCalendar &&
+              product.__preloadedCalendarPages <= product.__currentCalendarPage + product.monthlyTimeSlotPreloadSize / 2) {
+              product.__lastPreloadedCalendarPage.nextPage(product.monthlyTimeSlotPreloadSize);
+            }
+          }
 
           return this.nextPromise;
         };
@@ -91,6 +106,8 @@ Occasion.Modules.push(function(library) {
             this.prevPromise = this.prevPromise || prevPagePromise ||
               product.__constructCalendar(moment(lowerRange).subtract(1, 'months'), 0);
 
+            product.__currentCalendarPage -= 1;
+
             return this.prevPromise;
           };
         }
@@ -100,8 +117,13 @@ Occasion.Modules.push(function(library) {
             response.nextPage(product.monthlyTimeSlotPreloadSize - 1);
           } else if(preload > 0) {
             response.nextPage(--preload);
+          } else {
+            product.__preloadingCalendar = false;
           }
         }
+
+        product.__preloadedCalendarPages += 1;
+        product.__lastPreloadedCalendarPage = response;
 
         return response;
       });

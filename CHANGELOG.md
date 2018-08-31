@@ -36,3 +36,4 @@
 * Add `Answer#valid()` for determining if each `formControl` permutation has a valid `value`
 * Add `Customer#complete()` and `Attendee#complete()` for determining if all fields are filled out for them
 * Add `TimeSlot#toString(format)` for outputting timeSlot.startsAt + duration to string based on a format argument
+* Improve `Product#constructCalendar` preloading so it continually preloads further months

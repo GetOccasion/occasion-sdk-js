@@ -128,10 +128,28 @@ describe('Occasion.Product', function() {
         moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-23.+/, JsonApiResponses.TimeSlot.calendar[3]);
         moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-30.+/, JsonApiResponses.TimeSlot.calendar[4]);
 
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-06-01.+/, JsonApiResponses.TimeSlot.calendar[0]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-06-08.+/, JsonApiResponses.TimeSlot.calendar[1]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-06-15.+/, JsonApiResponses.TimeSlot.calendar[2]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-06-22.+/, JsonApiResponses.TimeSlot.calendar[3]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-06-29.+/, JsonApiResponses.TimeSlot.calendar[4]);
+
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-07-01.+/, JsonApiResponses.TimeSlot.calendar[0]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-07-08.+/, JsonApiResponses.TimeSlot.calendar[1]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-07-15.+/, JsonApiResponses.TimeSlot.calendar[2]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-07-22.+/, JsonApiResponses.TimeSlot.calendar[3]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-07-29.+/, JsonApiResponses.TimeSlot.calendar[4]);
+
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-01.+/, JsonApiResponses.TimeSlot.calendar[0]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-08.+/, JsonApiResponses.TimeSlot.calendar[1]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-15.+/, JsonApiResponses.TimeSlot.calendar[2]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-22.+/, JsonApiResponses.TimeSlot.calendar[3]);
+        moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-29.+/, JsonApiResponses.TimeSlot.calendar[4]);
+
         this.promise2 = this.promise.then(() => {
           jasmine.clock().mockDate(moment.tz('2018-05-09', this.product.merchant().timeZone).toDate());
 
-          return this.product.__constructCalendar(moment.tz('2018-05-01', this.product.merchant().timeZone), 0).then((collection) => {
+          return this.product.__constructCalendar(moment.tz('2018-05-01', this.product.merchant().timeZone)).then((collection) => {
             this.calendarCollection = collection;
           });
         });
@@ -154,22 +172,28 @@ describe('Occasion.Product', function() {
       describe('nextPage()', function() {
         beforeEach(function() {
           this.promise3 = this.promise2.then(() => {
-            spyOn(this.product, '__constructCalendar').and.callThrough();
+            return moxios.wait(() => {
+              spyOn(this.product, '__constructCalendar').and.callThrough();
+              return this.calendarCollection.nextPage()
+                .then((collection) => {
+                  collection.nextPage();
 
-            return this.calendarCollection.nextPage();
+                  return moxios.wait(() => {}, 100);
+                });
+            }, 100);
           });
         });
 
-        it('calls next month of timeSlots', function() {
+        it('preloads next month of timeSlots', function() {
           return this.promise3.then(() => {
             var i = this.product.__constructCalendar.calls.count() - 2;
-            expect(this.product.__constructCalendar.calls.all()[i].args[0].isSame(moment.tz('2018-06-01', this.product.merchant().timeZone))).toBeTruthy();
+            expect(this.product.__constructCalendar.calls.all()[i].args[0].isSame(moment.tz('2018-08-01', this.product.merchant().timeZone))).toBeTruthy();
           });
         });
 
         it('preloads next next month of timeSlots', function() {
           return this.promise3.then(() => {
-            expect(this.product.__constructCalendar.calls.mostRecent().args[0].isSame(moment.tz('2018-07-01', this.product.merchant().timeZone))).toBeTruthy();
+            expect(this.product.__constructCalendar.calls.mostRecent().args[0].isSame(moment.tz('2018-09-01', this.product.merchant().timeZone))).toBeTruthy();
           });
         });
 
@@ -267,67 +291,6 @@ describe('Occasion.Product', function() {
         return this.promise2.then(() => {
           expect(this.calendarCollection.first().timeSlots.size()).toBe(2);
           expect(this.calendarCollection.last().timeSlots.size()).toBe(5);
-        });
-      });
-
-      describe('hasNextPage()', function() {
-        it('returns true', function() {
-          return this.promise2.then(() => {
-            expect(this.calendarCollection.hasNextPage()).toBeTruthy();
-          });
-        });
-      });
-
-      describe('nextPage()', function() {
-        beforeEach(function() {
-          this.promise3 = this.promise2.then(() => {
-            spyOn(this.product, '__constructCalendar').and.callThrough();
-
-            return this.calendarCollection.nextPage();
-          });
-        });
-
-        it('calls next month of timeSlots', function() {
-          return this.promise3.then(() => {
-            var i = this.product.__constructCalendar.calls.count() - 2;
-            expect(this.product.__constructCalendar.calls.all()[i].args[0].isSame(moment.tz('2018-06-01', this.product.merchant().timeZone))).toBeTruthy();
-          });
-        });
-
-        it('preloads next next month of timeSlots', function() {
-          return this.promise3.then(() => {
-            expect(this.product.__constructCalendar.calls.mostRecent().args[0].isSame(moment.tz('2018-07-01', this.product.merchant().timeZone))).toBeTruthy();
-          });
-        });
-      });
-
-      describe('hasPrevPage()', function() {
-        it('returns true', function() {
-          return this.promise2.then(() => {
-            expect(this.calendarCollection.hasPrevPage()).toBeTruthy();
-          });
-        });
-      });
-
-      describe('prevPage()', function() {
-        beforeEach(function() {
-          this.promise3 = this.promise2.then(() => {
-            moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-04-01.+/, JsonApiResponses.TimeSlot.calendar[0]);
-            moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-04-08.+/, JsonApiResponses.TimeSlot.calendar[1]);
-            moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-04-15.+/, JsonApiResponses.TimeSlot.calendar[2]);
-            moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-04-22.+/, JsonApiResponses.TimeSlot.calendar[3]);
-            moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-04-29.+/, JsonApiResponses.TimeSlot.calendar[4]);
-
-            spyOn(this.product, '__constructCalendar').and.callThrough();
-
-            return this.calendarCollection.prevPage();
-          });
-        });
-
-        it('calls prev month of timeSlots', function() {
-          return this.promise3.then(() => {
-            expect(this.product.__constructCalendar.calls.mostRecent().args[0].isSame(moment.tz('2018-04-01', this.product.merchant().timeZone))).toBeTruthy();
-          });
         });
       });
     });
