@@ -31,7 +31,7 @@
 * Wrap Order price-related attributes in Decimal.js objects
 * Rebalance changed outstandingBalance across gift card and other payment transactions
 
-## Master
+## 0.2.2
 
 * Add `Answer#valid()` for determining if each `formControl` permutation has a valid `value`
 * Add `Customer#complete()` and `Attendee#complete()` for determining if all fields are filled out for them

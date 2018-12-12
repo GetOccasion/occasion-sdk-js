@@ -1,5 +1,5 @@
 /*
-	Occasion Javascript SDK 0.2.1
+	Occasion Javascript SDK 0.2.2
 	(c) 2018 Peak Labs, LLC DBA Occasion App
 	Occasion Javascript SDK may be freely distributed under the MIT license
 */
@@ -87,6 +87,19 @@ Occasion.Modules.push(function (library) {
       return _possibleConstructorReturn(this, (Answer.__proto__ || Object.getPrototypeOf(Answer)).apply(this, arguments));
     }
 
+    _createClass(Answer, [{
+      key: 'valid',
+      value: function valid() {
+        switch (this.question().formControl) {
+          case 'checkbox':
+          case 'waiver':
+            return !(this.question().required || this.question().formControl == 'waiver') || this.value == 'YES' || this.value != 'NO' && this.value;
+          default:
+            return !this.question().required || this.question().optionable && this.option() || !this.question().optionable && this.value && this.value != '';
+        }
+      }
+    }]);
+
     return Answer;
   }(library.Base);
 
@@ -109,6 +122,17 @@ Occasion.Modules.push(function (library) {
 
       return _possibleConstructorReturn(this, (Attendee.__proto__ || Object.getPrototypeOf(Attendee)).apply(this, arguments));
     }
+
+    _createClass(Attendee, [{
+      key: 'complete',
+      value: function complete() {
+        var _this4 = this;
+
+        return !this.order().product().attendeeQuestions.detect(function (question) {
+          return !_this4[question] || _this4[question].length == 0;
+        });
+      }
+    }]);
 
     return Attendee;
   }(library.Base);
@@ -173,6 +197,11 @@ Occasion.Modules.push(function (library) {
       key: 'ahoyEmailChanged',
       value: function ahoyEmailChanged() {
         /* TODO: Align customer data with Ahoy using +this+ */
+      }
+    }, {
+      key: 'complete',
+      value: function complete() {
+        return this.email && this.firstName && this.lastName && this.email.length > 0 && this.firstName.length > 0 && this.lastName.length > 0;
       }
     }]);
 
@@ -400,6 +429,8 @@ Occasion.Modules.push(function (library) {
 
   library.Order.attributes('sessionIdentifier', 'status');
 
+  library.Order.attributes('couponAmount', 'giftCardAmount', 'outstandingBalance', 'price', 'quantity', 'subtotal', 'tax', 'taxPercentage', 'total', { readOnly: true });
+
   library.Order.belongsTo('coupon');
   library.Order.belongsTo('currency');
   library.Order.belongsTo('customer', { autosave: true, inverseOf: 'orders' });
@@ -412,7 +443,7 @@ Occasion.Modules.push(function (library) {
   library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' });
 
   library.Order.afterRequest(function () {
-    var _this10 = this;
+    var _this11 = this;
 
     if (this.product() && !this.product().attendeeQuestions.empty()) {
       var diff = this.quantity - this.attendees().size();
@@ -428,24 +459,24 @@ Occasion.Modules.push(function (library) {
       }
     }
 
-    ActiveResource.Collection.build(['subtotal', 'couponAmount', 'tax', 'giftCardAmount', 'price', 'outstandingBalance']).select(function (attr) {
-      return _this10[attr];
+    ActiveResource.Collection.build(['subtotal', 'couponAmount', 'tax', 'giftCardAmount', 'price', 'total', 'outstandingBalance']).select(function (attr) {
+      return _this11[attr];
     }).each(function (attr) {
-      _this10[attr] = new Decimal(_this10[attr]);
+      _this11[attr] = new Decimal(_this11[attr]);
     });
 
     if (this.outstandingBalance && !this.outstandingBalance.isZero()) {
       var giftCardTransactions = this.transactions().target().select(function (t) {
-        return t.paymentMethod().isA(library.GiftCard);
+        return t.paymentMethod() && t.paymentMethod().isA(library.GiftCard);
       });
       var remainingBalanceTransaction = this.transactions().target().detect(function (t) {
-        return !t.paymentMethod().isA(library.GiftCard);
+        return !(t.paymentMethod() && t.paymentMethod().isA(library.GiftCard));
       });
 
       if (this.outstandingBalance.isPositive()) {
         if (!giftCardTransactions.empty()) {
           giftCardTransactions.each(function (t) {
-            if (_this10.outstandingBalance.isZero()) return;
+            if (_this11.outstandingBalance.isZero()) return;
 
             var amount = new Decimal(t.amount);
             var giftCardValue = new Decimal(t.paymentMethod().value);
@@ -453,47 +484,47 @@ Occasion.Modules.push(function (library) {
 
             if (remainingGiftCardBalance.isZero()) return;
 
-            if (remainingGiftCardBalance.greaterThanOrEqualTo(_this10.outstandingBalance)) {
-              amount = amount.plus(_this10.outstandingBalance);
-              _this10.outstandingBalance = new Decimal(0);
+            if (remainingGiftCardBalance.greaterThanOrEqualTo(_this11.outstandingBalance)) {
+              amount = amount.plus(_this11.outstandingBalance);
+              _this11.outstandingBalance = new Decimal(0);
             } else {
               amount = remainingGiftCardBalance;
-              _this10.outstandingBalance = _this10.outstandingBalance.minus(remainingGiftCardBalance);
+              _this11.outstandingBalance = _this11.outstandingBalance.minus(remainingGiftCardBalance);
             }
 
             t.amount = amount.toString();
 
-            _this10.transactions().target().delete(t);
-            t.__createClone({ cloner: _this10 });
+            _this11.transactions().target().delete(t);
+            t.__createClone({ cloner: _this11 });
           });
         }
       } else {
         if (!giftCardTransactions.empty()) {
           ActiveResource.Collection.build(giftCardTransactions.toArray().reverse()).each(function (t) {
-            if (_this10.outstandingBalance.isZero()) return;
+            if (_this11.outstandingBalance.isZero()) return;
 
             var amount = new Decimal(t.amount);
 
-            if (amount.greaterThan(_this10.outstandingBalance.abs())) {
-              amount = amount.plus(_this10.outstandingBalance);
-              _this10.outstandingBalance = new Decimal(0);
+            if (amount.greaterThan(_this11.outstandingBalance.abs())) {
+              amount = amount.plus(_this11.outstandingBalance);
+              _this11.outstandingBalance = new Decimal(0);
             } else {
-              _this10.outstandingBalance = _this10.outstandingBalance.plus(amount);
+              _this11.outstandingBalance = _this11.outstandingBalance.plus(amount);
 
-              _this10.removeCharge(t.paymentMethod());
+              _this11.removeCharge(t.paymentMethod());
               return;
             }
 
             t.amount = amount.toString();
-            _this10.transactions().target().delete(t);
-            t.__createClone({ cloner: _this10 });
+            _this11.transactions().target().delete(t);
+            t.__createClone({ cloner: _this11 });
           });
         }
       }
 
       if (!giftCardTransactions.empty()) {
         this.giftCardAmount = this.transactions().target().select(function (t) {
-          return t.paymentMethod().isA(library.GiftCard);
+          return t.paymentMethod() && t.paymentMethod().isA(library.GiftCard);
         }).inject(new Decimal(0), function (total, transaction) {
           return total.plus(transaction.amount);
         });
@@ -587,6 +618,10 @@ Occasion.Modules.push(function (library) {
         }
 
         var product = this;
+        if (_.isUndefined(product.__currentCalendarPage)) product.__currentCalendarPage = 0;
+        if (_.isUndefined(product.__preloadedCalendarPages)) product.__preloadedCalendarPages = 0;
+
+        product.__preloadingCalendar = true;
 
         var currentPromise = Promise.all(requests).then(function (timeSlotsArray) {
           var allTimeSlots = ActiveResource.Collection.build(timeSlotsArray).map(function (ts) {
@@ -615,7 +650,17 @@ Occasion.Modules.push(function (library) {
           };
 
           response.nextPage = function (preloadCount) {
-            this.nextPromise = this.nextPromise || product.__constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), preloadCount, currentPromise);
+            if (!this.nextPromise) {
+              this.nextPromise = product.__constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), preloadCount, currentPromise);
+            }
+
+            if (_.isUndefined(preloadCount)) {
+              product.__currentCalendarPage += 1;
+
+              if (!product.__preloadingCalendar && product.__preloadedCalendarPages <= product.__currentCalendarPage + product.monthlyTimeSlotPreloadSize / 2) {
+                product.__lastPreloadedCalendarPage.nextPage(product.monthlyTimeSlotPreloadSize);
+              }
+            }
 
             return this.nextPromise;
           };
@@ -628,6 +673,8 @@ Occasion.Modules.push(function (library) {
             response.prevPage = function () {
               this.prevPromise = this.prevPromise || prevPagePromise || product.__constructCalendar(moment(lowerRange).subtract(1, 'months'), 0);
 
+              product.__currentCalendarPage -= 1;
+
               return this.prevPromise;
             };
           }
@@ -637,8 +684,13 @@ Occasion.Modules.push(function (library) {
               response.nextPage(product.monthlyTimeSlotPreloadSize - 1);
             } else if (preload > 0) {
               response.nextPage(--preload);
+            } else {
+              product.__preloadingCalendar = false;
             }
           }
+
+          product.__preloadedCalendarPages += 1;
+          product.__lastPreloadedCalendarPage = response;
 
           return response;
         });
@@ -741,6 +793,32 @@ Occasion.Modules.push(function (library) {
 
       return _possibleConstructorReturn(this, (TimeSlot.__proto__ || Object.getPrototypeOf(TimeSlot)).apply(this, arguments));
     }
+
+    _createClass(TimeSlot, [{
+      key: 'toString',
+      value: function toString(format) {
+        var output;
+
+        if (this.product().showTimeSlotDuration) {
+          var durationTimeSlot = this.startsAt.clone().add(this.duration);
+          var durationFormat;
+
+          if (durationTimeSlot.isSame(this.startsAt, 'day')) {
+            durationFormat = 'LT';
+          } else {
+            durationFormat = 'LLLL';
+          }
+
+          output = this.startsAt.format(format);
+          output += ' - ';
+          output += durationTimeSlot.format(durationFormat);
+        } else {
+          output = this.startsAt.format(format);
+        }
+
+        return output;
+      }
+    }]);
 
     return TimeSlot;
   }(library.Base);
