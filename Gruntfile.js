@@ -111,6 +111,7 @@ module.exports = function(grunt) {
         src: [
           'src/init/client.js',
           'src/init/modules.js',
+          'src/construct_calendar.js',
           'src/*.js',
           'src/**/*.js',
         ],

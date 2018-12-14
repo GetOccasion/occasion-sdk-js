@@ -71,6 +71,149 @@ Occasion.baseUrl = 'https://occ.sn/api/v1';
 
 
 Occasion.Modules = ActiveResource.prototype.Collection.build();
+// @todo Remove includes({ product: 'merchant' }) when AR supports owner assignment to has_many children
+//   in non-load queries
+Occasion.__constructCalendar = function __constructCalendar(month) {
+  var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+      calendar = _ref.calendar,
+      monthlyTimeSlotDaysBatchSize = _ref.monthlyTimeSlotDaysBatchSize,
+      monthlyTimeSlotPreloadSize = _ref.monthlyTimeSlotPreloadSize,
+      preload = _ref.preload,
+      prevPagePromise = _ref.prevPagePromise,
+      relation = _ref.relation,
+      timeZone = _ref.timeZone;
+
+  var today = moment.tz(timeZone);
+  var lowerRange;
+  if (month) {
+    lowerRange = month.isSame(today, 'month') ? today : month.tz(timeZone).startOf('month');
+  } else {
+    lowerRange = today;
+  }
+  var upperRange = lowerRange.clone().endOf('month');
+
+  var numRequests = Math.ceil(upperRange.diff(lowerRange, 'days') / monthlyTimeSlotDaysBatchSize);
+  if (numRequests < 1) numRequests = 1;
+
+  var i = 0;
+  var requests = [];
+
+  var lower = lowerRange.clone();
+  var upper = lowerRange.clone().add(monthlyTimeSlotDaysBatchSize, 'days');
+  while (i < numRequests) {
+    if (i + 1 == numRequests) upper = upperRange.clone();
+
+    requests.push(relation.includes({
+      product: 'merchant'
+    }).where({
+      startsAt: {
+        ge: lower.toDate(),
+        le: upper.toDate()
+      },
+      status: 'bookable'
+    }).all());
+
+    lower.add(monthlyTimeSlotDaysBatchSize, 'days');
+    upper.add(monthlyTimeSlotDaysBatchSize, 'days');
+    i++;
+  }
+
+  calendar = calendar || {};
+  if (_.isUndefined(calendar.__currentPage)) calendar.__currentPage = 0;
+  if (_.isUndefined(calendar.__preloadedPages)) calendar.__preloadedPages = 0;
+
+  calendar.__preloading = true;
+
+  var currentPromise = Promise.all(requests).then(function (timeSlotsArray) {
+    var allTimeSlots = ActiveResource.Collection.build(timeSlotsArray).map(function (ts) {
+      return ts.toArray();
+    }).flatten();
+
+    var startDate = moment(lowerRange).startOf('month');
+    var endDate = moment(lowerRange).endOf('month');
+
+    var response = ActiveResource.CollectionResponse.build();
+
+    var day = startDate;
+    while (day.isSameOrBefore(endDate)) {
+      response.push({
+        day: day,
+        timeSlots: allTimeSlots.select(function (timeSlot) {
+          return timeSlot.startsAt.isSame(day, 'day');
+        })
+      });
+
+      day = day.clone().add(1, 'days');
+    }
+
+    response.hasNextPage = function () {
+      return true;
+    };
+
+    response.nextPage = function (preloadCount) {
+      if (!this.nextPromise) {
+        this.nextPromise = Occasion.__constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), {
+          calendar: calendar,
+          monthlyTimeSlotDaysBatchSize: monthlyTimeSlotDaysBatchSize,
+          monthlyTimeSlotPreloadSize: monthlyTimeSlotPreloadSize,
+          preload: preloadCount,
+          prevPagePromise: currentPromise,
+          relation: relation,
+          timeZone: timeZone
+        });
+      }
+
+      if (_.isUndefined(preloadCount)) {
+        calendar.__currentPage += 1;
+
+        if (!calendar.__preloading && calendar.__preloadedPages <= calendar.__currentPage + monthlyTimeSlotPreloadSize / 2) {
+          calendar.__lastPreloadedPage.nextPage(monthlyTimeSlotPreloadSize);
+        }
+      }
+
+      return this.nextPromise;
+    };
+
+    if (month && !month.isSame(today, 'month')) {
+      response.hasPrevPage = function () {
+        return true;
+      };
+
+      response.prevPage = function () {
+        this.prevPromise = this.prevPromise || prevPagePromise || Occasion.__constructCalendar(moment(lowerRange).subtract(1, 'months'), {
+          calendar: calendar,
+          monthlyTimeSlotDaysBatchSize: monthlyTimeSlotDaysBatchSize,
+          monthlyTimeSlotPreloadSize: monthlyTimeSlotPreloadSize,
+          preload: 0,
+          relation: relation,
+          timeZone: timeZone
+        });
+
+        calendar.__currentPage -= 1;
+
+        return this.prevPromise;
+      };
+    }
+
+    if (monthlyTimeSlotPreloadSize > 0) {
+      if (_.isUndefined(preload)) {
+        response.nextPage(monthlyTimeSlotPreloadSize - 1);
+      } else if (preload > 0) {
+        response.nextPage(--preload);
+      } else {
+        calendar.__preloading = false;
+      }
+    }
+
+    calendar.__preloadedPages += 1;
+    calendar.__lastPreloadedPage = response;
+
+    return response;
+  });
+
+  return currentPromise;
+};
+
 Occasion.Modules.push(function (library) {
   library.Answer = function (_library$Base) {
     _inherits(Answer, _library$Base);
@@ -565,141 +708,12 @@ Occasion.Modules.push(function (library) {
     _createClass(Product, [{
       key: 'constructCalendar',
       value: function constructCalendar(month) {
-        return this.__constructCalendar(month, { timeZone: this.merchant().timeZone });
-      }
-
-      // @todo Remove includes({ product: 'merchant' }) when AR supports owner assignment to has_many children
-      //   in non-load queries
-
-    }, {
-      key: '__constructCalendar',
-      value: function __constructCalendar(month) {
-        var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
-            preload = _ref.preload,
-            prevPagePromise = _ref.prevPagePromise,
-            timeZone = _ref.timeZone;
-
-        var today = moment.tz(timeZone);
-        var lowerRange;
-        if (month) {
-          lowerRange = month.isSame(today, 'month') ? today : month.tz(timeZone).startOf('month');
-        } else {
-          lowerRange = today;
-        }
-        var upperRange = lowerRange.clone().endOf('month');
-
-        var numRequests = Math.ceil(upperRange.diff(lowerRange, 'days') / this.monthlyTimeSlotDaysBatchSize);
-        if (numRequests < 1) numRequests = 1;
-
-        var i = 0;
-        var requests = [];
-
-        var lower = lowerRange.clone();
-        var upper = lowerRange.clone().add(this.monthlyTimeSlotDaysBatchSize, 'days');
-        while (i < numRequests) {
-          if (i + 1 == numRequests) upper = upperRange.clone();
-
-          requests.push(this.timeSlots().includes({
-            product: 'merchant'
-          }).where({
-            startsAt: {
-              ge: lower.toDate(),
-              le: upper.toDate()
-            },
-            status: 'bookable'
-          }).all());
-
-          lower.add(this.monthlyTimeSlotDaysBatchSize, 'days');
-          upper.add(this.monthlyTimeSlotDaysBatchSize, 'days');
-          i++;
-        }
-
-        var product = this;
-        if (_.isUndefined(product.__currentCalendarPage)) product.__currentCalendarPage = 0;
-        if (_.isUndefined(product.__preloadedCalendarPages)) product.__preloadedCalendarPages = 0;
-
-        product.__preloadingCalendar = true;
-
-        var currentPromise = Promise.all(requests).then(function (timeSlotsArray) {
-          var allTimeSlots = ActiveResource.Collection.build(timeSlotsArray).map(function (ts) {
-            return ts.toArray();
-          }).flatten();
-
-          var startDate = moment(lowerRange).startOf('month');
-          var endDate = moment(lowerRange).endOf('month');
-
-          var response = ActiveResource.CollectionResponse.build();
-
-          var day = startDate;
-          while (day.isSameOrBefore(endDate)) {
-            response.push({
-              day: day,
-              timeSlots: allTimeSlots.select(function (timeSlot) {
-                return timeSlot.startsAt.isSame(day, 'day');
-              })
-            });
-
-            day = day.clone().add(1, 'days');
-          }
-
-          response.hasNextPage = function () {
-            return true;
-          };
-
-          response.nextPage = function (preloadCount) {
-            if (!this.nextPromise) {
-              this.nextPromise = product.__constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), {
-                preload: preloadCount,
-                prevPagePromise: currentPromise,
-                timeZone: timeZone
-              });
-            }
-
-            if (_.isUndefined(preloadCount)) {
-              product.__currentCalendarPage += 1;
-
-              if (!product.__preloadingCalendar && product.__preloadedCalendarPages <= product.__currentCalendarPage + product.monthlyTimeSlotPreloadSize / 2) {
-                product.__lastPreloadedCalendarPage.nextPage(product.monthlyTimeSlotPreloadSize);
-              }
-            }
-
-            return this.nextPromise;
-          };
-
-          if (month && !month.isSame(today, 'month')) {
-            response.hasPrevPage = function () {
-              return true;
-            };
-
-            response.prevPage = function () {
-              this.prevPromise = this.prevPromise || prevPagePromise || product.__constructCalendar(moment(lowerRange).subtract(1, 'months'), {
-                preload: 0,
-                timeZone: timeZone
-              });
-
-              product.__currentCalendarPage -= 1;
-
-              return this.prevPromise;
-            };
-          }
-
-          if (product.monthlyTimeSlotPreloadSize > 0) {
-            if (_.isUndefined(preload)) {
-              response.nextPage(product.monthlyTimeSlotPreloadSize - 1);
-            } else if (preload > 0) {
-              response.nextPage(--preload);
-            } else {
-              product.__preloadingCalendar = false;
-            }
-          }
-
-          product.__preloadedCalendarPages += 1;
-          product.__lastPreloadedCalendarPage = response;
-
-          return response;
+        return Occasion.__constructCalendar(month, {
+          monthlyTimeSlotDaysBatchSize: this.monthlyTimeSlotDaysBatchSize,
+          monthlyTimeSlotPreloadSize: this.monthlyTimeSlotPreloadSize,
+          relation: this.timeSlots(),
+          timeZone: this.merchant().timeZone
         });
-
-        return currentPromise;
       }
     }]);
 
