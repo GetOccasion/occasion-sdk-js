@@ -836,6 +836,16 @@ Occasion.Modules.push(function (library) {
 
         return output;
       }
+    }], [{
+      key: 'constructCalendar',
+      value: function constructCalendar(timeZone, month) {
+        return Occasion.__constructCalendar(month, {
+          monthlyTimeSlotDaysBatchSize: 7,
+          monthlyTimeSlotPreloadSize: 4,
+          relation: this,
+          timeZone: timeZone
+        });
+      }
     }]);
 
     return TimeSlot;
