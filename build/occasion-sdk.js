@@ -1,52 +1,101 @@
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module unless amdModuleId is set
+    define(["active-resource","axios","decimal.js-light","moment","underscore","underscore.string","moment-timezone-with-data-2010-2020"], function (a0,b1,c2,d3,e4,f5,g6) {
+      return (root['Occasion'] = factory(a0,b1,c2,d3,e4,f5,g6));
+    });
+  } else if (typeof module === 'object' && module.exports) {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory(require("active-resource"),require("axios"),require("decimal.js-light"),require("moment"),require("underscore"),require("underscore.string"),require("moment-timezone-with-data-2010-2020"));
+  } else {
+    root['Occasion'] = factory(root["active-resource"],root["axios"],root["decimal.js-light"],root["moment"],root["underscore"],root["underscore.string"],root["moment-timezone-with-data-2010-2020"]);
+  }
+}(this, function (ActiveResource, axios, Decimal, moment, _, s) {
+
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 ActiveResource.Interfaces.JsonApi.contentType = 'application/json';
 
-class Occasion {
-  static baseUrl = 'https://occ.sn/api/v1';
-
-  static Client(options = {}) {
-    var url = options.baseUrl || Occasion.baseUrl;
-    var token = options.token;
-    var immutable = options.immutable || false;
-
-    if(!_.isString(token)) {
-      throw 'Token must be of type string';
-    }
-
-    var encodedToken = window.btoa(unescape(encodeURIComponent(token + ':')));
-
-    var libraryOptions = {
-      headers: {
-        Authorization: "Basic " + encodedToken
-      },
-      immutable,
-      strictAttributes: true
-    };
-
-    var resourceLibrary =
-      ActiveResource.createResourceLibrary(url, libraryOptions);
-
-    Occasion.Modules.each(function(initializeModule) { initializeModule(resourceLibrary) });
-
-    return resourceLibrary;
+var Occasion = function () {
+  function Occasion() {
+    _classCallCheck(this, Occasion);
   }
-}
+
+  _createClass(Occasion, null, [{
+    key: 'Client',
+    value: function Client() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      var url = options.baseUrl || Occasion.baseUrl;
+      var token = options.token;
+      var immutable = options.immutable || false;
+
+      if (!_.isString(token)) {
+        throw 'Token must be of type string';
+      }
+
+      var encodedToken = window.btoa(unescape(encodeURIComponent(token + ':')));
+
+      var libraryOptions = {
+        headers: {
+          Authorization: "Basic " + encodedToken
+        },
+        immutable: immutable,
+        strictAttributes: true
+      };
+
+      var resourceLibrary = ActiveResource.createResourceLibrary(url, libraryOptions);
+
+      Occasion.Modules.each(function (initializeModule) {
+        initializeModule(resourceLibrary);
+      });
+
+      return resourceLibrary;
+    }
+  }]);
+
+  return Occasion;
+}();
+
+Occasion.baseUrl = 'https://occ.sn/api/v1';
+
 
 Occasion.Modules = ActiveResource.prototype.Collection.build();
-Occasion.Modules.push(function(library) {
-  library.Answer = class Answer extends library.Base {
-    valid() {
-      switch(this.question().formControl) {
-        case 'checkbox':
-        case 'waiver':
-          return !(this.question().required || this.question().formControl == 'waiver') ||
-            (this.value == 'YES' || (this.value != 'NO' && this.value));
-        default:
-          return !this.question().required ||
-            ((this.question().optionable && this.option()) ||
-            (!this.question().optionable && this.value && this.value != ''));
-      }
+Occasion.Modules.push(function (library) {
+  library.Answer = function (_library$Base) {
+    _inherits(Answer, _library$Base);
+
+    function Answer() {
+      _classCallCheck(this, Answer);
+
+      return _possibleConstructorReturn(this, (Answer.__proto__ || Object.getPrototypeOf(Answer)).apply(this, arguments));
     }
-  };
+
+    _createClass(Answer, [{
+      key: 'valid',
+      value: function valid() {
+        switch (this.question().formControl) {
+          case 'checkbox':
+          case 'waiver':
+            return !(this.question().required || this.question().formControl == 'waiver') || this.value == 'YES' || this.value != 'NO' && this.value;
+          default:
+            return !this.question().required || this.question().optionable && this.option() || !this.question().optionable && this.value && this.value != '';
+        }
+      }
+    }]);
+
+    return Answer;
+  }(library.Base);
 
   library.Answer.className = 'Answer';
   library.Answer.queryName = 'answers';
@@ -58,37 +107,50 @@ Occasion.Modules.push(function(library) {
   library.Answer.belongsTo('order', { inverseOf: 'answers' });
 });
 
-Occasion.Modules.push(function(library) {
-  library.Attendee = class Attendee extends library.Base {
-    complete() {
-      return !this.order().product().attendeeQuestions.detect((question) => {
-        return !this[question] || this[question].length == 0;
-      });
+Occasion.Modules.push(function (library) {
+  library.Attendee = function (_library$Base2) {
+    _inherits(Attendee, _library$Base2);
+
+    function Attendee() {
+      _classCallCheck(this, Attendee);
+
+      return _possibleConstructorReturn(this, (Attendee.__proto__ || Object.getPrototypeOf(Attendee)).apply(this, arguments));
     }
-  };
+
+    _createClass(Attendee, [{
+      key: 'complete',
+      value: function complete() {
+        var _this4 = this;
+
+        return !this.order().product().attendeeQuestions.detect(function (question) {
+          return !_this4[question] || _this4[question].length == 0;
+        });
+      }
+    }]);
+
+    return Attendee;
+  }(library.Base);
 
   library.Attendee.className = 'Attendee';
   library.Attendee.queryName = 'attendees';
 
-  library.Attendee.attributes(
-    'address',
-    'age',
-    'city',
-    'country',
-    'email',
-    'firstName',
-    'gender',
-    'lastName',
-    'phone',
-    'state',
-    'zip'
-  );
+  library.Attendee.attributes('address', 'age', 'city', 'country', 'email', 'firstName', 'gender', 'lastName', 'phone', 'state', 'zip');
 
   library.Attendee.belongsTo('order', { inverseOf: 'attendees' });
 });
 
-Occasion.Modules.push(function(library) {
-  library.Coupon = class Coupon extends library.Base {};
+Occasion.Modules.push(function (library) {
+  library.Coupon = function (_library$Base3) {
+    _inherits(Coupon, _library$Base3);
+
+    function Coupon() {
+      _classCallCheck(this, Coupon);
+
+      return _possibleConstructorReturn(this, (Coupon.__proto__ || Object.getPrototypeOf(Coupon)).apply(this, arguments));
+    }
+
+    return Coupon;
+  }(library.Base);
 
   library.Coupon.className = 'Coupon';
   library.Coupon.queryName = 'coupons';
@@ -96,8 +158,18 @@ Occasion.Modules.push(function(library) {
   library.Coupon.belongsTo('merchant');
   library.Coupon.hasMany('orders');
 });
-Occasion.Modules.push(function(library) {
-  library.Currency = class Currency extends library.Base {};
+Occasion.Modules.push(function (library) {
+  library.Currency = function (_library$Base4) {
+    _inherits(Currency, _library$Base4);
+
+    function Currency() {
+      _classCallCheck(this, Currency);
+
+      return _possibleConstructorReturn(this, (Currency.__proto__ || Object.getPrototypeOf(Currency)).apply(this, arguments));
+    }
+
+    return Currency;
+  }(library.Base);
 
   library.Currency.className = 'Currency';
   library.Currency.queryName = 'currencies';
@@ -105,17 +177,30 @@ Occasion.Modules.push(function(library) {
   library.Currency.hasMany('merchants');
   library.Currency.hasMany('orders');
 });
-Occasion.Modules.push(function(library) {
-  library.Customer = class Customer extends library.Base {
-    ahoyEmailChanged() {
-      /* TODO: Align customer data with Ahoy using +this+ */
+Occasion.Modules.push(function (library) {
+  library.Customer = function (_library$Base5) {
+    _inherits(Customer, _library$Base5);
+
+    function Customer() {
+      _classCallCheck(this, Customer);
+
+      return _possibleConstructorReturn(this, (Customer.__proto__ || Object.getPrototypeOf(Customer)).apply(this, arguments));
     }
 
-    complete() {
-      return this.email && this.firstName && this.lastName &&
-        this.email.length > 0 && this.firstName.length > 0 && this.lastName.length > 0;
-    }
-  };
+    _createClass(Customer, [{
+      key: 'ahoyEmailChanged',
+      value: function ahoyEmailChanged() {
+        /* TODO: Align customer data with Ahoy using +this+ */
+      }
+    }, {
+      key: 'complete',
+      value: function complete() {
+        return this.email && this.firstName && this.lastName && this.email.length > 0 && this.firstName.length > 0 && this.lastName.length > 0;
+      }
+    }]);
+
+    return Customer;
+  }(library.Base);
 
   library.Customer.className = 'Customer';
   library.Customer.queryName = 'customers';
@@ -124,10 +209,10 @@ Occasion.Modules.push(function(library) {
 
   library.Customer.hasMany('orders', { inverseOf: 'customer' });
 
-  library.Customer.afterBuild(function() {
+  library.Customer.afterBuild(function () {
     var lastEmail = null;
-    var watchEmail = _.bind(function() {
-      if(lastEmail != this.email) {
+    var watchEmail = _.bind(function () {
+      if (lastEmail != this.email) {
         _.bind(this.ahoyEmailChanged, this)();
         lastEmail = this.email;
       }
@@ -139,8 +224,18 @@ Occasion.Modules.push(function(library) {
   });
 });
 
-Occasion.Modules.push(function(library) {
-  library.Merchant = class Merchant extends library.Base {};
+Occasion.Modules.push(function (library) {
+  library.Merchant = function (_library$Base6) {
+    _inherits(Merchant, _library$Base6);
+
+    function Merchant() {
+      _classCallCheck(this, Merchant);
+
+      return _possibleConstructorReturn(this, (Merchant.__proto__ || Object.getPrototypeOf(Merchant)).apply(this, arguments));
+    }
+
+    return Merchant;
+  }(library.Base);
 
   library.Merchant.className = 'Merchant';
   library.Merchant.queryName = 'merchants';
@@ -149,8 +244,18 @@ Occasion.Modules.push(function(library) {
   library.Merchant.hasMany('products');
   library.Merchant.hasMany('venues');
 });
-Occasion.Modules.push(function(library) {
-  library.Option = class Option extends library.Base {};
+Occasion.Modules.push(function (library) {
+  library.Option = function (_library$Base7) {
+    _inherits(Option, _library$Base7);
+
+    function Option() {
+      _classCallCheck(this, Option);
+
+      return _possibleConstructorReturn(this, (Option.__proto__ || Object.getPrototypeOf(Option)).apply(this, arguments));
+    }
+
+    return Option;
+  }(library.Base);
 
   library.Option.className = 'Option';
   library.Option.queryName = 'options';
@@ -158,151 +263,167 @@ Occasion.Modules.push(function(library) {
   library.Option.belongsTo('answer');
   library.Option.belongsTo('question');
 });
-Occasion.Modules.push(function(library) {
-  library.Order = class Order extends library.Base {
-    static construct(attributes) {
-      var order = this.build(attributes);
+Occasion.Modules.push(function (library) {
+  library.Order = function (_library$Base8) {
+    _inherits(Order, _library$Base8);
 
-      order.sessionIdentifier = order.sessionIdentifier ||
-        Math.random().toString(36).substring(7) + '-' + Date.now();
+    function Order() {
+      _classCallCheck(this, Order);
 
-      if(order.customer() == null) {
-        order.buildCustomer({
-          email: null,
-          firstName: null,
-          lastName: null,
-          zip: null
+      return _possibleConstructorReturn(this, (Order.__proto__ || Object.getPrototypeOf(Order)).apply(this, arguments));
+    }
+
+    _createClass(Order, [{
+      key: 'calculatePrice',
+
+
+      // POSTs the order to `/orders/price`, which calculates price related fields and adds them to the order
+      // @return [Promise] a promise for the order with price-related fields
+      value: function calculatePrice() {
+        return this.interface().post(this.klass().links()['related'] + 'price', this);
+      }
+
+      // POSTs the order to `/orders/information`, which calculates price + quantity related fields and adds them to the
+      //   order
+      // @return [Promise] a promise for the order with price & quantity related fields
+
+    }, {
+      key: 'retrieveInformation',
+      value: function retrieveInformation() {
+        return this.interface().post(this.klass().links()['related'] + 'information', this);
+      }
+
+      // Creates a transaction with a payment method and an amount
+      //
+      // @param [PaymentMethod] paymentMethod the payment method to charge
+      // @param [Number] amount the amount to charge to the payment method
+      // @return [Transaction] the built transaction representing the charge
+
+    }, {
+      key: 'charge',
+      value: function charge(paymentMethod, amount) {
+        return this.transactions().build({
+          amount: amount,
+          paymentMethod: paymentMethod
         });
       }
 
-      var promises = [new Promise(function(resolve) {
-        resolve(order);
-      })];
+      // Edits a transaction with a given payment method to have a new amount
+      //
+      // @param [PaymentMethod] paymentMethod the payment method to search transactions for
+      // @param [Number] amount the new amount to charge to the payment method
+      // @return [Transaction] the edited transaction representing the charge
 
-      if(order.product() != null) {
-        promises.push(order.product().questions().includes('options').perPage(500).load());
+    }, {
+      key: 'editCharge',
+      value: function editCharge(paymentMethod, amount) {
+        var transaction = this.transactions().target().detect(function (t) {
+          return t.paymentMethod() == paymentMethod;
+        });
 
-        if(!order.product().requiresTimeSlotSelection) {
-          promises.push(
-            order.product().timeSlots()
-            .includes({ product: 'merchant' })
-            .where({ status: 'bookable' })
-            .perPage(500).all()
-          );
+        if (transaction) {
+          transaction.amount = amount;
         }
       }
 
-      var _this = this;
-      return Promise.all(promises)
-      .then(function(args) {
-        order = args[0];
-        var questions = args[1];
-        var timeSlots = args[2];
+      // Removes a transaction for a given payment method
+      //
+      // @param [PaymentMethod] paymentMethod the payment method to remove the transaction for
 
-        if(questions != undefined) questions.inject(order, _this.__constructAnswer);
-        if(timeSlots != undefined) order.timeSlots().assign(timeSlots, false);
+    }, {
+      key: 'removeCharge',
+      value: function removeCharge(paymentMethod) {
+        var transaction = this.transactions().target().detect(function (t) {
+          return t.paymentMethod() == paymentMethod;
+        });
+
+        if (transaction) {
+          this.transactions().target().delete(transaction);
+        }
+      }
+
+      // @private
+
+      // Called by Order.construct, which injects order
+      // @note Must return order
+      //
+      // @param [Occsn.Order] order the order that wants an answer to the question
+      // @param [Occsn.Question] question the question to construct an answer for
+
+    }], [{
+      key: 'construct',
+      value: function construct(attributes) {
+        var order = this.build(attributes);
+
+        order.sessionIdentifier = order.sessionIdentifier || Math.random().toString(36).substring(7) + '-' + Date.now();
+
+        if (order.customer() == null) {
+          order.buildCustomer({
+            email: null,
+            firstName: null,
+            lastName: null,
+            zip: null
+          });
+        }
+
+        var promises = [new Promise(function (resolve) {
+          resolve(order);
+        })];
+
+        if (order.product() != null) {
+          promises.push(order.product().questions().includes('options').perPage(500).load());
+
+          if (!order.product().requiresTimeSlotSelection) {
+            promises.push(order.product().timeSlots().includes({ product: 'merchant' }).where({ status: 'bookable' }).perPage(500).all());
+          }
+        }
+
+        var _this = this;
+        return Promise.all(promises).then(function (args) {
+          order = args[0];
+          var questions = args[1];
+          var timeSlots = args[2];
+
+          if (questions != undefined) questions.inject(order, _this.__constructAnswer);
+          if (timeSlots != undefined) order.timeSlots().assign(timeSlots, false);
+
+          return order;
+        });
+      }
+    }, {
+      key: '__constructAnswer',
+      value: function __constructAnswer(order, question) {
+        if (question.category != 'static') {
+          var answer = order.answers().build({
+            question: question
+          });
+
+          switch (question.formControl) {
+            case 'drop_down':
+            case 'option_list':
+              answer.assignOption(question.options().target().detect(function (o) {
+                return o.default;
+              }));
+              break;
+            case 'spin_button':
+              answer.value = question.min;
+              break;
+          }
+        }
 
         return order;
-      });
-    }
-
-    // POSTs the order to `/orders/price`, which calculates price related fields and adds them to the order
-    // @return [Promise] a promise for the order with price-related fields
-    calculatePrice() {
-      return this.interface().post(this.klass().links()['related'] + 'price', this);
-    }
-
-    // POSTs the order to `/orders/information`, which calculates price + quantity related fields and adds them to the
-    //   order
-    // @return [Promise] a promise for the order with price & quantity related fields
-    retrieveInformation() {
-      return this.interface().post(this.klass().links()['related'] + 'information', this);
-    }
-
-    // Creates a transaction with a payment method and an amount
-    //
-    // @param [PaymentMethod] paymentMethod the payment method to charge
-    // @param [Number] amount the amount to charge to the payment method
-    // @return [Transaction] the built transaction representing the charge
-    charge(paymentMethod, amount) {
-      return this.transactions().build({
-        amount: amount,
-        paymentMethod: paymentMethod
-      });
-    }
-
-    // Edits a transaction with a given payment method to have a new amount
-    //
-    // @param [PaymentMethod] paymentMethod the payment method to search transactions for
-    // @param [Number] amount the new amount to charge to the payment method
-    // @return [Transaction] the edited transaction representing the charge
-    editCharge(paymentMethod, amount) {
-      var transaction = this.transactions().target().detect(function(t) { return t.paymentMethod() == paymentMethod; });
-
-      if(transaction) {
-        transaction.amount = amount;
       }
-    }
+    }]);
 
-    // Removes a transaction for a given payment method
-    //
-    // @param [PaymentMethod] paymentMethod the payment method to remove the transaction for
-    removeCharge(paymentMethod) {
-      var transaction = this.transactions().target().detect(function(t) { return t.paymentMethod() == paymentMethod; });
-
-      if(transaction) {
-        this.transactions().target().delete(transaction);
-      }
-    }
-    
-    // @private
-
-    // Called by Order.construct, which injects order
-    // @note Must return order
-    //
-    // @param [Occsn.Order] order the order that wants an answer to the question
-    // @param [Occsn.Question] question the question to construct an answer for
-    static __constructAnswer(order, question) {
-      if(question.category != 'static') {
-        let answer = order.answers().build({
-          question: question
-        });
-
-        switch(question.formControl) {
-          case 'drop_down':
-          case 'option_list':
-            answer.assignOption(question.options().target().detect((o) => { return o.default }));
-            break;
-          case 'spin_button':
-            answer.value = question.min;
-            break;
-        }
-      }
-      
-      return order;
-    }
-  };
+    return Order;
+  }(library.Base);
 
   library.Order.className = 'Order';
   library.Order.queryName = 'orders';
 
-  library.Order.attributes(
-    'sessionIdentifier',
-    'status'
-  );
+  library.Order.attributes('sessionIdentifier', 'status');
 
-  library.Order.attributes(
-    'couponAmount',
-    'giftCardAmount',
-    'outstandingBalance',
-    'price',
-    'quantity',
-    'subtotal',
-    'tax',
-    'taxPercentage',
-    'total',
-    { readOnly: true }
-  );
+  library.Order.attributes('couponAmount', 'giftCardAmount', 'outstandingBalance', 'price', 'quantity', 'subtotal', 'tax', 'taxPercentage', 'total', { readOnly: true });
 
   library.Order.belongsTo('coupon');
   library.Order.belongsTo('currency');
@@ -315,13 +436,15 @@ Occasion.Modules.push(function(library) {
   library.Order.hasMany('timeSlots');
   library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' });
 
-  library.Order.afterRequest(function() {
-    if(this.product() && !this.product().attendeeQuestions.empty()) {
+  library.Order.afterRequest(function () {
+    var _this11 = this;
+
+    if (this.product() && !this.product().attendeeQuestions.empty()) {
       var diff = this.quantity - this.attendees().size();
 
-      if(diff != 0) {
-        for(var i = 0; i < Math.abs(diff); i++) {
-          if(diff > 0) {
+      if (diff != 0) {
+        for (var i = 0; i < Math.abs(diff); i++) {
+          if (diff > 0) {
             this.attendees().build();
           } else {
             this.attendees().target().pop();
@@ -330,85 +453,78 @@ Occasion.Modules.push(function(library) {
       }
     }
 
-    ActiveResource.Collection.build([
-      'subtotal',
-      'couponAmount',
-      'tax',
-      'giftCardAmount',
-      'price',
-      'total',
-      'outstandingBalance'
-    ])
-    .select((attr) => this[attr])
-    .each((attr) => {
-      this[attr] = new Decimal(this[attr]);
+    ActiveResource.Collection.build(['subtotal', 'couponAmount', 'tax', 'giftCardAmount', 'price', 'total', 'outstandingBalance']).select(function (attr) {
+      return _this11[attr];
+    }).each(function (attr) {
+      _this11[attr] = new Decimal(_this11[attr]);
     });
 
-    if(this.outstandingBalance && !this.outstandingBalance.isZero()) {
-      var giftCardTransactions = this.transactions().target().select((t) => t.paymentMethod() && t.paymentMethod().isA(library.GiftCard));
-      var remainingBalanceTransaction = this.transactions().target().detect((t) => !(t.paymentMethod() && t.paymentMethod().isA(library.GiftCard)));
+    if (this.outstandingBalance && !this.outstandingBalance.isZero()) {
+      var giftCardTransactions = this.transactions().target().select(function (t) {
+        return t.paymentMethod() && t.paymentMethod().isA(library.GiftCard);
+      });
+      var remainingBalanceTransaction = this.transactions().target().detect(function (t) {
+        return !(t.paymentMethod() && t.paymentMethod().isA(library.GiftCard));
+      });
 
-      if(this.outstandingBalance.isPositive()) {
-        if(!giftCardTransactions.empty()) {
-          giftCardTransactions
-          .each((t) => {
-            if(this.outstandingBalance.isZero()) return;
+      if (this.outstandingBalance.isPositive()) {
+        if (!giftCardTransactions.empty()) {
+          giftCardTransactions.each(function (t) {
+            if (_this11.outstandingBalance.isZero()) return;
 
-            let amount = new Decimal(t.amount);
-            let giftCardValue = new Decimal(t.paymentMethod().value);
-            let remainingGiftCardBalance = giftCardValue.minus(amount);
+            var amount = new Decimal(t.amount);
+            var giftCardValue = new Decimal(t.paymentMethod().value);
+            var remainingGiftCardBalance = giftCardValue.minus(amount);
 
-            if(remainingGiftCardBalance.isZero()) return;
+            if (remainingGiftCardBalance.isZero()) return;
 
-            if(remainingGiftCardBalance.greaterThanOrEqualTo(this.outstandingBalance)) {
-              amount = amount.plus(this.outstandingBalance);
-              this.outstandingBalance = new Decimal(0);
+            if (remainingGiftCardBalance.greaterThanOrEqualTo(_this11.outstandingBalance)) {
+              amount = amount.plus(_this11.outstandingBalance);
+              _this11.outstandingBalance = new Decimal(0);
             } else {
               amount = remainingGiftCardBalance;
-              this.outstandingBalance = this.outstandingBalance.minus(remainingGiftCardBalance);
+              _this11.outstandingBalance = _this11.outstandingBalance.minus(remainingGiftCardBalance);
             }
 
             t.amount = amount.toString();
 
-            this.transactions().target().delete(t);
-            t.__createClone({ cloner: this });
+            _this11.transactions().target().delete(t);
+            t.__createClone({ cloner: _this11 });
           });
         }
       } else {
-        if(!giftCardTransactions.empty()) {
-          ActiveResource.Collection.build(giftCardTransactions.toArray().reverse())
-          .each((t) => {
-            if(this.outstandingBalance.isZero()) return;
+        if (!giftCardTransactions.empty()) {
+          ActiveResource.Collection.build(giftCardTransactions.toArray().reverse()).each(function (t) {
+            if (_this11.outstandingBalance.isZero()) return;
 
-            let amount = new Decimal(t.amount);
+            var amount = new Decimal(t.amount);
 
-            if(amount.greaterThan(this.outstandingBalance.abs())) {
-              amount = amount.plus(this.outstandingBalance);
-              this.outstandingBalance = new Decimal(0);
+            if (amount.greaterThan(_this11.outstandingBalance.abs())) {
+              amount = amount.plus(_this11.outstandingBalance);
+              _this11.outstandingBalance = new Decimal(0);
             } else {
-              this.outstandingBalance = this.outstandingBalance.plus(amount);
+              _this11.outstandingBalance = _this11.outstandingBalance.plus(amount);
 
-              this.removeCharge(t.paymentMethod());
+              _this11.removeCharge(t.paymentMethod());
               return;
             }
 
             t.amount = amount.toString();
-            this.transactions().target().delete(t);
-            t.__createClone({ cloner: this });
+            _this11.transactions().target().delete(t);
+            t.__createClone({ cloner: _this11 });
           });
         }
       }
 
-      if(!giftCardTransactions.empty()) {
-        this.giftCardAmount = this.transactions().target()
-          .select((t) => t.paymentMethod() && t.paymentMethod().isA(library.GiftCard))
-          .inject(
-            new Decimal(0),
-            (total, transaction) => total.plus(transaction.amount)
-          );
+      if (!giftCardTransactions.empty()) {
+        this.giftCardAmount = this.transactions().target().select(function (t) {
+          return t.paymentMethod() && t.paymentMethod().isA(library.GiftCard);
+        }).inject(new Decimal(0), function (total, transaction) {
+          return total.plus(transaction.amount);
+        });
       }
 
-      if(remainingBalanceTransaction) {
+      if (remainingBalanceTransaction) {
         remainingBalanceTransaction.amount = this.outstandingBalance.toString();
 
         this.transactions().target().delete(remainingBalanceTransaction);
@@ -418,147 +534,177 @@ Occasion.Modules.push(function(library) {
   });
 });
 
-Occasion.Modules.push(function(library) {
-  library.PaymentMethod = class PaymentMethod extends library.Base {};
+Occasion.Modules.push(function (library) {
+  library.PaymentMethod = function (_library$Base9) {
+    _inherits(PaymentMethod, _library$Base9);
+
+    function PaymentMethod() {
+      _classCallCheck(this, PaymentMethod);
+
+      return _possibleConstructorReturn(this, (PaymentMethod.__proto__ || Object.getPrototypeOf(PaymentMethod)).apply(this, arguments));
+    }
+
+    return PaymentMethod;
+  }(library.Base);
 
   library.PaymentMethod.className = 'PaymentMethod';
   library.PaymentMethod.queryName = 'payment_methods';
 
   library.PaymentMethod.hasMany('transactions', { as: 'paymentMethod' });
 });
-Occasion.Modules.push(function(library) {
-  library.Product = class Product extends library.Base {
-    constructCalendar(month) {
-      return this.__constructCalendar(month);
+Occasion.Modules.push(function (library) {
+  library.Product = function (_library$Base10) {
+    _inherits(Product, _library$Base10);
+
+    function Product() {
+      _classCallCheck(this, Product);
+
+      return _possibleConstructorReturn(this, (Product.__proto__ || Object.getPrototypeOf(Product)).apply(this, arguments));
     }
 
-    // @todo Remove includes({ product: 'merchant' }) when AR supports owner assignment to has_many children
-    //   in non-load queries
-    __constructCalendar(month, preload, prevPagePromise) {
-      var timeZone = this.merchant().timeZone;
-
-      var today = moment.tz(timeZone);
-      var lowerRange;
-      if(month) {
-        lowerRange = month.isSame(today, 'month') ? today : month.tz(timeZone).startOf('month');
-      } else {
-        lowerRange = today;
+    _createClass(Product, [{
+      key: 'constructCalendar',
+      value: function constructCalendar(month) {
+        return this.__constructCalendar(month, { timeZone: this.merchant().timeZone });
       }
-      var upperRange = lowerRange.clone().endOf('month');
 
-      var numRequests = Math.ceil(upperRange.diff(lowerRange, 'days') / this.monthlyTimeSlotDaysBatchSize);
-      if(numRequests < 1) numRequests = 1;
+      // @todo Remove includes({ product: 'merchant' }) when AR supports owner assignment to has_many children
+      //   in non-load queries
 
-      var i = 0;
-      var requests = [];
+    }, {
+      key: '__constructCalendar',
+      value: function __constructCalendar(month) {
+        var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+            preload = _ref.preload,
+            prevPagePromise = _ref.prevPagePromise,
+            timeZone = _ref.timeZone;
 
-      var lower = lowerRange.clone();
-      var upper = lowerRange.clone().add(this.monthlyTimeSlotDaysBatchSize, 'days');
-      while(i < numRequests) {
-        if(i + 1 == numRequests) upper = upperRange.clone();
+        var today = moment.tz(timeZone);
+        var lowerRange;
+        if (month) {
+          lowerRange = month.isSame(today, 'month') ? today : month.tz(timeZone).startOf('month');
+        } else {
+          lowerRange = today;
+        }
+        var upperRange = lowerRange.clone().endOf('month');
 
-        requests.push(
-          this.timeSlots()
-          .includes({
+        var numRequests = Math.ceil(upperRange.diff(lowerRange, 'days') / this.monthlyTimeSlotDaysBatchSize);
+        if (numRequests < 1) numRequests = 1;
+
+        var i = 0;
+        var requests = [];
+
+        var lower = lowerRange.clone();
+        var upper = lowerRange.clone().add(this.monthlyTimeSlotDaysBatchSize, 'days');
+        while (i < numRequests) {
+          if (i + 1 == numRequests) upper = upperRange.clone();
+
+          requests.push(this.timeSlots().includes({
             product: 'merchant'
-          })
-          .where({
+          }).where({
             startsAt: {
               ge: lower.toDate(),
               le: upper.toDate()
             },
             status: 'bookable'
-          }).all()
-        );
+          }).all());
 
-        lower.add(this.monthlyTimeSlotDaysBatchSize, 'days');
-        upper.add(this.monthlyTimeSlotDaysBatchSize, 'days');
-        i++;
-      }
-
-      var product = this;
-      if(_.isUndefined(product.__currentCalendarPage)) product.__currentCalendarPage = 0;
-      if(_.isUndefined(product.__preloadedCalendarPages)) product.__preloadedCalendarPages = 0;
-
-      product.__preloadingCalendar = true;
-
-      var currentPromise = Promise.all(requests)
-      .then(function(timeSlotsArray) {
-        var allTimeSlots = ActiveResource.Collection
-        .build(timeSlotsArray)
-        .map(function(ts) { return ts.toArray() })
-        .flatten();
-
-        let startDate = moment(lowerRange).startOf('month');
-        let endDate = moment(lowerRange).endOf('month');
-
-        var response = ActiveResource.CollectionResponse.build();
-
-        let day = startDate;
-        while(day.isSameOrBefore(endDate)) {
-          response.push({
-            day,
-            timeSlots: allTimeSlots.select((timeSlot) => { return timeSlot.startsAt.isSame(day, 'day'); })
-          });
-
-          day = day.clone().add(1, 'days');
+          lower.add(this.monthlyTimeSlotDaysBatchSize, 'days');
+          upper.add(this.monthlyTimeSlotDaysBatchSize, 'days');
+          i++;
         }
 
-        response.hasNextPage = function() { return true; };
+        var product = this;
+        if (_.isUndefined(product.__currentCalendarPage)) product.__currentCalendarPage = 0;
+        if (_.isUndefined(product.__preloadedCalendarPages)) product.__preloadedCalendarPages = 0;
 
-        response.nextPage = function(preloadCount) {
-          if(!this.nextPromise) {
-            this.nextPromise = product.__constructCalendar(
-              moment(upperRange).add(1, 'days').startOf('month'),
-              preloadCount,
-              currentPromise
-            );
+        product.__preloadingCalendar = true;
+
+        var currentPromise = Promise.all(requests).then(function (timeSlotsArray) {
+          var allTimeSlots = ActiveResource.Collection.build(timeSlotsArray).map(function (ts) {
+            return ts.toArray();
+          }).flatten();
+
+          var startDate = moment(lowerRange).startOf('month');
+          var endDate = moment(lowerRange).endOf('month');
+
+          var response = ActiveResource.CollectionResponse.build();
+
+          var day = startDate;
+          while (day.isSameOrBefore(endDate)) {
+            response.push({
+              day: day,
+              timeSlots: allTimeSlots.select(function (timeSlot) {
+                return timeSlot.startsAt.isSame(day, 'day');
+              })
+            });
+
+            day = day.clone().add(1, 'days');
           }
 
-          if(_.isUndefined(preloadCount)) {
-            product.__currentCalendarPage += 1;
+          response.hasNextPage = function () {
+            return true;
+          };
 
-            if(!product.__preloadingCalendar &&
-              product.__preloadedCalendarPages <= product.__currentCalendarPage + product.monthlyTimeSlotPreloadSize / 2) {
-              product.__lastPreloadedCalendarPage.nextPage(product.monthlyTimeSlotPreloadSize);
+          response.nextPage = function (preloadCount) {
+            if (!this.nextPromise) {
+              this.nextPromise = product.__constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), {
+                preload: preloadCount,
+                prevPagePromise: currentPromise,
+                timeZone: timeZone
+              });
+            }
+
+            if (_.isUndefined(preloadCount)) {
+              product.__currentCalendarPage += 1;
+
+              if (!product.__preloadingCalendar && product.__preloadedCalendarPages <= product.__currentCalendarPage + product.monthlyTimeSlotPreloadSize / 2) {
+                product.__lastPreloadedCalendarPage.nextPage(product.monthlyTimeSlotPreloadSize);
+              }
+            }
+
+            return this.nextPromise;
+          };
+
+          if (month && !month.isSame(today, 'month')) {
+            response.hasPrevPage = function () {
+              return true;
+            };
+
+            response.prevPage = function () {
+              this.prevPromise = this.prevPromise || prevPagePromise || product.__constructCalendar(moment(lowerRange).subtract(1, 'months'), {
+                preload: 0,
+                timeZone: timeZone
+              });
+
+              product.__currentCalendarPage -= 1;
+
+              return this.prevPromise;
+            };
+          }
+
+          if (product.monthlyTimeSlotPreloadSize > 0) {
+            if (_.isUndefined(preload)) {
+              response.nextPage(product.monthlyTimeSlotPreloadSize - 1);
+            } else if (preload > 0) {
+              response.nextPage(--preload);
+            } else {
+              product.__preloadingCalendar = false;
             }
           }
 
-          return this.nextPromise;
-        };
+          product.__preloadedCalendarPages += 1;
+          product.__lastPreloadedCalendarPage = response;
 
-        if(month && !month.isSame(today, 'month')) {
-          response.hasPrevPage = function() { return true; };
+          return response;
+        });
 
-          response.prevPage = function() {
-            this.prevPromise = this.prevPromise || prevPagePromise ||
-              product.__constructCalendar(moment(lowerRange).subtract(1, 'months'), 0);
+        return currentPromise;
+      }
+    }]);
 
-            product.__currentCalendarPage -= 1;
-
-            return this.prevPromise;
-          };
-        }
-
-        if(product.monthlyTimeSlotPreloadSize > 0) {
-          if(_.isUndefined(preload)) {
-            response.nextPage(product.monthlyTimeSlotPreloadSize - 1);
-          } else if(preload > 0) {
-            response.nextPage(--preload);
-          } else {
-            product.__preloadingCalendar = false;
-          }
-        }
-
-        product.__preloadedCalendarPages += 1;
-        product.__lastPreloadedCalendarPage = response;
-
-        return response;
-      });
-
-      return currentPromise;
-    }
-  };
+    return Product;
+  }(library.Base);
 
   library.Product.className = 'Product';
   library.Product.queryName = 'products';
@@ -571,13 +717,13 @@ Occasion.Modules.push(function(library) {
   library.Product.hasMany('redeemables');
   library.Product.hasMany('timeSlots');
 
-  library.Product.afterRequest(function() {
-    this.attendeeQuestions =
-      ActiveResource.Collection.build(this.attendeeQuestions)
-      .map((q) => { return s.camelize(q, true); });
+  library.Product.afterRequest(function () {
+    this.attendeeQuestions = ActiveResource.Collection.build(this.attendeeQuestions).map(function (q) {
+      return s.camelize(q, true);
+    });
 
-    if(this.firstTimeSlotStartsAt) {
-      if(this.merchant()) {
+    if (this.firstTimeSlotStartsAt) {
+      if (this.merchant()) {
         this.firstTimeSlotStartsAt = moment.tz(this.firstTimeSlotStartsAt, this.merchant().timeZone);
       } else {
         throw 'Product has timeslots - but merchant.timeZone is not available; include merchant in response.';
@@ -586,8 +732,18 @@ Occasion.Modules.push(function(library) {
   });
 });
 
-Occasion.Modules.push(function(library) {
-  library.Question = class Question extends library.Base {};
+Occasion.Modules.push(function (library) {
+  library.Question = function (_library$Base11) {
+    _inherits(Question, _library$Base11);
+
+    function Question() {
+      _classCallCheck(this, Question);
+
+      return _possibleConstructorReturn(this, (Question.__proto__ || Object.getPrototypeOf(Question)).apply(this, arguments));
+    }
+
+    return Question;
+  }(library.Base);
 
   library.Question.className = 'Question';
   library.Question.queryName = 'questions';
@@ -596,47 +752,80 @@ Occasion.Modules.push(function(library) {
   library.Question.hasMany('answers');
   library.Question.hasMany('options');
 });
-Occasion.Modules.push(function(library) {
+Occasion.Modules.push(function (library) {
   // TODO: Remove ability to directly query redeemables
-  library.Redeemable = class Redeemable extends library.Base {};
+  library.Redeemable = function (_library$Base12) {
+    _inherits(Redeemable, _library$Base12);
+
+    function Redeemable() {
+      _classCallCheck(this, Redeemable);
+
+      return _possibleConstructorReturn(this, (Redeemable.__proto__ || Object.getPrototypeOf(Redeemable)).apply(this, arguments));
+    }
+
+    return Redeemable;
+  }(library.Base);
 
   library.Redeemable.className = 'Redeemable';
   library.Redeemable.queryName = 'redeemables';
 
   library.Redeemable.belongsTo('product');
 });
-Occasion.Modules.push(function(library) {
-  library.State = class State extends library.Base {};
+Occasion.Modules.push(function (library) {
+  library.State = function (_library$Base13) {
+    _inherits(State, _library$Base13);
+
+    function State() {
+      _classCallCheck(this, State);
+
+      return _possibleConstructorReturn(this, (State.__proto__ || Object.getPrototypeOf(State)).apply(this, arguments));
+    }
+
+    return State;
+  }(library.Base);
 
   library.State.className = 'State';
   library.State.queryName = 'states';
 });
 
-Occasion.Modules.push(function(library) {
-  library.TimeSlot = class TimeSlot extends library.Base {
-    toString(format) {
-      var output;
+Occasion.Modules.push(function (library) {
+  library.TimeSlot = function (_library$Base14) {
+    _inherits(TimeSlot, _library$Base14);
 
-      if(this.product().showTimeSlotDuration) {
-        var durationTimeSlot = this.startsAt.clone().add(this.duration);
-        var durationFormat;
+    function TimeSlot() {
+      _classCallCheck(this, TimeSlot);
 
-        if(durationTimeSlot.isSame(this.startsAt, 'day')) {
-          durationFormat = 'LT';
+      return _possibleConstructorReturn(this, (TimeSlot.__proto__ || Object.getPrototypeOf(TimeSlot)).apply(this, arguments));
+    }
+
+    _createClass(TimeSlot, [{
+      key: 'toString',
+      value: function toString(format) {
+        var output;
+
+        if (this.product().showTimeSlotDuration) {
+          var durationTimeSlot = this.startsAt.clone().add(this.duration);
+          var durationFormat;
+
+          if (durationTimeSlot.isSame(this.startsAt, 'day')) {
+            durationFormat = 'LT';
+          } else {
+            durationFormat = 'LLLL';
+          }
+
+          output = this.startsAt.format(format);
+          output += ' - ';
+          output += durationTimeSlot.format(durationFormat);
         } else {
-          durationFormat = 'LLLL';
+          output = this.startsAt.format(format);
         }
 
-        output = this.startsAt.format(format);
-        output += ' - ';
-        output += durationTimeSlot.format(durationFormat);
-      } else {
-        output = this.startsAt.format(format);
+        return output;
       }
+    }]);
 
-      return output;
-    }
-  };
+    return TimeSlot;
+  }(library.Base);
 
   library.TimeSlot.className = 'TimeSlot';
   library.TimeSlot.queryName = 'time_slots';
@@ -645,8 +834,8 @@ Occasion.Modules.push(function(library) {
   library.TimeSlot.belongsTo('product');
   library.TimeSlot.belongsTo('venue');
 
-  library.TimeSlot.afterRequest(function() {
-    if(this.product().merchant()) {
+  library.TimeSlot.afterRequest(function () {
+    if (this.product().merchant()) {
       this.startsAt = moment.tz(this.startsAt, this.product().merchant().timeZone);
     } else {
       throw 'Must use includes({ product: \'merchant\' }) in timeSlot request';
@@ -656,8 +845,18 @@ Occasion.Modules.push(function(library) {
   });
 });
 
-Occasion.Modules.push(function(library) {
-  library.Transaction = class Transaction extends library.Base {};
+Occasion.Modules.push(function (library) {
+  library.Transaction = function (_library$Base15) {
+    _inherits(Transaction, _library$Base15);
+
+    function Transaction() {
+      _classCallCheck(this, Transaction);
+
+      return _possibleConstructorReturn(this, (Transaction.__proto__ || Object.getPrototypeOf(Transaction)).apply(this, arguments));
+    }
+
+    return Transaction;
+  }(library.Base);
 
   library.Transaction.className = 'Transaction';
   library.Transaction.queryName = 'transactions';
@@ -668,8 +867,18 @@ Occasion.Modules.push(function(library) {
   library.Transaction.belongsTo('paymentMethod', { polymorphic: true });
 });
 
-Occasion.Modules.push(function(library) {
-  library.Venue = class Venue extends library.Base {};
+Occasion.Modules.push(function (library) {
+  library.Venue = function (_library$Base16) {
+    _inherits(Venue, _library$Base16);
+
+    function Venue() {
+      _classCallCheck(this, Venue);
+
+      return _possibleConstructorReturn(this, (Venue.__proto__ || Object.getPrototypeOf(Venue)).apply(this, arguments));
+    }
+
+    return Venue;
+  }(library.Base);
 
   library.Venue.className = 'Venue';
   library.Venue.queryName = 'venues';
@@ -680,16 +889,36 @@ Occasion.Modules.push(function(library) {
   library.Venue.hasMany('products');
 });
 
-Occasion.Modules.push(function(library) {
-  library.CreditCard = class CreditCard extends library.PaymentMethod {};
+Occasion.Modules.push(function (library) {
+  library.CreditCard = function (_library$PaymentMetho) {
+    _inherits(CreditCard, _library$PaymentMetho);
+
+    function CreditCard() {
+      _classCallCheck(this, CreditCard);
+
+      return _possibleConstructorReturn(this, (CreditCard.__proto__ || Object.getPrototypeOf(CreditCard)).apply(this, arguments));
+    }
+
+    return CreditCard;
+  }(library.PaymentMethod);
 
   library.CreditCard.className = 'CreditCard';
   library.CreditCard.queryName = 'credit_cards';
 
   library.CreditCard.hasMany('transactions', { as: 'paymentMethod' });
 });
-Occasion.Modules.push(function(library) {
-  library.GiftCard = class GiftCard extends library.PaymentMethod {};
+Occasion.Modules.push(function (library) {
+  library.GiftCard = function (_library$PaymentMetho2) {
+    _inherits(GiftCard, _library$PaymentMetho2);
+
+    function GiftCard() {
+      _classCallCheck(this, GiftCard);
+
+      return _possibleConstructorReturn(this, (GiftCard.__proto__ || Object.getPrototypeOf(GiftCard)).apply(this, arguments));
+    }
+
+    return GiftCard;
+  }(library.PaymentMethod);
 
   library.GiftCard.className = 'GiftCard';
   library.GiftCard.queryName = 'gift_cards';
@@ -697,3 +926,7 @@ Occasion.Modules.push(function(library) {
   library.GiftCard.belongsTo('customer');
   library.GiftCard.hasMany('transactions', { as: 'paymentMethod' });
 });
+
+return Occasion;
+
+}));

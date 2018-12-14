@@ -1,14 +1,12 @@
 Occasion.Modules.push(function(library) {
   library.Product = class Product extends library.Base {
     constructCalendar(month) {
-      return this.__constructCalendar(month);
+      return this.__constructCalendar(month, { timeZone: this.merchant().timeZone });
     }
 
     // @todo Remove includes({ product: 'merchant' }) when AR supports owner assignment to has_many children
     //   in non-load queries
-    __constructCalendar(month, preload, prevPagePromise) {
-      var timeZone = this.merchant().timeZone;
-
+    __constructCalendar(month, { preload, prevPagePromise, timeZone } = {}) {
       var today = moment.tz(timeZone);
       var lowerRange;
       if(month) {
@@ -82,8 +80,11 @@ Occasion.Modules.push(function(library) {
           if(!this.nextPromise) {
             this.nextPromise = product.__constructCalendar(
               moment(upperRange).add(1, 'days').startOf('month'),
-              preloadCount,
-              currentPromise
+              {
+                preload: preloadCount,
+                prevPagePromise: currentPromise,
+                timeZone
+              },
             );
           }
 
@@ -104,7 +105,13 @@ Occasion.Modules.push(function(library) {
 
           response.prevPage = function() {
             this.prevPromise = this.prevPromise || prevPagePromise ||
-              product.__constructCalendar(moment(lowerRange).subtract(1, 'months'), 0);
+              product.__constructCalendar(
+                moment(lowerRange).subtract(1, 'months'),
+                {
+                  preload: 0,
+                  timeZone
+                }
+              );
 
             product.__currentCalendarPage -= 1;
 

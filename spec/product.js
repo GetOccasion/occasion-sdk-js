@@ -149,7 +149,12 @@ describe('Occasion.Product', function() {
         this.promise2 = this.promise.then(() => {
           jasmine.clock().mockDate(moment.tz('2018-05-09', this.product.merchant().timeZone).toDate());
 
-          return this.product.__constructCalendar(moment.tz('2018-05-01', this.product.merchant().timeZone)).then((collection) => {
+          return this.product.__constructCalendar(
+            moment.tz('2018-05-01', this.product.merchant().timeZone),
+            {
+              timeZone: this.product.merchant().timeZone
+            }
+          ).then((collection) => {
             this.calendarCollection = collection;
           });
         });
@@ -250,7 +255,13 @@ describe('Occasion.Product', function() {
         this.promise2 = this.promise.then(() => {
           jasmine.clock().mockDate(moment.tz('2018-04-01', this.product.merchant().timeZone).toDate());
 
-          return this.product.__constructCalendar(moment.tz('2018-05-01', this.product.merchant().timeZone), 0).then((collection) => {
+          return this.product.__constructCalendar(
+            moment.tz('2018-05-01', this.product.merchant().timeZone),
+            {
+              preload: 0,
+              timeZone: this.product.merchant().timeZone
+            }
+          ).then((collection) => {
             this.calendarCollection = collection;
           });
         });
