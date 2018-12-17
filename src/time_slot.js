@@ -1,6 +1,6 @@
 Occasion.Modules.push(function(library) {
   library.TimeSlot = class TimeSlot extends library.Base {
-    static constructCalendar(timeZone, month) {
+    static constructCalendar = function(timeZone, month) {
       return Occasion.__constructCalendar(
         month,
         {

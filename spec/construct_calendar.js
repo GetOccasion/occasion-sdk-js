@@ -7,13 +7,18 @@ describe('__constructCalendar()', function() {
     window.onSuccess = jasmine.createSpy('onSuccess');
     window.onFailure = jasmine.createSpy('onFailure');
     window.onCompletion = jasmine.createSpy('onCompletion');
-  });
 
-  afterEach(function() {
-    moxios.uninstall();
-  });
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-01.+/, JsonApiResponses.TimeSlot.calendar[0]);
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-08.+/, JsonApiResponses.TimeSlot.calendar[1]);
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-15.+/, JsonApiResponses.TimeSlot.calendar[2]);
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-22.+/, JsonApiResponses.TimeSlot.calendar[3]);
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-29.+/, JsonApiResponses.TimeSlot.calendar[4]);
 
-  beforeEach(function () {
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-09.+/, JsonApiResponses.TimeSlot.calendar[1]);
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-16.+/, JsonApiResponses.TimeSlot.calendar[2]);
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-23.+/, JsonApiResponses.TimeSlot.calendar[3]);
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-30.+/, JsonApiResponses.TimeSlot.calendar[4]);
+
     moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-06-01.+/, JsonApiResponses.TimeSlot.calendar[0]);
     moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-06-08.+/, JsonApiResponses.TimeSlot.calendar[1]);
     moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-06-15.+/, JsonApiResponses.TimeSlot.calendar[2]);
@@ -26,6 +31,14 @@ describe('__constructCalendar()', function() {
     moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-07-22.+/, JsonApiResponses.TimeSlot.calendar[3]);
     moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-07-29.+/, JsonApiResponses.TimeSlot.calendar[4]);
 
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-01.+/, JsonApiResponses.TimeSlot.calendar[0]);
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-08.+/, JsonApiResponses.TimeSlot.calendar[1]);
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-15.+/, JsonApiResponses.TimeSlot.calendar[2]);
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-22.+/, JsonApiResponses.TimeSlot.calendar[3]);
+    moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-29.+/, JsonApiResponses.TimeSlot.calendar[4]);
+  });
+
+  beforeEach(function () {
     this.occsnClient.Product.find('1kbsdf')
     .then(window.onSuccess);
 
@@ -37,20 +50,16 @@ describe('__constructCalendar()', function() {
     });
   });
 
-  afterEach(function () {
+  afterEach(function() {
     jasmine.clock().uninstall();
+    moxios.uninstall();
   });
 
   describe('no month arg', function() {
     beforeEach(function() {
       jasmine.clock().mockDate(moment.tz('2018-05-09', 'America/Los_Angeles').toDate());
 
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-09.+/, JsonApiResponses.TimeSlot.calendar[1]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-16.+/, JsonApiResponses.TimeSlot.calendar[2]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-23.+/, JsonApiResponses.TimeSlot.calendar[3]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-30.+/, JsonApiResponses.TimeSlot.calendar[4]);
-
-      this.promise2 = this.promise.then(() => {
+      return this.promise2 = this.promise.then(() => {
         spyOn(Occasion, '__constructCalendar').and.callThrough();
 
         return Occasion.__constructCalendar(
@@ -76,7 +85,7 @@ describe('__constructCalendar()', function() {
     describe('preloading', function() {
       it('preloads appropriate months', function() {
         return this.promise2.then(() => {
-          moxios.wait(() => {
+          return moxios.wait(() => {
             expect(Occasion.__constructCalendar).toHaveBeenCalledTimes(3);
           });
         });
@@ -86,29 +95,6 @@ describe('__constructCalendar()', function() {
 
   describe('current month as arg', function() {
     beforeEach(function() {
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-09.+/, JsonApiResponses.TimeSlot.calendar[1]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-16.+/, JsonApiResponses.TimeSlot.calendar[2]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-23.+/, JsonApiResponses.TimeSlot.calendar[3]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-30.+/, JsonApiResponses.TimeSlot.calendar[4]);
-
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-06-01.+/, JsonApiResponses.TimeSlot.calendar[0]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-06-08.+/, JsonApiResponses.TimeSlot.calendar[1]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-06-15.+/, JsonApiResponses.TimeSlot.calendar[2]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-06-22.+/, JsonApiResponses.TimeSlot.calendar[3]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-06-29.+/, JsonApiResponses.TimeSlot.calendar[4]);
-
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-07-01.+/, JsonApiResponses.TimeSlot.calendar[0]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-07-08.+/, JsonApiResponses.TimeSlot.calendar[1]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-07-15.+/, JsonApiResponses.TimeSlot.calendar[2]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-07-22.+/, JsonApiResponses.TimeSlot.calendar[3]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-07-29.+/, JsonApiResponses.TimeSlot.calendar[4]);
-
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-01.+/, JsonApiResponses.TimeSlot.calendar[0]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-08.+/, JsonApiResponses.TimeSlot.calendar[1]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-15.+/, JsonApiResponses.TimeSlot.calendar[2]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-22.+/, JsonApiResponses.TimeSlot.calendar[3]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-08-29.+/, JsonApiResponses.TimeSlot.calendar[4]);
-
       this.promise2 = this.promise.then(() => {
         jasmine.clock().mockDate(moment.tz('2018-05-09', this.product.merchant().timeZone).toDate());
 
@@ -212,12 +198,6 @@ describe('__constructCalendar()', function() {
 
   describe('other month as arg', function() {
     beforeEach(function() {
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-01.+/, JsonApiResponses.TimeSlot.calendar[0]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-08.+/, JsonApiResponses.TimeSlot.calendar[1]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-15.+/, JsonApiResponses.TimeSlot.calendar[2]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-22.+/, JsonApiResponses.TimeSlot.calendar[3]);
-      moxios.stubRequest(/.+\/time_slots\/\?.*filter%5Bstarts_at%5D%5Bge%5D=2018-05-29.+/, JsonApiResponses.TimeSlot.calendar[4]);
-
       this.promise2 = this.promise.then(() => {
         jasmine.clock().mockDate(moment.tz('2018-04-01', this.product.merchant().timeZone).toDate());
 
@@ -271,6 +251,29 @@ describe('__constructCalendar()', function() {
       return this.promise2.then(() => {
         expect(this.calendarCollection.first().timeSlots.size()).toBe(2);
         expect(this.calendarCollection.last().timeSlots.size()).toBe(5);
+      });
+    });
+  });
+
+  describe('with queryParams', function() {
+    beforeEach(function() {
+      jasmine.clock().mockDate(moment.tz('2018-05-09', 'America/Los_Angeles').toDate());
+
+      this.promise2 = this.promise.then(() => {
+        debugger
+        return this.occsnClient.TimeSlot.where({
+          keywords: 'lorem',
+          venue: [
+            this.occsnClient.Venue.build({ id: '1' }),
+            this.occsnClient.Venue.build({ id: '2' }),
+          ]
+        }).constructCalendar(this.product.merchant().timeZone);
+      });
+    });
+
+    it('adds relation queryParams to query', function() {
+      return this.promise2.then(() => {
+        expect(moxios.requests.mostRecent().url).toContain(qs.stringify({ filter: { keywords: 'lorem', venue: '1,2' } }));
       });
     });
   });

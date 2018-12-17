@@ -803,7 +803,9 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.TimeSlot = function (_library$Base14) {
+  var _class, _temp;
+
+  library.TimeSlot = (_temp = _class = function (_library$Base14) {
     _inherits(TimeSlot, _library$Base14);
 
     function TimeSlot() {
@@ -836,20 +838,17 @@ Occasion.Modules.push(function (library) {
 
         return output;
       }
-    }], [{
-      key: 'constructCalendar',
-      value: function constructCalendar(timeZone, month) {
-        return Occasion.__constructCalendar(month, {
-          monthlyTimeSlotDaysBatchSize: 7,
-          monthlyTimeSlotPreloadSize: 4,
-          relation: this,
-          timeZone: timeZone
-        });
-      }
     }]);
 
     return TimeSlot;
-  }(library.Base);
+  }(library.Base), _class.constructCalendar = function (timeZone, month) {
+    return Occasion.__constructCalendar(month, {
+      monthlyTimeSlotDaysBatchSize: 7,
+      monthlyTimeSlotPreloadSize: 4,
+      relation: this,
+      timeZone: timeZone
+    });
+  }, _temp);
 
   library.TimeSlot.className = 'TimeSlot';
   library.TimeSlot.queryName = 'time_slots';
