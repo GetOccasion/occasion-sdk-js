@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/nicklandgrebe/occasion-sdk-js#readme",
   "dependencies": {
-    "active-resource": "git+https://github.com/nicklandgrebe/activeresource.js.git#occsn-checkout-compat",
+    "active-resource": "git+https://github.com/nicklandgrebe/activeresource.js.git",
     "decimal.js-light": "^2.4.1",
     "moment": "^2.22.1",
     "moment-timezone-with-data-2010-2020": "^0.4.0"

@@ -64,6 +64,7 @@ module.exports = function(grunt) {
               { 'jquery': '$' },
               { 'decimal.js-light': 'Decimal' },
               'moment',
+              'qs',
               { 'jasmine-jquery': null },
               { 'jasmine-promises': null },
               { 'moment-timezone-with-data-2010-2020': null },
@@ -111,6 +112,7 @@ module.exports = function(grunt) {
         src: [
           'src/init/client.js',
           'src/init/modules.js',
+          'src/construct_calendar.js',
           'src/*.js',
           'src/**/*.js',
         ],
