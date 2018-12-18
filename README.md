@@ -5,7 +5,7 @@ The Occasion Javascript SDK enables you to sell bookings simply and securely thr
 ## Installation
 
 ```javascript
-npm i occasion-sdk --save
+yarn add occasion-sdk
 ```
 
 You can also use the CDN address https://unpkg.com/occasion-sdk to add it to your AMD loader or into your page:
