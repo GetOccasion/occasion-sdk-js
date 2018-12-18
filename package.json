@@ -2,13 +2,13 @@
   "name": "occasion-sdk",
   "version": "0.2.2",
   "description": "An SDK library that enables access to Occasion's application, providing a rich DSL for creating and managing bookings.",
-  "main": "dist/occasion-sdk.min.js",
+  "main": "dist/occasion-sdk.js",
   "scripts": {
     "test": "grunt spec"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nicklandgrebe/occasion-sdk-js.git"
+    "url": "git+https://github.com/GetOccasion/occasion-sdk-js.git"
   },
   "keywords": [
     "occasion",
@@ -18,9 +18,9 @@
   "author": "Peak Labs, LLC, DBA Occasion App",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nicklandgrebe/occasion-sdk-js/issues"
+    "url": "https://github.com/GetOccasion/occasion-sdk-js/issues"
   },
-  "homepage": "https://github.com/nicklandgrebe/occasion-sdk-js#readme",
+  "homepage": "https://github.com/GetOccasion/occasion-sdk-js#readme",
   "dependencies": {
     "active-resource": "https://github.com/GetOccasion/activeresource.js.git",
     "decimal.js-light": "^2.4.1",
