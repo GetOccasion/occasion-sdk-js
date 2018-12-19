@@ -45,3 +45,4 @@
 `options` as first arg
   * Add `status` option for choosing what status timeslots the calendar consists of
   * Change `timeZone` to be **mandatory** option
+* Change `constructCalendar` to always start at beginning of month provided

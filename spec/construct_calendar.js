@@ -76,7 +76,13 @@ describe('__constructCalendar()', function() {
       });
     });
 
-    it('starts at current day and adds all days in current month as items to collection', function() {
+    it('starts at beginning of current month', function() {
+      return this.promise2.then(() => {
+        expect(moxios.requests.at(1).url).toContain('2018-05-01');
+      });
+    });
+
+    it('adds all days in current month as items to collection', function() {
       return this.promise2.then(() => {
         expect(this.calendarCollection.size()).toBe(31);
       });
@@ -112,7 +118,13 @@ describe('__constructCalendar()', function() {
       });
     });
 
-    it('starts at current day and adds all days in current month as items to collection', function() {
+    it('starts at beginning of month', function() {
+      return this.promise2.then(() => {
+        expect(moxios.requests.at(1).url).toContain('2018-05-01');
+      });
+    });
+
+    it('adds all days in current month as items to collection', function() {
       return this.promise2.then(() => {
         expect(this.calendarCollection.size()).toBe(31);
       });

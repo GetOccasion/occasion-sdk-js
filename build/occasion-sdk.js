@@ -87,12 +87,14 @@ Occasion.__constructCalendar = function __constructCalendar(month) {
       timeZone = _ref.timeZone;
 
   var today = moment.tz(timeZone);
+
   var lowerRange;
   if (month) {
-    lowerRange = month.isSame(today, 'month') ? today : month.tz(timeZone).startOf('month');
+    lowerRange = month.tz(timeZone);
   } else {
     lowerRange = today;
   }
+  lowerRange = lowerRange.startOf('month');
   var upperRange = lowerRange.clone().endOf('month');
 
   var numRequests = Math.ceil(upperRange.diff(lowerRange, 'days') / monthlyTimeSlotDaysBatchSize);
