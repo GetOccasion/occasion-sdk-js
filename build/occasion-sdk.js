@@ -16,6 +16,8 @@
 
 'use strict';
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -81,6 +83,7 @@ Occasion.__constructCalendar = function __constructCalendar(month) {
       preload = _ref.preload,
       prevPagePromise = _ref.prevPagePromise,
       relation = _ref.relation,
+      status = _ref.status,
       timeZone = _ref.timeZone;
 
   var today = moment.tz(timeZone);
@@ -110,7 +113,7 @@ Occasion.__constructCalendar = function __constructCalendar(month) {
         ge: lower.toDate(),
         le: upper.toDate()
       },
-      status: 'bookable'
+      status: status || 'bookable'
     }).all());
 
     lower.add(monthlyTimeSlotDaysBatchSize, 'days');
@@ -150,17 +153,21 @@ Occasion.__constructCalendar = function __constructCalendar(month) {
       return true;
     };
 
+    var commonPaginationOptions = {
+      calendar: calendar,
+      monthlyTimeSlotDaysBatchSize: monthlyTimeSlotDaysBatchSize,
+      monthlyTimeSlotPreloadSize: monthlyTimeSlotPreloadSize,
+      relation: relation,
+      status: status,
+      timeZone: timeZone
+    };
+
     response.nextPage = function (preloadCount) {
       if (!this.nextPromise) {
-        this.nextPromise = Occasion.__constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), {
-          calendar: calendar,
-          monthlyTimeSlotDaysBatchSize: monthlyTimeSlotDaysBatchSize,
-          monthlyTimeSlotPreloadSize: monthlyTimeSlotPreloadSize,
+        this.nextPromise = Occasion.__constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), _extends({}, commonPaginationOptions, {
           preload: preloadCount,
-          prevPagePromise: currentPromise,
-          relation: relation,
-          timeZone: timeZone
-        });
+          prevPagePromise: currentPromise
+        }));
       }
 
       if (_.isUndefined(preloadCount)) {
@@ -180,14 +187,9 @@ Occasion.__constructCalendar = function __constructCalendar(month) {
       };
 
       response.prevPage = function () {
-        this.prevPromise = this.prevPromise || prevPagePromise || Occasion.__constructCalendar(moment(lowerRange).subtract(1, 'months'), {
-          calendar: calendar,
-          monthlyTimeSlotDaysBatchSize: monthlyTimeSlotDaysBatchSize,
-          monthlyTimeSlotPreloadSize: monthlyTimeSlotPreloadSize,
-          preload: 0,
-          relation: relation,
-          timeZone: timeZone
-        });
+        this.prevPromise = this.prevPromise || prevPagePromise || Occasion.__constructCalendar(moment(lowerRange).subtract(1, 'months'), _extends({}, commonPaginationOptions, {
+          preload: 0
+        }));
 
         calendar.__currentPage -= 1;
 
@@ -708,12 +710,14 @@ Occasion.Modules.push(function (library) {
     _createClass(Product, [{
       key: 'constructCalendar',
       value: function constructCalendar(month) {
-        return Occasion.__constructCalendar(month, {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        return Occasion.__constructCalendar(month, _extends({
           monthlyTimeSlotDaysBatchSize: this.monthlyTimeSlotDaysBatchSize,
           monthlyTimeSlotPreloadSize: this.monthlyTimeSlotPreloadSize,
           relation: this.timeSlots(),
           timeZone: this.merchant().timeZone
-        });
+        }, options));
       }
     }]);
 
@@ -841,13 +845,21 @@ Occasion.Modules.push(function (library) {
     }]);
 
     return TimeSlot;
-  }(library.Base), _class.constructCalendar = function (timeZone, month) {
-    return Occasion.__constructCalendar(month, {
+  }(library.Base), _class.constructCalendar = function () {
+    var month = void 0,
+        options = void 0;
+    if (moment.isMoment(arguments[0])) {
+      month = arguments[0];
+      options = arguments[1] || {};
+    } else {
+      options = arguments[0] || {};
+    }
+
+    return Occasion.__constructCalendar(month, _extends({
       monthlyTimeSlotDaysBatchSize: 7,
       monthlyTimeSlotPreloadSize: 4,
-      relation: this,
-      timeZone: timeZone
-    });
+      relation: this
+    }, options));
   }, _temp);
 
   library.TimeSlot.className = 'TimeSlot';

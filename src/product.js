@@ -1,13 +1,14 @@
 Occasion.Modules.push(function(library) {
   library.Product = class Product extends library.Base {
-    constructCalendar(month) {
+    constructCalendar(month, options = {}) {
       return Occasion.__constructCalendar(
         month,
         {
           monthlyTimeSlotDaysBatchSize: this.monthlyTimeSlotDaysBatchSize,
           monthlyTimeSlotPreloadSize: this.monthlyTimeSlotPreloadSize,
           relation: this.timeSlots(),
-          timeZone: this.merchant().timeZone
+          timeZone: this.merchant().timeZone,
+          ...options
         }
       );
     }

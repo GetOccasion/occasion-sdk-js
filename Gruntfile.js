@@ -19,7 +19,10 @@ module.exports = function(grunt) {
     },
     babel: {
       options: {
-        plugins: ['transform-class-properties'],
+        plugins: [
+          'transform-class-properties',
+          'transform-object-rest-spread'
+        ],
         presets: ['es2015']
       },
       build: {
@@ -156,7 +159,7 @@ module.exports = function(grunt) {
                 "qs": '/node_modules/qs/dist/qs',
                 "es6-promise": '/node_modules/es6-promise/dist/es6-promise',
                 "underscore": '/node_modules/underscore/underscore-min',
-                "underscore.string": '/node_modules/underscore.string/dist/underscore.string',
+                "underscore.string": '/node_modules/underscore.string/dist/underscore.string.min',
                 "underscore.inflection": '/node_modules/underscore.inflection/lib/underscore.inflection',
                 "occasion-sdk": '/build/occasion-sdk',
                 "moment": '/node_modules/moment/min/moment.min',

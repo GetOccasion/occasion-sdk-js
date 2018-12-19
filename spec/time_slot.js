@@ -13,7 +13,7 @@ describe('Occasion.TimeSlot', function() {
     moxios.uninstall();
   });
 
-  describe('constructCalendar(timeZone, month)', function() {
+  describe('constructCalendar(month, options)', function() {
     beforeEach(function () {
       jasmine.clock().mockDate(moment.tz('2018-05-09', 'America/Los_Angeles').toDate());
 
@@ -42,7 +42,7 @@ describe('Occasion.TimeSlot', function() {
         .then(() => {
           this.product = window.onSuccess.calls.mostRecent().args[0];
 
-          return this.occsnClient.TimeSlot.constructCalendar(this.product.merchant().timeZone).then((collection) => {
+          return this.occsnClient.TimeSlot.constructCalendar({ timeZone: this.product.merchant().timeZone }).then((collection) => {
             this.calendarCollection = collection;
           });
         });

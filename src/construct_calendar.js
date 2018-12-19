@@ -7,6 +7,7 @@ Occasion.__constructCalendar = function __constructCalendar(month, {
   preload,
   prevPagePromise,
   relation,
+  status,
   timeZone
 } = {}) {
   var today = moment.tz(timeZone);
@@ -39,7 +40,7 @@ Occasion.__constructCalendar = function __constructCalendar(month, {
           ge: lower.toDate(),
           le: upper.toDate()
         },
-        status: 'bookable'
+        status: status || 'bookable'
       }).all()
     );
 
@@ -78,18 +79,23 @@ Occasion.__constructCalendar = function __constructCalendar(month, {
 
     response.hasNextPage = function() { return true; };
 
+    let commonPaginationOptions = {
+      calendar,
+      monthlyTimeSlotDaysBatchSize,
+      monthlyTimeSlotPreloadSize,
+      relation,
+      status,
+      timeZone
+    };
+
     response.nextPage = function(preloadCount) {
       if(!this.nextPromise) {
         this.nextPromise = Occasion.__constructCalendar(
           moment(upperRange).add(1, 'days').startOf('month'),
           {
-            calendar,
-            monthlyTimeSlotDaysBatchSize,
-            monthlyTimeSlotPreloadSize,
+            ...commonPaginationOptions,
             preload: preloadCount,
             prevPagePromise: currentPromise,
-            relation,
-            timeZone
           },
         );
       }
@@ -114,12 +120,8 @@ Occasion.__constructCalendar = function __constructCalendar(month, {
           Occasion.__constructCalendar(
             moment(lowerRange).subtract(1, 'months'),
             {
-              calendar,
-              monthlyTimeSlotDaysBatchSize,
-              monthlyTimeSlotPreloadSize,
+              ...commonPaginationOptions,
               preload: 0,
-              relation,
-              timeZone
             }
           );
 

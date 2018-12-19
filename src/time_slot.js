@@ -1,16 +1,24 @@
 Occasion.Modules.push(function(library) {
   library.TimeSlot = class TimeSlot extends library.Base {
-    static constructCalendar = function(timeZone, month) {
+    static constructCalendar = function() {
+      let month, options;
+      if(moment.isMoment(arguments[0])) {
+        month = arguments[0];
+        options = arguments[1] || {};
+      } else {
+        options = arguments[0] || {};
+      }
+
       return Occasion.__constructCalendar(
         month,
         {
           monthlyTimeSlotDaysBatchSize: 7,
           monthlyTimeSlotPreloadSize: 4,
           relation: this,
-          timeZone
+          ...options
         }
       );
-    }
+    };
 
     toString(format) {
       var output;

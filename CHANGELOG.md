@@ -41,3 +41,7 @@
 ## Master
 
 * Add `TimeSlot.constructCalendar(timeZone, month)`
+* Change `TimeSlot.constructCalendar` to accept either `month` as first arg with `options` as second, or
+`options` as first arg
+  * Add `status` option for choosing what status timeslots the calendar consists of
+  * Change `timeZone` to be **mandatory** option

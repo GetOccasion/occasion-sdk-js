@@ -260,20 +260,42 @@ describe('__constructCalendar()', function() {
       jasmine.clock().mockDate(moment.tz('2018-05-09', 'America/Los_Angeles').toDate());
 
       this.promise2 = this.promise.then(() => {
-        debugger
         return this.occsnClient.TimeSlot.where({
           keywords: 'lorem',
           venue: [
             this.occsnClient.Venue.build({ id: '1' }),
             this.occsnClient.Venue.build({ id: '2' }),
           ]
-        }).constructCalendar(this.product.merchant().timeZone);
+        }).constructCalendar({ timeZone: this.product.merchant().timeZone });
       });
     });
 
     it('adds relation queryParams to query', function() {
       return this.promise2.then(() => {
         expect(moxios.requests.mostRecent().url).toContain(qs.stringify({ filter: { keywords: 'lorem', venue: '1,2' } }));
+      });
+    });
+  });
+
+  describe('options', function() {
+    describe('status', function() {
+      beforeEach(function() {
+        jasmine.clock().mockDate(moment.tz('2018-05-09', 'America/Los_Angeles').toDate());
+
+        this.promise2 = this.promise.then(() => {
+          return this.occsnClient.TimeSlot.constructCalendar(
+            {
+              status: 'upcoming',
+              timeZone: this.product.merchant().timeZone
+            }
+          );
+        });
+      });
+
+      it('changes time slot status filter', function() {
+        return this.promise2.then(() => {
+          expect(moxios.requests.mostRecent().url).toContain(qs.stringify({ filter: { status: 'upcoming' } }));
+        });
       });
     });
   });
