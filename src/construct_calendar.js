@@ -11,6 +11,7 @@ Occasion.__constructCalendar = function __constructCalendar(month, {
   timeZone
 } = {}) {
   var today = moment.tz(timeZone);
+  status = status || 'bookable';
 
   var lowerRange;
   if(month) {
@@ -42,7 +43,7 @@ Occasion.__constructCalendar = function __constructCalendar(month, {
           ge: lower.toDate(),
           le: upper.toDate()
         },
-        status: status || 'bookable'
+        status
       }).all()
     );
 
@@ -114,7 +115,7 @@ Occasion.__constructCalendar = function __constructCalendar(month, {
       return this.nextPromise;
     };
 
-    if(month && !month.isSame(today, 'month')) {
+    if(status !== 'bookable' || (month && !month.isSame(today, 'month'))) {
       response.hasPrevPage = function() { return true; };
 
       response.prevPage = function() {

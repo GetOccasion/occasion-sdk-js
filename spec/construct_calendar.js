@@ -88,6 +88,12 @@ describe('__constructCalendar()', function() {
       });
     });
 
+    it('does not have prevPage for months before today', function() {
+      return this.promise2.then(() => {
+        expect(this.calendarCollection.hasPrevPage()).toBeFalsy();
+      });
+    });
+
     describe('preloading', function() {
       it('preloads appropriate months', function() {
         return this.promise2.then(() => {
@@ -300,7 +306,9 @@ describe('__constructCalendar()', function() {
               status: 'upcoming',
               timeZone: this.product.merchant().timeZone
             }
-          );
+          ).then((collection) => {
+            this.calendarCollection = collection;
+          });
         });
       });
 
@@ -308,6 +316,12 @@ describe('__constructCalendar()', function() {
         return this.promise2.then(() => {
           expect(moxios.requests.mostRecent().url).toContain(qs.stringify({ filter: { status: 'upcoming' } }));
         });
+      });
+
+      it('has prevPage for months before today', function() {
+        return this.promise2.then(() => {
+          expect(this.calendarCollection.hasPrevPage()).toBeTruthy();
+        })
       });
     });
   });

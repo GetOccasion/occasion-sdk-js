@@ -87,6 +87,7 @@ Occasion.__constructCalendar = function __constructCalendar(month) {
       timeZone = _ref.timeZone;
 
   var today = moment.tz(timeZone);
+  status = status || 'bookable';
 
   var lowerRange;
   if (month) {
@@ -115,7 +116,7 @@ Occasion.__constructCalendar = function __constructCalendar(month) {
         ge: lower.toDate(),
         le: upper.toDate()
       },
-      status: status || 'bookable'
+      status: status
     }).all());
 
     lower.add(monthlyTimeSlotDaysBatchSize, 'days');
@@ -183,7 +184,7 @@ Occasion.__constructCalendar = function __constructCalendar(month) {
       return this.nextPromise;
     };
 
-    if (month && !month.isSame(today, 'month')) {
+    if (status !== 'bookable' || month && !month.isSame(today, 'month')) {
       response.hasPrevPage = function () {
         return true;
       };

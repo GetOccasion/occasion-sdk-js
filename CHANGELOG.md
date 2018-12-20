@@ -44,5 +44,6 @@
 * Change `TimeSlot.constructCalendar` to accept either `month` as first arg with `options` as second, or
 `options` as first arg
   * Add `status` option for choosing what status timeslots the calendar consists of
+    * If `status !== 'bookable'`, allow `prevPage` to be requested on first page of calendar
   * Change `timeZone` to be **mandatory** option
 * Change `constructCalendar` to always start at beginning of month provided
