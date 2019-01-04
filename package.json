@@ -4,7 +4,8 @@
   "description": "An SDK library that enables access to Occasion's application, providing a rich DSL for creating and managing bookings.",
   "main": "dist/occasion-sdk.js",
   "scripts": {
-    "test": "grunt spec"
+    "test": "grunt spec",
+    "build": "grunt build"
   },
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
 Occasion.Modules.push(function(library) {
   library.Order = class Order extends library.Base {
     static construct(attributes) {
-      var order = this.build(attributes);
+      var order = this.includes('currency').build(attributes);
 
       order.sessionIdentifier = order.sessionIdentifier ||
         Math.random().toString(36).substring(7) + '-' + Date.now();
@@ -94,7 +94,7 @@ Occasion.Modules.push(function(library) {
         this.transactions().target().delete(transaction);
       }
     }
-    
+
     // @private
 
     // Called by Order.construct, which injects order
@@ -118,7 +118,7 @@ Occasion.Modules.push(function(library) {
             break;
         }
       }
-      
+
       return order;
     }
   };
