@@ -47,3 +47,4 @@
     * If `status !== 'bookable'`, allow `prevPage` to be requested on first page of calendar
   * Change `timeZone` to be **mandatory** option
 * Change `constructCalendar` to always start at beginning of month provided
+* Add `Label` class

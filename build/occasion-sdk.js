@@ -373,8 +373,27 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Merchant = function (_library$Base6) {
-    _inherits(Merchant, _library$Base6);
+  library.Label = function (_library$Base6) {
+    _inherits(Label, _library$Base6);
+
+    function Label() {
+      _classCallCheck(this, Label);
+
+      return _possibleConstructorReturn(this, (Label.__proto__ || Object.getPrototypeOf(Label)).apply(this, arguments));
+    }
+
+    return Label;
+  }(library.Base);
+
+  library.Label.className = 'Label';
+  library.Label.queryName = 'labels';
+
+  library.Label.belongsTo('product');
+});
+
+Occasion.Modules.push(function (library) {
+  library.Merchant = function (_library$Base7) {
+    _inherits(Merchant, _library$Base7);
 
     function Merchant() {
       _classCallCheck(this, Merchant);
@@ -393,8 +412,8 @@ Occasion.Modules.push(function (library) {
   library.Merchant.hasMany('venues');
 });
 Occasion.Modules.push(function (library) {
-  library.Option = function (_library$Base7) {
-    _inherits(Option, _library$Base7);
+  library.Option = function (_library$Base8) {
+    _inherits(Option, _library$Base8);
 
     function Option() {
       _classCallCheck(this, Option);
@@ -412,8 +431,8 @@ Occasion.Modules.push(function (library) {
   library.Option.belongsTo('question');
 });
 Occasion.Modules.push(function (library) {
-  library.Order = function (_library$Base8) {
-    _inherits(Order, _library$Base8);
+  library.Order = function (_library$Base9) {
+    _inherits(Order, _library$Base9);
 
     function Order() {
       _classCallCheck(this, Order);
@@ -585,7 +604,7 @@ Occasion.Modules.push(function (library) {
   library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' });
 
   library.Order.afterRequest(function () {
-    var _this11 = this;
+    var _this12 = this;
 
     if (this.product() && !this.product().attendeeQuestions.empty()) {
       var diff = this.quantity - this.attendees().size();
@@ -602,9 +621,9 @@ Occasion.Modules.push(function (library) {
     }
 
     ActiveResource.Collection.build(['subtotal', 'couponAmount', 'tax', 'giftCardAmount', 'price', 'total', 'outstandingBalance']).select(function (attr) {
-      return _this11[attr];
+      return _this12[attr];
     }).each(function (attr) {
-      _this11[attr] = new Decimal(_this11[attr]);
+      _this12[attr] = new Decimal(_this12[attr]);
     });
 
     if (this.outstandingBalance && !this.outstandingBalance.isZero()) {
@@ -618,7 +637,7 @@ Occasion.Modules.push(function (library) {
       if (this.outstandingBalance.isPositive()) {
         if (!giftCardTransactions.empty()) {
           giftCardTransactions.each(function (t) {
-            if (_this11.outstandingBalance.isZero()) return;
+            if (_this12.outstandingBalance.isZero()) return;
 
             var amount = new Decimal(t.amount);
             var giftCardValue = new Decimal(t.paymentMethod().value);
@@ -626,40 +645,40 @@ Occasion.Modules.push(function (library) {
 
             if (remainingGiftCardBalance.isZero()) return;
 
-            if (remainingGiftCardBalance.greaterThanOrEqualTo(_this11.outstandingBalance)) {
-              amount = amount.plus(_this11.outstandingBalance);
-              _this11.outstandingBalance = new Decimal(0);
+            if (remainingGiftCardBalance.greaterThanOrEqualTo(_this12.outstandingBalance)) {
+              amount = amount.plus(_this12.outstandingBalance);
+              _this12.outstandingBalance = new Decimal(0);
             } else {
               amount = remainingGiftCardBalance;
-              _this11.outstandingBalance = _this11.outstandingBalance.minus(remainingGiftCardBalance);
+              _this12.outstandingBalance = _this12.outstandingBalance.minus(remainingGiftCardBalance);
             }
 
             t.amount = amount.toString();
 
-            _this11.transactions().target().delete(t);
-            t.__createClone({ cloner: _this11 });
+            _this12.transactions().target().delete(t);
+            t.__createClone({ cloner: _this12 });
           });
         }
       } else {
         if (!giftCardTransactions.empty()) {
           ActiveResource.Collection.build(giftCardTransactions.toArray().reverse()).each(function (t) {
-            if (_this11.outstandingBalance.isZero()) return;
+            if (_this12.outstandingBalance.isZero()) return;
 
             var amount = new Decimal(t.amount);
 
-            if (amount.greaterThan(_this11.outstandingBalance.abs())) {
-              amount = amount.plus(_this11.outstandingBalance);
-              _this11.outstandingBalance = new Decimal(0);
+            if (amount.greaterThan(_this12.outstandingBalance.abs())) {
+              amount = amount.plus(_this12.outstandingBalance);
+              _this12.outstandingBalance = new Decimal(0);
             } else {
-              _this11.outstandingBalance = _this11.outstandingBalance.plus(amount);
+              _this12.outstandingBalance = _this12.outstandingBalance.plus(amount);
 
-              _this11.removeCharge(t.paymentMethod());
+              _this12.removeCharge(t.paymentMethod());
               return;
             }
 
             t.amount = amount.toString();
-            _this11.transactions().target().delete(t);
-            t.__createClone({ cloner: _this11 });
+            _this12.transactions().target().delete(t);
+            t.__createClone({ cloner: _this12 });
           });
         }
       }
@@ -683,8 +702,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.PaymentMethod = function (_library$Base9) {
-    _inherits(PaymentMethod, _library$Base9);
+  library.PaymentMethod = function (_library$Base10) {
+    _inherits(PaymentMethod, _library$Base10);
 
     function PaymentMethod() {
       _classCallCheck(this, PaymentMethod);
@@ -701,8 +720,8 @@ Occasion.Modules.push(function (library) {
   library.PaymentMethod.hasMany('transactions', { as: 'paymentMethod' });
 });
 Occasion.Modules.push(function (library) {
-  library.Product = function (_library$Base10) {
-    _inherits(Product, _library$Base10);
+  library.Product = function (_library$Base11) {
+    _inherits(Product, _library$Base11);
 
     function Product() {
       _classCallCheck(this, Product);
@@ -733,6 +752,7 @@ Occasion.Modules.push(function (library) {
   library.Product.belongsTo('merchant');
   library.Product.belongsTo('venue');
 
+  library.Product.hasMany('labels');
   library.Product.hasMany('orders');
   library.Product.hasMany('questions');
   library.Product.hasMany('redeemables');
@@ -754,8 +774,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Question = function (_library$Base11) {
-    _inherits(Question, _library$Base11);
+  library.Question = function (_library$Base12) {
+    _inherits(Question, _library$Base12);
 
     function Question() {
       _classCallCheck(this, Question);
@@ -775,8 +795,8 @@ Occasion.Modules.push(function (library) {
 });
 Occasion.Modules.push(function (library) {
   // TODO: Remove ability to directly query redeemables
-  library.Redeemable = function (_library$Base12) {
-    _inherits(Redeemable, _library$Base12);
+  library.Redeemable = function (_library$Base13) {
+    _inherits(Redeemable, _library$Base13);
 
     function Redeemable() {
       _classCallCheck(this, Redeemable);
@@ -793,8 +813,8 @@ Occasion.Modules.push(function (library) {
   library.Redeemable.belongsTo('product');
 });
 Occasion.Modules.push(function (library) {
-  library.State = function (_library$Base13) {
-    _inherits(State, _library$Base13);
+  library.State = function (_library$Base14) {
+    _inherits(State, _library$Base14);
 
     function State() {
       _classCallCheck(this, State);
@@ -812,8 +832,8 @@ Occasion.Modules.push(function (library) {
 Occasion.Modules.push(function (library) {
   var _class, _temp;
 
-  library.TimeSlot = (_temp = _class = function (_library$Base14) {
-    _inherits(TimeSlot, _library$Base14);
+  library.TimeSlot = (_temp = _class = function (_library$Base15) {
+    _inherits(TimeSlot, _library$Base15);
 
     function TimeSlot() {
       _classCallCheck(this, TimeSlot);
@@ -884,8 +904,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Transaction = function (_library$Base15) {
-    _inherits(Transaction, _library$Base15);
+  library.Transaction = function (_library$Base16) {
+    _inherits(Transaction, _library$Base16);
 
     function Transaction() {
       _classCallCheck(this, Transaction);
@@ -906,8 +926,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Venue = function (_library$Base16) {
-    _inherits(Venue, _library$Base16);
+  library.Venue = function (_library$Base17) {
+    _inherits(Venue, _library$Base17);
 
     function Venue() {
       _classCallCheck(this, Venue);

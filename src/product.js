@@ -20,6 +20,7 @@ Occasion.Modules.push(function(library) {
   library.Product.belongsTo('merchant');
   library.Product.belongsTo('venue');
 
+  library.Product.hasMany('labels');
   library.Product.hasMany('orders');
   library.Product.hasMany('questions');
   library.Product.hasMany('redeemables');
