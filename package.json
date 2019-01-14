@@ -2,7 +2,7 @@
   "name": "occasion-sdk",
   "version": "0.2.2",
   "description": "An SDK library that enables access to Occasion's application, providing a rich DSL for creating and managing bookings.",
-  "main": "dist/occasion-sdk.js",
+  "main": "build/occasion-sdk.js",
   "scripts": {
     "test": "grunt spec",
     "build": "grunt build"
