@@ -1346,8 +1346,8 @@ moment-timezone-with-data-2010-2020@^0.4.0:
   resolved "https://registry.yarnpkg.com/moment-timezone-with-data-2010-2020/-/moment-timezone-with-data-2010-2020-0.4.0.tgz#5727ee446baa7509c952a8ba94bafa6a169402e0"
 
 moment@^2.22.1:
-  version "2.23.0"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.23.0.tgz#759ea491ac97d54bac5ad776996e2a58cc1bc225"
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
 
 "moxios@git+https://github.com/nicklandgrebe/moxios.git":
   version "0.3.0"
