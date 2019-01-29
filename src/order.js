@@ -141,6 +141,7 @@ Occasion.Modules.push(function(library) {
     'tax',
     'taxPercentage',
     'total',
+    'priceDueOnInitialOrder',
     { readOnly: true }
   );
 
