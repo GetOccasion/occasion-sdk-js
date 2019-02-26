@@ -55,8 +55,7 @@ Occasion.Modules.push(function(library) {
         var questions = args[1];
         var timeSlots = args[2];
 
-        if (questions != undefined)
-          questions.inject(order, _this.__constructAnswer);
+        if (questions != undefined) questions.inject(order, _this.__constructAnswer);
         if (timeSlots != undefined) order.timeSlots().assign(timeSlots, false);
 
         return order;
@@ -66,20 +65,14 @@ Occasion.Modules.push(function(library) {
     // POSTs the order to `/orders/price`, which calculates price related fields and adds them to the order
     // @return [Promise] a promise for the order with price-related fields
     calculatePrice() {
-      return this.interface().post(
-        this.klass().links()["related"] + "price",
-        this
-      );
+      return this.interface().post(this.klass().links()["related"] + "price", this);
     }
 
     // POSTs the order to `/orders/information`, which calculates price + quantity related fields and adds them to the
     //   order
     // @return [Promise] a promise for the order with price & quantity related fields
     retrieveInformation() {
-      return this.interface().post(
-        this.klass().links()["related"] + "information",
-        this
-      );
+      return this.interface().post(this.klass().links()["related"] + "information", this);
     }
 
     // Creates a transaction with a payment method and an amount
@@ -169,7 +162,7 @@ Occasion.Modules.push(function(library) {
   library.Order.attributes("sessionIdentifier", "status");
 
   library.Order.attributes(
-    "couponDiscount",
+    "couponAmount",
     "dropInsDiscount",
     "giftCardAmount",
     "outstandingBalance",
@@ -213,7 +206,7 @@ Occasion.Modules.push(function(library) {
     }
 
     ActiveResource.Collection.build([
-      "couponDiscount",
+      "couponAmount",
       "dropInsDiscount",
       "giftCardAmount",
       "outstandingBalance",
@@ -234,14 +227,10 @@ Occasion.Modules.push(function(library) {
     if (this.outstandingBalance && !this.outstandingBalance.isZero()) {
       var giftCardTransactions = this.transactions()
         .target()
-        .select(
-          t => t.paymentMethod() && t.paymentMethod().isA(library.GiftCard)
-        );
+        .select(t => t.paymentMethod() && t.paymentMethod().isA(library.GiftCard));
       var remainingBalanceTransaction = this.transactions()
         .target()
-        .detect(
-          t => !(t.paymentMethod() && t.paymentMethod().isA(library.GiftCard))
-        );
+        .detect(t => !(t.paymentMethod() && t.paymentMethod().isA(library.GiftCard)));
 
       if (this.outstandingBalance.isPositive()) {
         if (!giftCardTransactions.empty()) {
@@ -254,18 +243,12 @@ Occasion.Modules.push(function(library) {
 
             if (remainingGiftCardBalance.isZero()) return;
 
-            if (
-              remainingGiftCardBalance.greaterThanOrEqualTo(
-                this.outstandingBalance
-              )
-            ) {
+            if (remainingGiftCardBalance.greaterThanOrEqualTo(this.outstandingBalance)) {
               amount = amount.plus(this.outstandingBalance);
               this.outstandingBalance = new Decimal(0);
             } else {
               amount = remainingGiftCardBalance;
-              this.outstandingBalance = this.outstandingBalance.minus(
-                remainingGiftCardBalance
-              );
+              this.outstandingBalance = this.outstandingBalance.minus(remainingGiftCardBalance);
             }
 
             t.amount = amount.toString();
@@ -278,9 +261,7 @@ Occasion.Modules.push(function(library) {
         }
       } else {
         if (!giftCardTransactions.empty()) {
-          ActiveResource.Collection.build(
-            giftCardTransactions.toArray().reverse()
-          ).each(t => {
+          ActiveResource.Collection.build(giftCardTransactions.toArray().reverse()).each(t => {
             if (this.outstandingBalance.isZero()) return;
 
             let amount = new Decimal(t.amount);
@@ -307,12 +288,8 @@ Occasion.Modules.push(function(library) {
       if (!giftCardTransactions.empty()) {
         this.giftCardAmount = this.transactions()
           .target()
-          .select(
-            t => t.paymentMethod() && t.paymentMethod().isA(library.GiftCard)
-          )
-          .inject(new Decimal(0), (total, transaction) =>
-            total.plus(transaction.amount)
-          );
+          .select(t => t.paymentMethod() && t.paymentMethod().isA(library.GiftCard))
+          .inject(new Decimal(0), (total, transaction) => total.plus(transaction.amount));
       }
 
       if (remainingBalanceTransaction) {

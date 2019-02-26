@@ -590,7 +590,7 @@ Occasion.Modules.push(function (library) {
 
   library.Order.attributes("sessionIdentifier", "status");
 
-  library.Order.attributes("couponDiscount", "dropInsDiscount", "giftCardAmount", "outstandingBalance", "price", "priceDueOnInitialOrder", "quantity", "subtotal", "tax", "taxPercentage", "total", "totalDiscount", { readOnly: true });
+  library.Order.attributes("couponAmount", "dropInsDiscount", "giftCardAmount", "outstandingBalance", "price", "priceDueOnInitialOrder", "quantity", "subtotal", "tax", "taxPercentage", "total", "totalDiscount", { readOnly: true });
 
   library.Order.belongsTo("coupon");
   library.Order.belongsTo("currency");
@@ -620,7 +620,7 @@ Occasion.Modules.push(function (library) {
       }
     }
 
-    ActiveResource.Collection.build(["couponDiscount", "dropInsDiscount", "giftCardAmount", "outstandingBalance", "price", "priceDueOnInitialOrder", "quantity", "subtotal", "tax", "taxPercentage", "total", "totalDiscount"]).select(function (attr) {
+    ActiveResource.Collection.build(["couponAmount", "dropInsDiscount", "giftCardAmount", "outstandingBalance", "price", "priceDueOnInitialOrder", "quantity", "subtotal", "tax", "taxPercentage", "total", "totalDiscount"]).select(function (attr) {
       return _this12[attr];
     }).each(function (attr) {
       _this12[attr] = new Decimal(_this12[attr]);
