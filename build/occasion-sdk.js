@@ -447,7 +447,7 @@ Occasion.Modules.push(function (library) {
       // POSTs the order to `/orders/price`, which calculates price related fields and adds them to the order
       // @return [Promise] a promise for the order with price-related fields
       value: function calculatePrice() {
-        return this.interface().post(this.klass().links()['related'] + 'price', this);
+        return this.interface().post(this.klass().links()["related"] + "price", this);
       }
 
       // POSTs the order to `/orders/information`, which calculates price + quantity related fields and adds them to the
@@ -457,7 +457,7 @@ Occasion.Modules.push(function (library) {
     }, {
       key: 'retrieveInformation',
       value: function retrieveInformation() {
-        return this.interface().post(this.klass().links()['related'] + 'information', this);
+        return this.interface().post(this.klass().links()["related"] + "information", this);
       }
 
       // Creates a transaction with a payment method and an amount
@@ -520,9 +520,9 @@ Occasion.Modules.push(function (library) {
     }], [{
       key: 'construct',
       value: function construct(attributes) {
-        var order = this.includes('currency').build(attributes);
+        var order = this.includes("currency").build(attributes);
 
-        order.sessionIdentifier = order.sessionIdentifier || Math.random().toString(36).substring(7) + '-' + Date.now();
+        order.sessionIdentifier = order.sessionIdentifier || Math.random().toString(36).substring(7) + "-" + Date.now();
 
         if (order.customer() == null) {
           order.buildCustomer({
@@ -538,10 +538,10 @@ Occasion.Modules.push(function (library) {
         })];
 
         if (order.product() != null) {
-          promises.push(order.product().questions().includes('options').perPage(500).load());
+          promises.push(order.product().questions().includes("options").perPage(500).load());
 
           if (!order.product().requiresTimeSlotSelection) {
-            promises.push(order.product().timeSlots().includes({ product: 'merchant' }).where({ status: 'bookable' }).perPage(500).all());
+            promises.push(order.product().timeSlots().includes({ product: "merchant" }).where({ status: "bookable" }).perPage(500).all());
           }
         }
 
@@ -560,19 +560,19 @@ Occasion.Modules.push(function (library) {
     }, {
       key: '__constructAnswer',
       value: function __constructAnswer(order, question) {
-        if (question.category != 'static') {
+        if (question.category != "static") {
           var answer = order.answers().build({
             question: question
           });
 
           switch (question.formControl) {
-            case 'drop_down':
-            case 'option_list':
+            case "drop_down":
+            case "option_list":
               answer.assignOption(question.options().target().detect(function (o) {
                 return o.default;
               }));
               break;
-            case 'spin_button':
+            case "spin_button":
               answer.value = question.min;
               break;
           }
@@ -585,23 +585,23 @@ Occasion.Modules.push(function (library) {
     return Order;
   }(library.Base);
 
-  library.Order.className = 'Order';
-  library.Order.queryName = 'orders';
+  library.Order.className = "Order";
+  library.Order.queryName = "orders";
 
-  library.Order.attributes('sessionIdentifier', 'status');
+  library.Order.attributes("sessionIdentifier", "status");
 
-  library.Order.attributes('couponAmount', 'giftCardAmount', 'outstandingBalance', 'price', 'quantity', 'subtotal', 'tax', 'taxPercentage', 'total', 'priceDueOnInitialOrder', { readOnly: true });
+  library.Order.attributes("couponDiscount", "dropInsDiscount", "giftCardAmount", "outstandingBalance", "price", "priceDueOnInitialOrder", "quantity", "subtotal", "tax", "taxPercentage", "total", "totalDiscount", { readOnly: true });
 
-  library.Order.belongsTo('coupon');
-  library.Order.belongsTo('currency');
-  library.Order.belongsTo('customer', { autosave: true, inverseOf: 'orders' });
-  library.Order.belongsTo('merchant');
-  library.Order.belongsTo('product');
+  library.Order.belongsTo("coupon");
+  library.Order.belongsTo("currency");
+  library.Order.belongsTo("customer", { autosave: true, inverseOf: "orders" });
+  library.Order.belongsTo("merchant");
+  library.Order.belongsTo("product");
 
-  library.Order.hasMany('answers', { autosave: true, inverseOf: 'order' });
-  library.Order.hasMany('attendees', { autosave: true, inverseOf: 'order' });
-  library.Order.hasMany('timeSlots');
-  library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' });
+  library.Order.hasMany("answers", { autosave: true, inverseOf: "order" });
+  library.Order.hasMany("attendees", { autosave: true, inverseOf: "order" });
+  library.Order.hasMany("timeSlots");
+  library.Order.hasMany("transactions", { autosave: true, inverseOf: "order" });
 
   library.Order.afterRequest(function () {
     var _this12 = this;
@@ -620,7 +620,7 @@ Occasion.Modules.push(function (library) {
       }
     }
 
-    ActiveResource.Collection.build(['subtotal', 'couponAmount', 'tax', 'giftCardAmount', 'price', 'total', 'outstandingBalance']).select(function (attr) {
+    ActiveResource.Collection.build(["couponDiscount", "dropInsDiscount", "giftCardAmount", "outstandingBalance", "price", "priceDueOnInitialOrder", "quantity", "subtotal", "tax", "taxPercentage", "total", "totalDiscount"]).select(function (attr) {
       return _this12[attr];
     }).each(function (attr) {
       _this12[attr] = new Decimal(_this12[attr]);
