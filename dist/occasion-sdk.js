@@ -1,6 +1,6 @@
 /*
-	Occasion Javascript SDK 0.2.2
-	(c) 2018 Peak Labs, LLC DBA Occasion App
+	Occasion Javascript SDK 0.2.3
+	(c) 2019 Peak Labs, LLC DBA Occasion App
 	Occasion Javascript SDK may be freely distributed under the MIT license
 */
 
@@ -21,6 +21,8 @@
 }(this, function (ActiveResource, axios, Decimal, moment, _, s) {
 
 'use strict';
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -77,6 +79,152 @@ Occasion.baseUrl = 'https://occ.sn/api/v1';
 
 
 Occasion.Modules = ActiveResource.prototype.Collection.build();
+// @todo Remove includes({ product: 'merchant' }) when AR supports owner assignment to has_many children
+//   in non-load queries
+Occasion.__constructCalendar = function __constructCalendar(month) {
+  var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+      calendar = _ref.calendar,
+      monthlyTimeSlotDaysBatchSize = _ref.monthlyTimeSlotDaysBatchSize,
+      monthlyTimeSlotPreloadSize = _ref.monthlyTimeSlotPreloadSize,
+      preload = _ref.preload,
+      prevPagePromise = _ref.prevPagePromise,
+      relation = _ref.relation,
+      status = _ref.status,
+      timeZone = _ref.timeZone;
+
+  var today = moment.tz(timeZone);
+  status = status || 'bookable';
+
+  var lowerRange;
+  if (month) {
+    lowerRange = month.tz(timeZone);
+  } else {
+    lowerRange = today;
+  }
+  lowerRange = lowerRange.startOf('month');
+  var upperRange = lowerRange.clone().endOf('month');
+
+  var numRequests = Math.ceil(upperRange.diff(lowerRange, 'days') / monthlyTimeSlotDaysBatchSize);
+  if (numRequests < 1) numRequests = 1;
+
+  var i = 0;
+  var requests = [];
+
+  var lower = lowerRange.clone();
+  var upper = lowerRange.clone().add(monthlyTimeSlotDaysBatchSize, 'days');
+  while (i < numRequests) {
+    if (i + 1 == numRequests) upper = upperRange.clone();
+
+    requests.push(relation.includes({
+      product: 'merchant'
+    }).where({
+      startsAt: {
+        ge: lower.toDate(),
+        le: upper.toDate()
+      },
+      status: status
+    }).all());
+
+    lower.add(monthlyTimeSlotDaysBatchSize, 'days');
+    upper.add(monthlyTimeSlotDaysBatchSize, 'days');
+    i++;
+  }
+
+  calendar = calendar || {};
+  if (_.isUndefined(calendar.__currentPage)) calendar.__currentPage = 0;
+  if (_.isUndefined(calendar.__preloadedPages)) calendar.__preloadedPages = 0;
+
+  calendar.__preloading = true;
+
+  var currentPromise = Promise.all(requests).then(function (timeSlotsArray) {
+    var allTimeSlots = ActiveResource.Collection.build(timeSlotsArray).map(function (ts) {
+      return ts.toArray();
+    }).flatten();
+
+    var startDate = moment(lowerRange).startOf('month');
+    var endDate = moment(lowerRange).endOf('month');
+
+    var response = ActiveResource.CollectionResponse.build();
+
+    var day = startDate;
+    while (day.isSameOrBefore(endDate)) {
+      response.push({
+        day: day,
+        timeSlots: allTimeSlots.select(function (timeSlot) {
+          return timeSlot.startsAt.isSame(day, 'day');
+        })
+      });
+
+      day = day.clone().add(1, 'days');
+    }
+
+    response.hasNextPage = function () {
+      return true;
+    };
+
+    var commonPaginationOptions = {
+      calendar: calendar,
+      monthlyTimeSlotDaysBatchSize: monthlyTimeSlotDaysBatchSize,
+      monthlyTimeSlotPreloadSize: monthlyTimeSlotPreloadSize,
+      relation: relation,
+      status: status,
+      timeZone: timeZone
+    };
+
+    response.nextPage = function (preloadCount) {
+      if (!this.nextPromise) {
+        this.nextPromise = Occasion.__constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), _extends({}, commonPaginationOptions, {
+          preload: preloadCount,
+          prevPagePromise: currentPromise
+        }));
+      }
+
+      if (_.isUndefined(preloadCount)) {
+        calendar.__currentPage += 1;
+
+        if (!calendar.__preloading && calendar.__preloadedPages <= calendar.__currentPage + monthlyTimeSlotPreloadSize / 2) {
+          calendar.__lastPreloadedPage.nextPage(monthlyTimeSlotPreloadSize);
+        }
+      }
+
+      return this.nextPromise;
+    };
+
+    if (status !== 'bookable' || month && !month.isSame(today, 'month')) {
+      response.hasPrevPage = function () {
+        return true;
+      };
+
+      response.prevPage = function () {
+        this.prevPromise = this.prevPromise || prevPagePromise || Occasion.__constructCalendar(moment(lowerRange).subtract(1, 'months'), _extends({}, commonPaginationOptions, {
+          preload: 0
+        }));
+
+        calendar.__currentPage -= 1;
+
+        return this.prevPromise;
+      };
+    }
+
+    if (monthlyTimeSlotPreloadSize > 0) {
+      if (_.isUndefined(preload)) {
+        response.nextPage(monthlyTimeSlotPreloadSize - 1);
+      } else if (preload > 0) {
+        response.nextPage(--preload);
+      } else {
+        calendar.__preloading = false;
+      }
+    }
+
+    calendar.__preloadedPages += 1;
+    calendar.__lastPreloadedPage = response;
+
+    return response;
+  });
+
+  return currentPromise;
+};
+
 Occasion.Modules.push(function (library) {
   library.Answer = function (_library$Base) {
     _inherits(Answer, _library$Base);
@@ -231,8 +379,27 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Merchant = function (_library$Base6) {
-    _inherits(Merchant, _library$Base6);
+  library.Label = function (_library$Base6) {
+    _inherits(Label, _library$Base6);
+
+    function Label() {
+      _classCallCheck(this, Label);
+
+      return _possibleConstructorReturn(this, (Label.__proto__ || Object.getPrototypeOf(Label)).apply(this, arguments));
+    }
+
+    return Label;
+  }(library.Base);
+
+  library.Label.className = 'Label';
+  library.Label.queryName = 'labels';
+
+  library.Label.belongsTo('product');
+});
+
+Occasion.Modules.push(function (library) {
+  library.Merchant = function (_library$Base7) {
+    _inherits(Merchant, _library$Base7);
 
     function Merchant() {
       _classCallCheck(this, Merchant);
@@ -251,8 +418,8 @@ Occasion.Modules.push(function (library) {
   library.Merchant.hasMany('venues');
 });
 Occasion.Modules.push(function (library) {
-  library.Option = function (_library$Base7) {
-    _inherits(Option, _library$Base7);
+  library.Option = function (_library$Base8) {
+    _inherits(Option, _library$Base8);
 
     function Option() {
       _classCallCheck(this, Option);
@@ -270,8 +437,8 @@ Occasion.Modules.push(function (library) {
   library.Option.belongsTo('question');
 });
 Occasion.Modules.push(function (library) {
-  library.Order = function (_library$Base8) {
-    _inherits(Order, _library$Base8);
+  library.Order = function (_library$Base9) {
+    _inherits(Order, _library$Base9);
 
     function Order() {
       _classCallCheck(this, Order);
@@ -280,33 +447,14 @@ Occasion.Modules.push(function (library) {
     }
 
     _createClass(Order, [{
-      key: 'calculatePrice',
+      key: 'charge',
 
-
-      // POSTs the order to `/orders/price`, which calculates price related fields and adds them to the order
-      // @return [Promise] a promise for the order with price-related fields
-      value: function calculatePrice() {
-        return this.interface().post(this.klass().links()['related'] + 'price', this);
-      }
-
-      // POSTs the order to `/orders/information`, which calculates price + quantity related fields and adds them to the
-      //   order
-      // @return [Promise] a promise for the order with price & quantity related fields
-
-    }, {
-      key: 'retrieveInformation',
-      value: function retrieveInformation() {
-        return this.interface().post(this.klass().links()['related'] + 'information', this);
-      }
 
       // Creates a transaction with a payment method and an amount
       //
       // @param [PaymentMethod] paymentMethod the payment method to charge
       // @param [Number] amount the amount to charge to the payment method
       // @return [Transaction] the built transaction representing the charge
-
-    }, {
-      key: 'charge',
       value: function charge(paymentMethod, amount) {
         return this.transactions().build({
           amount: amount,
@@ -359,9 +507,9 @@ Occasion.Modules.push(function (library) {
     }], [{
       key: 'construct',
       value: function construct(attributes) {
-        var order = this.build(attributes);
+        var order = this.includes("currency").build(attributes);
 
-        order.sessionIdentifier = order.sessionIdentifier || Math.random().toString(36).substring(7) + '-' + Date.now();
+        order.sessionIdentifier = order.sessionIdentifier || Math.random().toString(36).substring(7) + "-" + Date.now();
 
         if (order.customer() == null) {
           order.buildCustomer({
@@ -377,10 +525,10 @@ Occasion.Modules.push(function (library) {
         })];
 
         if (order.product() != null) {
-          promises.push(order.product().questions().includes('options').perPage(500).load());
+          promises.push(order.product().questions().includes("options").perPage(500).load());
 
           if (!order.product().requiresTimeSlotSelection) {
-            promises.push(order.product().timeSlots().includes({ product: 'merchant' }).where({ status: 'bookable' }).perPage(500).all());
+            promises.push(order.product().timeSlots().includes({ product: "merchant" }).where({ status: "bookable" }).perPage(500).all());
           }
         }
 
@@ -399,19 +547,19 @@ Occasion.Modules.push(function (library) {
     }, {
       key: '__constructAnswer',
       value: function __constructAnswer(order, question) {
-        if (question.category != 'static') {
+        if (question.category != "static") {
           var answer = order.answers().build({
             question: question
           });
 
           switch (question.formControl) {
-            case 'drop_down':
-            case 'option_list':
+            case "drop_down":
+            case "option_list":
               answer.assignOption(question.options().target().detect(function (o) {
                 return o.default;
               }));
               break;
-            case 'spin_button':
+            case "spin_button":
               answer.value = question.min;
               break;
           }
@@ -424,26 +572,26 @@ Occasion.Modules.push(function (library) {
     return Order;
   }(library.Base);
 
-  library.Order.className = 'Order';
-  library.Order.queryName = 'orders';
+  library.Order.className = "Order";
+  library.Order.queryName = "orders";
 
-  library.Order.attributes('sessionIdentifier', 'status');
+  library.Order.attributes("sessionIdentifier", "status");
 
-  library.Order.attributes('couponAmount', 'giftCardAmount', 'outstandingBalance', 'price', 'quantity', 'subtotal', 'tax', 'taxPercentage', 'total', { readOnly: true });
+  library.Order.attributes("couponAmount", "dropInsDiscount", "giftCardAmount", "outstandingBalance", "price", "priceDueOnInitialOrder", "quantity", "subtotal", "tax", "taxPercentage", "total", "totalDiscount", { readOnly: true });
 
-  library.Order.belongsTo('coupon');
-  library.Order.belongsTo('currency');
-  library.Order.belongsTo('customer', { autosave: true, inverseOf: 'orders' });
-  library.Order.belongsTo('merchant');
-  library.Order.belongsTo('product');
+  library.Order.belongsTo("coupon");
+  library.Order.belongsTo("currency");
+  library.Order.belongsTo("customer", { autosave: true, inverseOf: "orders" });
+  library.Order.belongsTo("merchant");
+  library.Order.belongsTo("product");
 
-  library.Order.hasMany('answers', { autosave: true, inverseOf: 'order' });
-  library.Order.hasMany('attendees', { autosave: true, inverseOf: 'order' });
-  library.Order.hasMany('timeSlots');
-  library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' });
+  library.Order.hasMany("answers", { autosave: true, inverseOf: "order" });
+  library.Order.hasMany("attendees", { autosave: true, inverseOf: "order" });
+  library.Order.hasMany("timeSlots");
+  library.Order.hasMany("transactions", { autosave: true, inverseOf: "order" });
 
   library.Order.afterRequest(function () {
-    var _this11 = this;
+    var _this12 = this;
 
     if (this.product() && !this.product().attendeeQuestions.empty()) {
       var diff = this.quantity - this.attendees().size();
@@ -459,10 +607,10 @@ Occasion.Modules.push(function (library) {
       }
     }
 
-    ActiveResource.Collection.build(['subtotal', 'couponAmount', 'tax', 'giftCardAmount', 'price', 'total', 'outstandingBalance']).select(function (attr) {
-      return _this11[attr];
+    ActiveResource.Collection.build(["couponAmount", "dropInsDiscount", "giftCardAmount", "outstandingBalance", "price", "priceDueOnInitialOrder", "quantity", "subtotal", "tax", "taxPercentage", "total", "totalDiscount"]).select(function (attr) {
+      return _this12[attr];
     }).each(function (attr) {
-      _this11[attr] = new Decimal(_this11[attr]);
+      _this12[attr] = new Decimal(_this12[attr]);
     });
 
     if (this.outstandingBalance && !this.outstandingBalance.isZero()) {
@@ -476,7 +624,7 @@ Occasion.Modules.push(function (library) {
       if (this.outstandingBalance.isPositive()) {
         if (!giftCardTransactions.empty()) {
           giftCardTransactions.each(function (t) {
-            if (_this11.outstandingBalance.isZero()) return;
+            if (_this12.outstandingBalance.isZero()) return;
 
             var amount = new Decimal(t.amount);
             var giftCardValue = new Decimal(t.paymentMethod().value);
@@ -484,40 +632,40 @@ Occasion.Modules.push(function (library) {
 
             if (remainingGiftCardBalance.isZero()) return;
 
-            if (remainingGiftCardBalance.greaterThanOrEqualTo(_this11.outstandingBalance)) {
-              amount = amount.plus(_this11.outstandingBalance);
-              _this11.outstandingBalance = new Decimal(0);
+            if (remainingGiftCardBalance.greaterThanOrEqualTo(_this12.outstandingBalance)) {
+              amount = amount.plus(_this12.outstandingBalance);
+              _this12.outstandingBalance = new Decimal(0);
             } else {
               amount = remainingGiftCardBalance;
-              _this11.outstandingBalance = _this11.outstandingBalance.minus(remainingGiftCardBalance);
+              _this12.outstandingBalance = _this12.outstandingBalance.minus(remainingGiftCardBalance);
             }
 
             t.amount = amount.toString();
 
-            _this11.transactions().target().delete(t);
-            t.__createClone({ cloner: _this11 });
+            _this12.transactions().target().delete(t);
+            t.__createClone({ cloner: _this12 });
           });
         }
       } else {
         if (!giftCardTransactions.empty()) {
           ActiveResource.Collection.build(giftCardTransactions.toArray().reverse()).each(function (t) {
-            if (_this11.outstandingBalance.isZero()) return;
+            if (_this12.outstandingBalance.isZero()) return;
 
             var amount = new Decimal(t.amount);
 
-            if (amount.greaterThan(_this11.outstandingBalance.abs())) {
-              amount = amount.plus(_this11.outstandingBalance);
-              _this11.outstandingBalance = new Decimal(0);
+            if (amount.greaterThan(_this12.outstandingBalance.abs())) {
+              amount = amount.plus(_this12.outstandingBalance);
+              _this12.outstandingBalance = new Decimal(0);
             } else {
-              _this11.outstandingBalance = _this11.outstandingBalance.plus(amount);
+              _this12.outstandingBalance = _this12.outstandingBalance.plus(amount);
 
-              _this11.removeCharge(t.paymentMethod());
+              _this12.removeCharge(t.paymentMethod());
               return;
             }
 
             t.amount = amount.toString();
-            _this11.transactions().target().delete(t);
-            t.__createClone({ cloner: _this11 });
+            _this12.transactions().target().delete(t);
+            t.__createClone({ cloner: _this12 });
           });
         }
       }
@@ -541,8 +689,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.PaymentMethod = function (_library$Base9) {
-    _inherits(PaymentMethod, _library$Base9);
+  library.PaymentMethod = function (_library$Base10) {
+    _inherits(PaymentMethod, _library$Base10);
 
     function PaymentMethod() {
       _classCallCheck(this, PaymentMethod);
@@ -559,8 +707,8 @@ Occasion.Modules.push(function (library) {
   library.PaymentMethod.hasMany('transactions', { as: 'paymentMethod' });
 });
 Occasion.Modules.push(function (library) {
-  library.Product = function (_library$Base10) {
-    _inherits(Product, _library$Base10);
+  library.Product = function (_library$Base11) {
+    _inherits(Product, _library$Base11);
 
     function Product() {
       _classCallCheck(this, Product);
@@ -571,131 +719,14 @@ Occasion.Modules.push(function (library) {
     _createClass(Product, [{
       key: 'constructCalendar',
       value: function constructCalendar(month) {
-        return this.__constructCalendar(month);
-      }
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      // @todo Remove includes({ product: 'merchant' }) when AR supports owner assignment to has_many children
-      //   in non-load queries
-
-    }, {
-      key: '__constructCalendar',
-      value: function __constructCalendar(month, preload, prevPagePromise) {
-        var timeZone = this.merchant().timeZone;
-
-        var today = moment.tz(timeZone);
-        var lowerRange;
-        if (month) {
-          lowerRange = month.isSame(today, 'month') ? today : month.tz(timeZone).startOf('month');
-        } else {
-          lowerRange = today;
-        }
-        var upperRange = lowerRange.clone().endOf('month');
-
-        var numRequests = Math.ceil(upperRange.diff(lowerRange, 'days') / this.monthlyTimeSlotDaysBatchSize);
-        if (numRequests < 1) numRequests = 1;
-
-        var i = 0;
-        var requests = [];
-
-        var lower = lowerRange.clone();
-        var upper = lowerRange.clone().add(this.monthlyTimeSlotDaysBatchSize, 'days');
-        while (i < numRequests) {
-          if (i + 1 == numRequests) upper = upperRange.clone();
-
-          requests.push(this.timeSlots().includes({
-            product: 'merchant'
-          }).where({
-            startsAt: {
-              ge: lower.toDate(),
-              le: upper.toDate()
-            },
-            status: 'bookable'
-          }).all());
-
-          lower.add(this.monthlyTimeSlotDaysBatchSize, 'days');
-          upper.add(this.monthlyTimeSlotDaysBatchSize, 'days');
-          i++;
-        }
-
-        var product = this;
-        if (_.isUndefined(product.__currentCalendarPage)) product.__currentCalendarPage = 0;
-        if (_.isUndefined(product.__preloadedCalendarPages)) product.__preloadedCalendarPages = 0;
-
-        product.__preloadingCalendar = true;
-
-        var currentPromise = Promise.all(requests).then(function (timeSlotsArray) {
-          var allTimeSlots = ActiveResource.Collection.build(timeSlotsArray).map(function (ts) {
-            return ts.toArray();
-          }).flatten();
-
-          var startDate = moment(lowerRange).startOf('month');
-          var endDate = moment(lowerRange).endOf('month');
-
-          var response = ActiveResource.CollectionResponse.build();
-
-          var day = startDate;
-          while (day.isSameOrBefore(endDate)) {
-            response.push({
-              day: day,
-              timeSlots: allTimeSlots.select(function (timeSlot) {
-                return timeSlot.startsAt.isSame(day, 'day');
-              })
-            });
-
-            day = day.clone().add(1, 'days');
-          }
-
-          response.hasNextPage = function () {
-            return true;
-          };
-
-          response.nextPage = function (preloadCount) {
-            if (!this.nextPromise) {
-              this.nextPromise = product.__constructCalendar(moment(upperRange).add(1, 'days').startOf('month'), preloadCount, currentPromise);
-            }
-
-            if (_.isUndefined(preloadCount)) {
-              product.__currentCalendarPage += 1;
-
-              if (!product.__preloadingCalendar && product.__preloadedCalendarPages <= product.__currentCalendarPage + product.monthlyTimeSlotPreloadSize / 2) {
-                product.__lastPreloadedCalendarPage.nextPage(product.monthlyTimeSlotPreloadSize);
-              }
-            }
-
-            return this.nextPromise;
-          };
-
-          if (month && !month.isSame(today, 'month')) {
-            response.hasPrevPage = function () {
-              return true;
-            };
-
-            response.prevPage = function () {
-              this.prevPromise = this.prevPromise || prevPagePromise || product.__constructCalendar(moment(lowerRange).subtract(1, 'months'), 0);
-
-              product.__currentCalendarPage -= 1;
-
-              return this.prevPromise;
-            };
-          }
-
-          if (product.monthlyTimeSlotPreloadSize > 0) {
-            if (_.isUndefined(preload)) {
-              response.nextPage(product.monthlyTimeSlotPreloadSize - 1);
-            } else if (preload > 0) {
-              response.nextPage(--preload);
-            } else {
-              product.__preloadingCalendar = false;
-            }
-          }
-
-          product.__preloadedCalendarPages += 1;
-          product.__lastPreloadedCalendarPage = response;
-
-          return response;
-        });
-
-        return currentPromise;
+        return Occasion.__constructCalendar(month, _extends({
+          monthlyTimeSlotDaysBatchSize: this.monthlyTimeSlotDaysBatchSize,
+          monthlyTimeSlotPreloadSize: this.monthlyTimeSlotPreloadSize,
+          relation: this.timeSlots(),
+          timeZone: this.merchant().timeZone
+        }, options));
       }
     }]);
 
@@ -708,6 +739,7 @@ Occasion.Modules.push(function (library) {
   library.Product.belongsTo('merchant');
   library.Product.belongsTo('venue');
 
+  library.Product.hasMany('labels');
   library.Product.hasMany('orders');
   library.Product.hasMany('questions');
   library.Product.hasMany('redeemables');
@@ -729,8 +761,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Question = function (_library$Base11) {
-    _inherits(Question, _library$Base11);
+  library.Question = function (_library$Base12) {
+    _inherits(Question, _library$Base12);
 
     function Question() {
       _classCallCheck(this, Question);
@@ -750,8 +782,8 @@ Occasion.Modules.push(function (library) {
 });
 Occasion.Modules.push(function (library) {
   // TODO: Remove ability to directly query redeemables
-  library.Redeemable = function (_library$Base12) {
-    _inherits(Redeemable, _library$Base12);
+  library.Redeemable = function (_library$Base13) {
+    _inherits(Redeemable, _library$Base13);
 
     function Redeemable() {
       _classCallCheck(this, Redeemable);
@@ -768,8 +800,8 @@ Occasion.Modules.push(function (library) {
   library.Redeemable.belongsTo('product');
 });
 Occasion.Modules.push(function (library) {
-  library.State = function (_library$Base13) {
-    _inherits(State, _library$Base13);
+  library.State = function (_library$Base14) {
+    _inherits(State, _library$Base14);
 
     function State() {
       _classCallCheck(this, State);
@@ -785,8 +817,10 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.TimeSlot = function (_library$Base14) {
-    _inherits(TimeSlot, _library$Base14);
+  var _class, _temp;
+
+  library.TimeSlot = (_temp = _class = function (_library$Base15) {
+    _inherits(TimeSlot, _library$Base15);
 
     function TimeSlot() {
       _classCallCheck(this, TimeSlot);
@@ -821,7 +855,22 @@ Occasion.Modules.push(function (library) {
     }]);
 
     return TimeSlot;
-  }(library.Base);
+  }(library.Base), _class.constructCalendar = function () {
+    var month = void 0,
+        options = void 0;
+    if (moment.isMoment(arguments[0])) {
+      month = arguments[0];
+      options = arguments[1] || {};
+    } else {
+      options = arguments[0] || {};
+    }
+
+    return Occasion.__constructCalendar(month, _extends({
+      monthlyTimeSlotDaysBatchSize: 7,
+      monthlyTimeSlotPreloadSize: 4,
+      relation: this
+    }, options));
+  }, _temp);
 
   library.TimeSlot.className = 'TimeSlot';
   library.TimeSlot.queryName = 'time_slots';
@@ -842,8 +891,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Transaction = function (_library$Base15) {
-    _inherits(Transaction, _library$Base15);
+  library.Transaction = function (_library$Base16) {
+    _inherits(Transaction, _library$Base16);
 
     function Transaction() {
       _classCallCheck(this, Transaction);
@@ -864,8 +913,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Venue = function (_library$Base16) {
-    _inherits(Venue, _library$Base16);
+  library.Venue = function (_library$Base17) {
+    _inherits(Venue, _library$Base17);
 
     function Venue() {
       _classCallCheck(this, Venue);
