@@ -3,7 +3,13 @@
     "id": "1",
     "type": "orders",
     "attributes": {
+      "couponAmount": 2.0,
+      "dropInsDiscount": 0.0,
+      "giftCardAmount": 1.0,
+      "outstandingBalance": 1.0,
       "price": 3.0,
+      "subtotal": 3.0,
+      "tax": 1.0,
       "verificationCode": "abc123"
     },
     "relationships": {

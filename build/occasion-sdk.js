@@ -441,33 +441,14 @@ Occasion.Modules.push(function (library) {
     }
 
     _createClass(Order, [{
-      key: 'calculatePrice',
+      key: 'charge',
 
-
-      // POSTs the order to `/orders/price`, which calculates price related fields and adds them to the order
-      // @return [Promise] a promise for the order with price-related fields
-      value: function calculatePrice() {
-        return this.interface().post(this.klass().links()["related"] + "price", this);
-      }
-
-      // POSTs the order to `/orders/information`, which calculates price + quantity related fields and adds them to the
-      //   order
-      // @return [Promise] a promise for the order with price & quantity related fields
-
-    }, {
-      key: 'retrieveInformation',
-      value: function retrieveInformation() {
-        return this.interface().post(this.klass().links()["related"] + "information", this);
-      }
 
       // Creates a transaction with a payment method and an amount
       //
       // @param [PaymentMethod] paymentMethod the payment method to charge
       // @param [Number] amount the amount to charge to the payment method
       // @return [Transaction] the built transaction representing the charge
-
-    }, {
-      key: 'charge',
       value: function charge(paymentMethod, amount) {
         return this.transactions().build({
           amount: amount,

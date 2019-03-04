@@ -62,19 +62,6 @@ Occasion.Modules.push(function(library) {
       });
     }
 
-    // POSTs the order to `/orders/price`, which calculates price related fields and adds them to the order
-    // @return [Promise] a promise for the order with price-related fields
-    calculatePrice() {
-      return this.interface().post(this.klass().links()["related"] + "price", this);
-    }
-
-    // POSTs the order to `/orders/information`, which calculates price + quantity related fields and adds them to the
-    //   order
-    // @return [Promise] a promise for the order with price & quantity related fields
-    retrieveInformation() {
-      return this.interface().post(this.klass().links()["related"] + "information", this);
-    }
-
     // Creates a transaction with a payment method and an amount
     //
     // @param [PaymentMethod] paymentMethod the payment method to charge
