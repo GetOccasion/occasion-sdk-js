@@ -738,9 +738,10 @@ Occasion.Modules.push(function (library) {
   library.Product.hasMany('questions');
   library.Product.hasMany('redeemables');
   library.Product.hasMany('timeSlots');
-  library.Product.hasOne("firstTimeSlot");
-  library.Product.hasOne("lastTimeSlot");
-  library.Product.hasOne("firstFilteredTimeSlot");
+
+  library.Product.hasOne('firstTimeSlot', { as: 'timeSlot' });
+  library.Product.hasOne('lastTimeSlot', { as: 'timeSlot' });
+  library.Product.hasOne('firstFilteredTimeSlot', { as: 'timeSlot' });
 
   library.Product.afterRequest(function () {
     this.attendeeQuestions = ActiveResource.Collection.build(this.attendeeQuestions).map(function (q) {
