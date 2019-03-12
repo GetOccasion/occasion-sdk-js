@@ -23,9 +23,9 @@ Occasion.Modules.push(function(library) {
   library.Product.hasMany('redeemables')
   library.Product.hasMany('timeSlots')
 
-  library.Product.hasOne('firstTimeSlot', { as: 'timeSlot' })
-  library.Product.hasOne('lastTimeSlot', { as: 'timeSlot' })
-  library.Product.hasOne('firstFilteredTimeSlot', { as: 'timeSlot' })
+  library.Product.hasOne('firstTimeSlot', { className: 'TimeSlot' })
+  library.Product.hasOne('lastTimeSlot', { className: 'TimeSlot' })
+  library.Product.hasOne('firstFilteredTimeSlot', { className: 'TimeSlot' })
 
   library.Product.afterRequest(function() {
     this.attendeeQuestions = ActiveResource.Collection.build(this.attendeeQuestions).map(q => {
