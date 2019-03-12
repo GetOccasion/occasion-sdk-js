@@ -878,13 +878,9 @@ Occasion.Modules.push(function (library) {
   library.TimeSlot.belongsTo('venue');
 
   library.TimeSlot.afterRequest(function () {
-    if (this.product().merchant()) {
-      this.startsAt = moment.tz(this.startsAt, this.product().merchant().timeZone);
-    } else {
-      throw 'Must use includes({ product: \'merchant\' }) in timeSlot request';
-    }
-
+    this.startsAt = moment.tz(this.startsAt, this.timeZone);
     this.duration = moment.duration(this.duration, 'minutes');
+    this.endsAt = moment.tz(this.startsAt.clone().add(this.duration), this.timeZone);
   });
 });
 
