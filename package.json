@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/GetOccasion/occasion-sdk-js#readme",
   "dependencies": {
-    "active-resource": "1.0.0-beta.3",
+    "active-resource": "1.0.0-alpha.2",
     "decimal.js-light": "^2.4.1",
     "moment": "^2.22.1",
     "moment-timezone-with-data-2010-2020": "^0.4.0"

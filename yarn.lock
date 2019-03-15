@@ -6,16 +6,16 @@ abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
 
-active-resource@1.0.0-beta.3:
-  version "1.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/active-resource/-/active-resource-1.0.0-beta.3.tgz#493d2a08ad3295a2d48182261b8b534027b11049"
-  integrity sha512-EXqy6KxWW4tcNN15ZWftlq+Mpho2TdCKGXKlDWdMukFX6GzDBpP9IJPLwZcbtYqPhClqS+rqp87f0DRU+78Mcw==
+active-resource@1.0.0-alpha.2:
+  version "1.0.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/active-resource/-/active-resource-1.0.0-alpha.2.tgz#180df6fab397b0fa2b012f6b6a2a62eb5f460f20"
+  integrity sha512-3OcMuP/qGUku9WjjwlssoFPgB3t9X/NYFcI2uJl8sGa2wtNl6i6JSbuhi32Cg8Jtkyh9NzYpK+tjQTHBSszBUA==
   dependencies:
     axios "^0.16.2"
     es6-promise "^4.1.1"
     qs "^6.5.0"
     underscore "1.8.3"
-    underscore.inflection "^1.3.3"
+    underscore.inflection latest
     underscore.string latest
 
 ajv@^6.5.5:
@@ -1756,7 +1756,7 @@ uglify-to-browserify@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/uglify-to-browserify/-/uglify-to-browserify-1.0.2.tgz#6e0924d6bda6b5afe349e39a6d632850a0f882b7"
 
-underscore.inflection@^1.3.3:
+underscore.inflection@latest:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/underscore.inflection/-/underscore.inflection-1.3.3.tgz#80afc119393878783a03cb2923d6ed5b4e277283"
   integrity sha512-DwnTzoQUp5B+JBl26OcTGBgmCa7Enxtrj1gUHixOCCFvMf7LzMX7U+odu3VLMDwzfSmhPMblspbEeK77ohreCQ==
