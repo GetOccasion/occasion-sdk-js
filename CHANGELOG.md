@@ -52,3 +52,5 @@
 - Add support for drop ins discount
 
 ## Master
+
+- Decouple time slots from products

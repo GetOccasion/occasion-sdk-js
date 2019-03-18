@@ -20,8 +20,8 @@ Occasion.Modules.push(function(library) {
     toString(format) {
       var output
 
-      if (this.product().showTimeSlotDuration) {
-        var durationTimeSlot = this.startsAt.clone().add(this.duration)
+      if (this.showTimeSlotDuration) {
+        var durationTimeSlot = this.endsAt
         var durationFormat
 
         if (durationTimeSlot.isSame(this.startsAt, 'day')) {

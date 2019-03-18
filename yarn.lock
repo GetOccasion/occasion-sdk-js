@@ -1758,8 +1758,6 @@ uglify-to-browserify@~1.0.0:
 underscore.inflection@latest:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/underscore.inflection/-/underscore.inflection-1.3.3.tgz#80afc119393878783a03cb2923d6ed5b4e277283"
-
-underscore.string@latest:
   version "3.3.5"
   resolved "https://registry.yarnpkg.com/underscore.string/-/underscore.string-3.3.5.tgz#fc2ad255b8bd309e239cbc5816fd23a9b7ea4023"
   dependencies:
