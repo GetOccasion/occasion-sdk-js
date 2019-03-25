@@ -161,6 +161,7 @@ Occasion.Modules.push(function(library) {
     'taxPercentage',
     'total',
     'totalDiscount',
+    'serviceFee',
     { readOnly: true }
   )
 

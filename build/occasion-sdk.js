@@ -571,7 +571,7 @@ Occasion.Modules.push(function (library) {
 
   library.Order.attributes('sessionIdentifier', 'status');
 
-  library.Order.attributes('couponAmount', 'dropInsDiscount', 'giftCardAmount', 'outstandingBalance', 'price', 'priceDueOnInitialOrder', 'quantity', 'subtotal', 'tax', 'taxPercentage', 'total', 'totalDiscount', { readOnly: true });
+  library.Order.attributes('couponAmount', 'dropInsDiscount', 'giftCardAmount', 'outstandingBalance', 'price', 'priceDueOnInitialOrder', 'quantity', 'subtotal', 'tax', 'taxPercentage', 'total', 'totalDiscount', 'serviceFee', { readOnly: true });
 
   library.Order.belongsTo('coupon');
   library.Order.belongsTo('currency');
