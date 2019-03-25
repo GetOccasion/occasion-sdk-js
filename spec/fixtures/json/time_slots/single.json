@@ -5,6 +5,7 @@
       "type": "time_slots",
       "attributes": {
         "starts_at": "2018-05-01T15:00:00.000-06:00",
+        "time_zone": "America/Chicago",
         "duration": 60,
         "spots_available": 20
       },

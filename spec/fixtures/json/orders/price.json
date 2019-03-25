@@ -8,7 +8,8 @@
       "giftCardAmount": 1.0,
       "price": 2.0,
       "outstandingBalance": 1.0,
-      "dropInsDiscount": 0.0
+      "dropInsDiscount": 0.0,
+      "serviceFee": 0.0
     }
   }
 }
