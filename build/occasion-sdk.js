@@ -353,7 +353,7 @@ Occasion.Modules.push(function (library) {
   library.Customer.className = 'Customer';
   library.Customer.queryName = 'customers';
 
-  library.Customer.attributes('email', 'firstName', 'lastName', 'zip', 'phone', 'upcomingEventsEmails');
+  library.Customer.attributes('email', 'firstName', 'lastName', 'zip', 'phone');
 
   library.Customer.hasMany('orders', { inverseOf: 'customer' });
 
@@ -505,14 +505,15 @@ Occasion.Modules.push(function (library) {
 
         order.sessionIdentifier = order.sessionIdentifier || Math.random().toString(36).substring(7) + '-' + Date.now();
 
+        order.upcomingEventsEmails = order.upcomingEventsEmails || true;
+
         if (order.customer() == null) {
           order.buildCustomer({
             email: null,
             firstName: null,
             lastName: null,
             zip: null,
-            phone: null,
-            upcomingEventsEmails: false
+            phone: null
           });
         }
 
@@ -571,7 +572,7 @@ Occasion.Modules.push(function (library) {
   library.Order.className = 'Order';
   library.Order.queryName = 'orders';
 
-  library.Order.attributes('sessionIdentifier', 'status');
+  library.Order.attributes('sessionIdentifier', 'status', 'upcomingEventsEmails');
 
   library.Order.attributes('couponAmount', 'dropInsDiscount', 'giftCardAmount', 'outstandingBalance', 'price', 'priceDueOnInitialOrder', 'quantity', 'subtotal', 'tax', 'taxPercentage', 'total', 'totalDiscount', 'serviceFee', { readOnly: true });
 

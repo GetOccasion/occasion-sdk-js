@@ -11,14 +11,15 @@ Occasion.Modules.push(function(library) {
           '-' +
           Date.now()
 
+      order.upcomingEventsEmails = order.upcomingEventsEmails || true
+
       if (order.customer() == null) {
         order.buildCustomer({
           email: null,
           firstName: null,
           lastName: null,
           zip: null,
-          phone: null,
-          upcomingEventsEmails: false
+          phone: null
         })
       }
 
@@ -148,7 +149,7 @@ Occasion.Modules.push(function(library) {
   library.Order.className = 'Order'
   library.Order.queryName = 'orders'
 
-  library.Order.attributes('sessionIdentifier', 'status')
+  library.Order.attributes('sessionIdentifier', 'status', 'upcomingEventsEmails')
 
   library.Order.attributes(
     'couponAmount',
