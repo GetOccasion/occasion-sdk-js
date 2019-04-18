@@ -16,7 +16,9 @@ Occasion.Modules.push(function(library) {
           email: null,
           firstName: null,
           lastName: null,
-          zip: null
+          zip: null,
+          phone: null,
+          upcomingEventsEmails: false
         })
       }
 

@@ -5,29 +5,42 @@ Occasion.Modules.push(function(library) {
     }
 
     complete() {
-      return this.email && this.firstName && this.lastName &&
-        this.email.length > 0 && this.firstName.length > 0 && this.lastName.length > 0;
+      return (
+        this.email &&
+        this.firstName &&
+        this.lastName &&
+        this.email.length > 0 &&
+        this.firstName.length > 0 &&
+        this.lastName.length > 0
+      )
     }
-  };
+  }
 
-  library.Customer.className = 'Customer';
-  library.Customer.queryName = 'customers';
+  library.Customer.className = 'Customer'
+  library.Customer.queryName = 'customers'
 
-  library.Customer.attributes('email', 'firstName', 'lastName', 'zip');
+  library.Customer.attributes(
+    'email',
+    'firstName',
+    'lastName',
+    'zip',
+    'phone',
+    'upcomingEventsEmails'
+  )
 
-  library.Customer.hasMany('orders', { inverseOf: 'customer' });
+  library.Customer.hasMany('orders', { inverseOf: 'customer' })
 
   library.Customer.afterBuild(function() {
-    var lastEmail = null;
+    var lastEmail = null
     var watchEmail = _.bind(function() {
-      if(lastEmail != this.email) {
-        _.bind(this.ahoyEmailChanged, this)();
-        lastEmail = this.email;
+      if (lastEmail != this.email) {
+        _.bind(this.ahoyEmailChanged, this)()
+        lastEmail = this.email
       }
 
-      setTimeout(watchEmail, 500);
-    }, this);
+      setTimeout(watchEmail, 500)
+    }, this)
 
-    setTimeout(watchEmail, 500);
-  });
-});
+    setTimeout(watchEmail, 500)
+  })
+})

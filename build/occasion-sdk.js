@@ -353,7 +353,7 @@ Occasion.Modules.push(function (library) {
   library.Customer.className = 'Customer';
   library.Customer.queryName = 'customers';
 
-  library.Customer.attributes('email', 'firstName', 'lastName', 'zip');
+  library.Customer.attributes('email', 'firstName', 'lastName', 'zip', 'phone', 'upcomingEventsEmails');
 
   library.Customer.hasMany('orders', { inverseOf: 'customer' });
 
@@ -510,7 +510,9 @@ Occasion.Modules.push(function (library) {
             email: null,
             firstName: null,
             lastName: null,
-            zip: null
+            zip: null,
+            phone: null,
+            upcomingEventsEmails: false
           });
         }
 
