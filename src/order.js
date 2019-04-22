@@ -149,7 +149,7 @@ Occasion.Modules.push(function(library) {
   library.Order.className = 'Order'
   library.Order.queryName = 'orders'
 
-  library.Order.attributes('sessionIdentifier', 'status', 'upcomingEventsEmails')
+  library.Order.attributes('sessionIdentifier', 'status', 'upcomingEventsEmails', 'referrerToken')
 
   library.Order.attributes(
     'couponAmount',
