@@ -152,6 +152,8 @@ Occasion.Modules.push(function(library) {
   library.Order.attributes('sessionIdentifier', 'status', 'upcomingEventsEmails', 'referrerToken')
 
   library.Order.attributes(
+    'buyerBookingFee',
+    'buyerTotal',
     'couponAmount',
     'dropInsDiscount',
     'giftCardAmount',
@@ -159,12 +161,12 @@ Occasion.Modules.push(function(library) {
     'price',
     'priceDueOnInitialOrder',
     'quantity',
+    'serviceFee',
     'subtotal',
     'tax',
     'taxPercentage',
     'total',
     'totalDiscount',
-    'serviceFee',
     { readOnly: true }
   )
 
@@ -198,6 +200,8 @@ Occasion.Modules.push(function(library) {
 
     // Wrap these in Decimal
     ActiveResource.Collection.build([
+      'buyerBookingFee',
+      'buyerTotal',
       'couponAmount',
       'dropInsDiscount',
       'giftCardAmount',
@@ -205,12 +209,12 @@ Occasion.Modules.push(function(library) {
       'price',
       'priceDueOnInitialOrder',
       'quantity',
+      'serviceFee',
       'subtotal',
       'tax',
       'taxPercentage',
       'total',
-      'totalDiscount',
-      'serviceFee'
+      'totalDiscount'
     ])
       .select(attr => this[attr])
       .each(attr => {

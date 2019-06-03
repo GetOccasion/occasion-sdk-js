@@ -574,7 +574,7 @@ Occasion.Modules.push(function (library) {
 
   library.Order.attributes('sessionIdentifier', 'status', 'upcomingEventsEmails', 'referrerToken');
 
-  library.Order.attributes('couponAmount', 'dropInsDiscount', 'giftCardAmount', 'outstandingBalance', 'price', 'priceDueOnInitialOrder', 'quantity', 'subtotal', 'tax', 'taxPercentage', 'total', 'totalDiscount', 'serviceFee', { readOnly: true });
+  library.Order.attributes('buyerBookingFee', 'buyerTotal', 'couponAmount', 'dropInsDiscount', 'giftCardAmount', 'outstandingBalance', 'price', 'priceDueOnInitialOrder', 'quantity', 'serviceFee', 'subtotal', 'tax', 'taxPercentage', 'total', 'totalDiscount', { readOnly: true });
 
   library.Order.belongsTo('coupon');
   library.Order.belongsTo('currency');
@@ -605,7 +605,7 @@ Occasion.Modules.push(function (library) {
     }
 
     // Wrap these in Decimal
-    ActiveResource.Collection.build(['couponAmount', 'dropInsDiscount', 'giftCardAmount', 'outstandingBalance', 'price', 'priceDueOnInitialOrder', 'quantity', 'subtotal', 'tax', 'taxPercentage', 'total', 'totalDiscount', 'serviceFee']).select(function (attr) {
+    ActiveResource.Collection.build(['buyerBookingFee', 'buyerTotal', 'couponAmount', 'dropInsDiscount', 'giftCardAmount', 'outstandingBalance', 'price', 'priceDueOnInitialOrder', 'quantity', 'serviceFee', 'subtotal', 'tax', 'taxPercentage', 'total', 'totalDiscount']).select(function (attr) {
       return _this12[attr];
     }).each(function (attr) {
       _this12[attr] = new Decimal(_this12[attr]);
