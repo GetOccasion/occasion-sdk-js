@@ -282,7 +282,7 @@ Occasion.Modules.push(function (library) {
   library.Attendee.className = 'Attendee';
   library.Attendee.queryName = 'attendees';
 
-  library.Attendee.attributes('address', 'age', 'city', 'country', 'email', 'firstName', 'gender', 'lastName', 'phone', 'state', 'zip');
+  library.Attendee.attributes('address', 'age', 'allergies', 'city', 'country', 'email', 'firstName', 'gender', 'lastName', 'phone', 'state', 'zip');
 
   library.Attendee.belongsTo('order', { inverseOf: 'attendees' });
 });
