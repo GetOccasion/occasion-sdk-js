@@ -153,18 +153,22 @@ Occasion.Modules.push(function(library) {
 
   library.Order.attributes(
     'buyerBookingFee',
-    'buyerTotal',
+    'buyerDueTodayAfterGiftCards',
+    'buyerDueToday',
+    'buyerTotalWithoutGiftCards',
     'couponAmount',
     'dropInsDiscount',
     'giftCardAmount',
     'outstandingBalance',
+    'paymentDueOnEvent',
     'price',
-    'priceDueOnInitialOrder',
     'quantity',
     'serviceFee',
     'subtotal',
     'tax',
     'taxPercentage',
+    'totalDiscountsGiftCards',
+    'totalTaxesFees',
     'total',
     'totalDiscount',
     { readOnly: true }
@@ -201,20 +205,24 @@ Occasion.Modules.push(function(library) {
     // Wrap these in Decimal
     ActiveResource.Collection.build([
       'buyerBookingFee',
-      'buyerTotal',
+      'buyerDueToday',
+      'buyerDueTodayAfterGiftCards',
+      'buyerTotalWithoutGiftCards',
       'couponAmount',
       'dropInsDiscount',
       'giftCardAmount',
       'outstandingBalance',
+      'paymentDueOnEvent',
       'price',
-      'priceDueOnInitialOrder',
       'quantity',
       'serviceFee',
       'subtotal',
       'tax',
       'taxPercentage',
       'total',
-      'totalDiscount'
+      'totalDiscount',
+      'totalDiscountsGiftCards',
+      'totalTaxesFees'
     ])
       .select(attr => this[attr])
       .each(attr => {
