@@ -254,7 +254,7 @@ babel-plugin-syntax-class-properties@^6.8.0:
 
 babel-plugin-syntax-object-rest-spread@^6.8.0:
   version "6.13.0"
-  resolved "http://registry.npmjs.org/babel-plugin-syntax-object-rest-spread/-/babel-plugin-syntax-object-rest-spread-6.13.0.tgz#fd6536f2bce13836ffa3a5458c4903a597bb3bf5"
+  resolved "https://registry.npmjs.org/babel-plugin-syntax-object-rest-spread/-/babel-plugin-syntax-object-rest-spread-6.13.0.tgz#fd6536f2bce13836ffa3a5458c4903a597bb3bf5"
 
 babel-plugin-transform-class-properties@^6.24.1:
   version "6.24.1"
@@ -1033,12 +1033,13 @@ grunt-template-jasmine-requirejs@^0.2.3:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/grunt-template-jasmine-requirejs/-/grunt-template-jasmine-requirejs-0.2.3.tgz#288730e2334e0bf2417d4b23f6f12dad8c53f318"
 
-grunt-umd@^2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/grunt-umd/-/grunt-umd-2.4.0.tgz#d1318c645ba4734c10c20c1dd6923467d81b05ef"
+grunt-umd@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/grunt-umd/-/grunt-umd-3.0.0.tgz#3526e771b062b89c6cd6dcfc62b3e1f71a0d7370"
+  integrity sha512-hrorGHjHv2EjN2DtZVqj5Y1KjX95RrdIuJlL5KyckArcw2UBijDOy0jrkauz1HTKSYUm7F0nUftLphjcexHTGw==
   dependencies:
-    libumd "^0.7.0"
-    xtend "^4.0.0"
+    libumd "^0.9.0"
+    xtend "^4.0.1"
 
 grunt@0.4.5:
   version "0.4.5"
@@ -1283,9 +1284,10 @@ klaw@^1.0.0:
   optionalDependencies:
     graceful-fs "^4.1.9"
 
-libumd@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/libumd/-/libumd-0.7.0.tgz#f43efae6ad984ce4928c1f356f519d12ec8f9b76"
+libumd@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/libumd/-/libumd-0.9.0.tgz#393451f27524d92a68a9df2d4a4303294d561ad8"
+  integrity sha512-PU5h//kVK280bmayTQiuD2uxG9qY6DOk2zx/9xi93vhC5zCqow5mQn9wUSCBIUqycKFAUrk7T1sEC4wlxACtMQ==
   dependencies:
     alphabet "^1.0.0"
     annois "^0.3.2"
@@ -1873,9 +1875,10 @@ wrappy@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
 
-xtend@^4.0.0:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/xtend/-/xtend-4.0.1.tgz#a5c6d532be656e23db820efb943a1f04998d63af"
+xtend@^4.0.1:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/xtend/-/xtend-4.0.2.tgz#bb72779f5fa465186b1f438f674fa347fdb5db54"
+  integrity sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==
 
 yargs@~3.5.4:
   version "3.5.4"
