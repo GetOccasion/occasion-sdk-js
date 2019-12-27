@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/GetOccasion/occasion-sdk-js#readme",
   "dependencies": {
-    "active-resource": "GetOccasion/activeresource.js#53_queue",
+    "active-resource": "GetOccasion/activeresource.js#track_local_changes",
     "decimal.js-light": "^2.4.1",
     "moment": "^2.22.1",
     "moment-timezone-with-data-2010-2020": "^0.4.0"

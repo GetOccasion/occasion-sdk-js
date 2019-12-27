@@ -6,9 +6,9 @@ abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
 
-active-resource@GetOccasion/activeresource.js#53_queue:
+active-resource@GetOccasion/activeresource.js#track_local_changes:
   version "1.0.0-alpha.2"
-  resolved "https://codeload.github.com/GetOccasion/activeresource.js/tar.gz/3658e6cf5d18f6e0668e61c51bbba13a9024b879"
+  resolved "https://codeload.github.com/GetOccasion/activeresource.js/tar.gz/cbf3d357f43f9c3323130f61b6fe77971c77a496"
   dependencies:
     axios "^0.16.2"
     es6-promise "^4.1.1"
