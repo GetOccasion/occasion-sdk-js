@@ -12,7 +12,12 @@ class Occasion {
       throw 'Token must be of type string';
     }
 
-    var encodedToken = window.btoa(unescape(encodeURIComponent(token + ':')));
+    // Support NodeJs
+    if (typeof window === `undefined`) {
+      var encodedToken = Buffer.from(unescape(encodeURIComponent(token + ':'))).toString('base64')
+    } else {
+      var encodedToken = window.btoa(unescape(encodeURIComponent(token + ':')))
+    }
 
     var libraryOptions = {
       headers: {
