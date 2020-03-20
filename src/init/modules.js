@@ -1,1 +1,1 @@
-Occasion.Modules = ActiveResource.prototype.Collection.build();
+Occasion.Modules = ActiveResource.prototype.Collection.build()
