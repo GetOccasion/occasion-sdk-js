@@ -40,6 +40,7 @@ var Occasion = function () {
 
       var url = options.baseUrl || Occasion.baseUrl;
       var token = options.token;
+      var secret = options.secret;
       var immutable = options.immutable || false;
 
       if (!_.isString(token)) {
@@ -48,9 +49,9 @@ var Occasion = function () {
 
       // Support NodeJs
       if (typeof window === 'undefined') {
-        var encodedToken = Buffer.from(unescape(encodeURIComponent(token + ':'))).toString('base64');
+        var encodedToken = Buffer.from(unescape(encodeURIComponent([token, secret].join(':')))).toString('base64');
       } else {
-        var encodedToken = window.btoa(unescape(encodeURIComponent(token + ':')));
+        var encodedToken = window.btoa(unescape(encodeURIComponent([token, secret].join(':'))));
       }
 
       var libraryOptions = {
@@ -78,6 +79,7 @@ Occasion.baseUrl = 'https://occ.sn/api/v1';
 
 
 Occasion.Modules = ActiveResource.prototype.Collection.build();
+
 // @todo Remove includes({ product: 'merchant' }) when AR supports owner assignment to has_many children
 //   in non-load queries
 Occasion.__constructCalendar = function __constructCalendar(month) {
@@ -311,6 +313,7 @@ Occasion.Modules.push(function (library) {
   library.Coupon.belongsTo('merchant');
   library.Coupon.hasMany('orders');
 });
+
 Occasion.Modules.push(function (library) {
   library.Currency = function (_library$Base4) {
     _inherits(Currency, _library$Base4);
@@ -330,6 +333,7 @@ Occasion.Modules.push(function (library) {
   library.Currency.hasMany('merchants');
   library.Currency.hasMany('orders');
 });
+
 Occasion.Modules.push(function (library) {
   library.Customer = function (_library$Base5) {
     _inherits(Customer, _library$Base5);
@@ -416,6 +420,7 @@ Occasion.Modules.push(function (library) {
   library.Merchant.hasMany('products');
   library.Merchant.hasMany('venues');
 });
+
 Occasion.Modules.push(function (library) {
   library.Option = function (_library$Base8) {
     _inherits(Option, _library$Base8);
@@ -435,6 +440,7 @@ Occasion.Modules.push(function (library) {
   library.Option.belongsTo('answer');
   library.Option.belongsTo('question');
 });
+
 Occasion.Modules.push(function (library) {
   library.Order = function (_library$Base9) {
     _inherits(Order, _library$Base9);
@@ -709,6 +715,7 @@ Occasion.Modules.push(function (library) {
 
   library.PaymentMethod.hasMany('transactions', { as: 'paymentMethod' });
 });
+
 Occasion.Modules.push(function (library) {
   library.Product = function (_library$Base11) {
     _inherits(Product, _library$Base11);
@@ -787,6 +794,7 @@ Occasion.Modules.push(function (library) {
   library.Question.hasMany('answers');
   library.Question.hasMany('options');
 });
+
 Occasion.Modules.push(function (library) {
   // TODO: Remove ability to directly query redeemables
   library.Redeemable = function (_library$Base13) {
@@ -806,6 +814,7 @@ Occasion.Modules.push(function (library) {
 
   library.Redeemable.belongsTo('product');
 });
+
 Occasion.Modules.push(function (library) {
   library.State = function (_library$Base14) {
     _inherits(State, _library$Base14);
@@ -955,6 +964,7 @@ Occasion.Modules.push(function (library) {
 
   library.CreditCard.hasMany('transactions', { as: 'paymentMethod' });
 });
+
 Occasion.Modules.push(function (library) {
   library.GiftCard = function (_library$PaymentMetho2) {
     _inherits(GiftCard, _library$PaymentMetho2);
