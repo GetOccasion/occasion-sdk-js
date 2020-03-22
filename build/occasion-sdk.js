@@ -295,8 +295,25 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Coupon = function (_library$Base3) {
-    _inherits(Coupon, _library$Base3);
+  library.Country = function (_library$Base3) {
+    _inherits(Country, _library$Base3);
+
+    function Country() {
+      _classCallCheck(this, Country);
+
+      return _possibleConstructorReturn(this, (Country.__proto__ || Object.getPrototypeOf(Country)).apply(this, arguments));
+    }
+
+    return Country;
+  }(library.Base);
+
+  library.Country.className = 'Country';
+  library.Country.queryName = 'countries';
+});
+
+Occasion.Modules.push(function (library) {
+  library.Coupon = function (_library$Base4) {
+    _inherits(Coupon, _library$Base4);
 
     function Coupon() {
       _classCallCheck(this, Coupon);
@@ -315,8 +332,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Currency = function (_library$Base4) {
-    _inherits(Currency, _library$Base4);
+  library.Currency = function (_library$Base5) {
+    _inherits(Currency, _library$Base5);
 
     function Currency() {
       _classCallCheck(this, Currency);
@@ -335,8 +352,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Customer = function (_library$Base5) {
-    _inherits(Customer, _library$Base5);
+  library.Customer = function (_library$Base6) {
+    _inherits(Customer, _library$Base6);
 
     function Customer() {
       _classCallCheck(this, Customer);
@@ -382,8 +399,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Label = function (_library$Base6) {
-    _inherits(Label, _library$Base6);
+  library.Label = function (_library$Base7) {
+    _inherits(Label, _library$Base7);
 
     function Label() {
       _classCallCheck(this, Label);
@@ -401,8 +418,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Merchant = function (_library$Base7) {
-    _inherits(Merchant, _library$Base7);
+  library.Merchant = function (_library$Base8) {
+    _inherits(Merchant, _library$Base8);
 
     function Merchant() {
       _classCallCheck(this, Merchant);
@@ -422,8 +439,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Option = function (_library$Base8) {
-    _inherits(Option, _library$Base8);
+  library.Option = function (_library$Base9) {
+    _inherits(Option, _library$Base9);
 
     function Option() {
       _classCallCheck(this, Option);
@@ -442,8 +459,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Order = function (_library$Base9) {
-    _inherits(Order, _library$Base9);
+  library.Order = function (_library$Base10) {
+    _inherits(Order, _library$Base10);
 
     function Order() {
       _classCallCheck(this, Order);
@@ -599,7 +616,7 @@ Occasion.Modules.push(function (library) {
   library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' });
 
   library.Order.afterRequest(function () {
-    var _this12 = this;
+    var _this13 = this;
 
     if (this.product() && !this.product().attendeeQuestions.empty()) {
       var diff = this.quantity - this.attendees().size();
@@ -617,9 +634,9 @@ Occasion.Modules.push(function (library) {
 
     // Wrap these in Decimal
     ActiveResource.Collection.build(['buyerBookingFee', 'buyerDueToday', 'buyerDueTodayAfterGiftCards', 'buyerTotalWithoutGiftCards', 'couponAmount', 'dropInsDiscount', 'giftCardAmount', 'outstandingBalance', 'paymentDueOnEvent', 'price', 'quantity', 'serviceFee', 'subtotal', 'tax', 'taxPercentage', 'total', 'totalDiscount', 'totalDiscountsGiftCards', 'totalTaxesFees']).select(function (attr) {
-      return _this12[attr];
+      return _this13[attr];
     }).each(function (attr) {
-      _this12[attr] = new Decimal(_this12[attr]);
+      _this13[attr] = new Decimal(_this13[attr]);
     });
 
     if (this.outstandingBalance && !this.outstandingBalance.isZero()) {
@@ -633,7 +650,7 @@ Occasion.Modules.push(function (library) {
       if (this.outstandingBalance.isPositive()) {
         if (!giftCardTransactions.empty()) {
           giftCardTransactions.each(function (t) {
-            if (_this12.outstandingBalance.isZero()) return;
+            if (_this13.outstandingBalance.isZero()) return;
 
             var amount = new Decimal(t.amount);
             var giftCardValue = new Decimal(t.paymentMethod().value);
@@ -641,40 +658,40 @@ Occasion.Modules.push(function (library) {
 
             if (remainingGiftCardBalance.isZero()) return;
 
-            if (remainingGiftCardBalance.greaterThanOrEqualTo(_this12.outstandingBalance)) {
-              amount = amount.plus(_this12.outstandingBalance);
-              _this12.outstandingBalance = new Decimal(0);
+            if (remainingGiftCardBalance.greaterThanOrEqualTo(_this13.outstandingBalance)) {
+              amount = amount.plus(_this13.outstandingBalance);
+              _this13.outstandingBalance = new Decimal(0);
             } else {
               amount = remainingGiftCardBalance;
-              _this12.outstandingBalance = _this12.outstandingBalance.minus(remainingGiftCardBalance);
+              _this13.outstandingBalance = _this13.outstandingBalance.minus(remainingGiftCardBalance);
             }
 
             t.amount = amount.toString();
 
-            _this12.transactions().target().delete(t);
-            t.__createClone({ cloner: _this12 });
+            _this13.transactions().target().delete(t);
+            t.__createClone({ cloner: _this13 });
           });
         }
       } else {
         if (!giftCardTransactions.empty()) {
           ActiveResource.Collection.build(giftCardTransactions.toArray().reverse()).each(function (t) {
-            if (_this12.outstandingBalance.isZero()) return;
+            if (_this13.outstandingBalance.isZero()) return;
 
             var amount = new Decimal(t.amount);
 
-            if (amount.greaterThan(_this12.outstandingBalance.abs())) {
-              amount = amount.plus(_this12.outstandingBalance);
-              _this12.outstandingBalance = new Decimal(0);
+            if (amount.greaterThan(_this13.outstandingBalance.abs())) {
+              amount = amount.plus(_this13.outstandingBalance);
+              _this13.outstandingBalance = new Decimal(0);
             } else {
-              _this12.outstandingBalance = _this12.outstandingBalance.plus(amount);
+              _this13.outstandingBalance = _this13.outstandingBalance.plus(amount);
 
-              _this12.removeCharge(t.paymentMethod());
+              _this13.removeCharge(t.paymentMethod());
               return;
             }
 
             t.amount = amount.toString();
-            _this12.transactions().target().delete(t);
-            t.__createClone({ cloner: _this12 });
+            _this13.transactions().target().delete(t);
+            t.__createClone({ cloner: _this13 });
           });
         }
       }
@@ -698,8 +715,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.PaymentMethod = function (_library$Base10) {
-    _inherits(PaymentMethod, _library$Base10);
+  library.PaymentMethod = function (_library$Base11) {
+    _inherits(PaymentMethod, _library$Base11);
 
     function PaymentMethod() {
       _classCallCheck(this, PaymentMethod);
@@ -717,8 +734,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Product = function (_library$Base11) {
-    _inherits(Product, _library$Base11);
+  library.Product = function (_library$Base12) {
+    _inherits(Product, _library$Base12);
 
     function Product() {
       _classCallCheck(this, Product);
@@ -775,8 +792,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Question = function (_library$Base12) {
-    _inherits(Question, _library$Base12);
+  library.Question = function (_library$Base13) {
+    _inherits(Question, _library$Base13);
 
     function Question() {
       _classCallCheck(this, Question);
@@ -797,8 +814,8 @@ Occasion.Modules.push(function (library) {
 
 Occasion.Modules.push(function (library) {
   // TODO: Remove ability to directly query redeemables
-  library.Redeemable = function (_library$Base13) {
-    _inherits(Redeemable, _library$Base13);
+  library.Redeemable = function (_library$Base14) {
+    _inherits(Redeemable, _library$Base14);
 
     function Redeemable() {
       _classCallCheck(this, Redeemable);
@@ -816,8 +833,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.State = function (_library$Base14) {
-    _inherits(State, _library$Base14);
+  library.State = function (_library$Base15) {
+    _inherits(State, _library$Base15);
 
     function State() {
       _classCallCheck(this, State);
@@ -835,8 +852,8 @@ Occasion.Modules.push(function (library) {
 Occasion.Modules.push(function (library) {
   var _class, _temp;
 
-  library.TimeSlot = (_temp = _class = function (_library$Base15) {
-    _inherits(TimeSlot, _library$Base15);
+  library.TimeSlot = (_temp = _class = function (_library$Base16) {
+    _inherits(TimeSlot, _library$Base16);
 
     function TimeSlot() {
       _classCallCheck(this, TimeSlot);
@@ -903,8 +920,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Transaction = function (_library$Base16) {
-    _inherits(Transaction, _library$Base16);
+  library.Transaction = function (_library$Base17) {
+    _inherits(Transaction, _library$Base17);
 
     function Transaction() {
       _classCallCheck(this, Transaction);
@@ -925,8 +942,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Venue = function (_library$Base17) {
-    _inherits(Venue, _library$Base17);
+  library.Venue = function (_library$Base18) {
+    _inherits(Venue, _library$Base18);
 
     function Venue() {
       _classCallCheck(this, Venue);
@@ -942,6 +959,7 @@ Occasion.Modules.push(function (library) {
 
   library.Venue.belongsTo('merchant');
   library.Venue.belongsTo('state');
+  library.Venue.belongsTo('country');
 
   library.Venue.hasMany('products');
 });

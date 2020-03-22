@@ -6,6 +6,7 @@ Occasion.Modules.push(function(library) {
 
   library.Venue.belongsTo('merchant')
   library.Venue.belongsTo('state')
+  library.Venue.belongsTo('country')
 
   library.Venue.hasMany('products')
 })
