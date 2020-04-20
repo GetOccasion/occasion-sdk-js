@@ -20,7 +20,7 @@ Once you’ve added `occasion-sdk` to your application, initialize it with your 
 which can be found in your account settings on Occasion.
 
 ```javascript
-let OccasionClient = new Occasion.Client('[API_TOKEN]');
+let OccasionClient = new Occasion.Client(token: '[API_TOKEN]');
 ```
 
 ## Resources
