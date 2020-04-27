@@ -8,13 +8,13 @@ abbrev@1:
 
 active-resource@GetOccasion/activeresource.js#track_local_changes:
   version "1.0.0-alpha.2"
-  resolved "https://codeload.github.com/GetOccasion/activeresource.js/tar.gz/694f187ea5942c3ee6f9553beb9fe4d3a9c4b7ec"
+  resolved "https://codeload.github.com/GetOccasion/activeresource.js/tar.gz/24ee8a2cc622f5ba0e106f8935691714e4bed1c9"
   dependencies:
     axios "^0.16.2"
     es6-promise "^4.1.1"
     qs "^6.5.0"
     underscore "^1.8.3"
-    underscore.inflection latest
+    underscore.inflection getoccasion/underscore.inflection#es6-webpack-compat
     underscore.string latest
 
 ajv@^6.5.5:
@@ -813,9 +813,9 @@ findup-sync@~0.1.2:
     lodash "~2.4.1"
 
 follow-redirects@^1.2.3:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.10.0.tgz#01f5263aee921c6a54fb91667f08f4155ce169eb"
-  integrity sha512-4eyLK6s6lH32nOvLLwlIOnr9zrL8Sm+OvW4pVTJNoXeGzYIkHVf+pADQi+OJ0E67hiuSLezPVPyBcIZO50TmmQ==
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.11.0.tgz#afa14f08ba12a52963140fe43212658897bc0ecb"
+  integrity sha512-KZm0V+ll8PfBrKwMzdo5D13b1bur9Iq9Zd/RMmAoQQcl2PxxFml8cxXPaaPYVbV0RjNjq1CU7zIzAOqtUPudmA==
   dependencies:
     debug "^3.0.0"
 
@@ -1522,9 +1522,9 @@ qs@0.6.5:
   resolved "https://registry.yarnpkg.com/qs/-/qs-0.6.5.tgz#294b268e4b0d4250f6dde19b3b8b34935dff14ef"
 
 qs@^6.5.0:
-  version "6.9.1"
-  resolved "https://registry.yarnpkg.com/qs/-/qs-6.9.1.tgz#20082c65cb78223635ab1a9eaca8875a29bf8ec9"
-  integrity sha512-Cxm7/SS/y/Z3MHWSxXb8lIFqgqBowP5JMlTUFyJN88y0SGQhVmZnqFK/PeuMX9LzUyWsqqhNxIyg0jlzq946yA==
+  version "6.9.3"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.9.3.tgz#bfadcd296c2d549f1dffa560619132c977f5008e"
+  integrity sha512-EbZYNarm6138UKKq46tdx08Yo/q9ZhFoAXAI1meAFd2GtbRDhbZY2WQSICskT0c5q99aFzLG1D4nvTk9tqfXIw==
 
 qs@~0.5.2:
   version "0.5.6"
@@ -1787,10 +1787,9 @@ uglify-to-browserify@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/uglify-to-browserify/-/uglify-to-browserify-1.0.2.tgz#6e0924d6bda6b5afe349e39a6d632850a0f882b7"
 
-underscore.inflection@latest:
+underscore.inflection@getoccasion/underscore.inflection#es6-webpack-compat:
   version "1.3.3"
-  resolved "https://registry.yarnpkg.com/underscore.inflection/-/underscore.inflection-1.3.3.tgz#80afc119393878783a03cb2923d6ed5b4e277283"
-  integrity sha512-DwnTzoQUp5B+JBl26OcTGBgmCa7Enxtrj1gUHixOCCFvMf7LzMX7U+odu3VLMDwzfSmhPMblspbEeK77ohreCQ==
+  resolved "https://codeload.github.com/getoccasion/underscore.inflection/tar.gz/6cfaedb52c34c18078e8c1f7335d58c4b5c4bb55"
 
 underscore.string@latest:
   version "3.3.5"
@@ -1816,9 +1815,9 @@ underscore.string@~2.4.0:
   integrity sha1-jN2PusTi0uoefi6Al8QvRCKA+Fs=
 
 underscore@^1.8.3:
-  version "1.9.2"
-  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.9.2.tgz#0c8d6f536d6f378a5af264a72f7bec50feb7cf2f"
-  integrity sha512-D39qtimx0c1fI3ya1Lnhk3E9nONswSKhnffBI0gME9C99fYOkNi04xs8K6pePLhvl1frbDemkaBQ5ikWllR2HQ==
+  version "1.10.2"
+  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.10.2.tgz#73d6aa3668f3188e4adb0f1943bd12cfd7efaaaf"
+  integrity sha512-N4P+Q/BuyuEKFJ43B9gYuOj4TQUHXX+j2FqguVOpjkssLUUrnJofCcBccJSCoeturDoZU6GorDTHSvUDlSQbTg==
 
 underscore@~1.7.0:
   version "1.7.0"
