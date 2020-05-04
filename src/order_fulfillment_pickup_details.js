@@ -5,7 +5,7 @@ Occasion.Modules.push(function (library) {
   library.OrderFulfillmentPickupDetails.queryName = 'order_fulfillments_pickup_details'
 
   library.OrderFulfillmentPickupDetails.belongsTo('orderFulfillment')
-  library.OrderFulfillmentShippingDetails.hasOne('orderFulfillmentRecipient', { autosave: true })
+  library.OrderFulfillmentPickupDetails.hasOne('orderFulfillmentRecipient', { autosave: true })
 
   library.OrderFulfillmentPickupDetails.attributes(
     'expiredAt',

@@ -733,7 +733,7 @@ Occasion.Modules.push(function (library) {
   library.OrderFulfillment.queryName = 'order_fulfillments';
 
   library.OrderFulfillment.belongsTo('order');
-  library.OrderFulfillment.hasOne('orderFulfillmentShippingDetails', { autosave: true });
+  library.OrderFulfillment.hasOne('orderFulfillmentShipmentDetails', { autosave: true });
   library.OrderFulfillment.hasOne('orderFulfillmentPickupDetails', { autosave: true });
 
   library.OrderFulfillment.attributes('fulfillmentType');
@@ -756,7 +756,7 @@ Occasion.Modules.push(function (library) {
   library.OrderFulfillmentPickupDetails.queryName = 'order_fulfillments_pickup_details';
 
   library.OrderFulfillmentPickupDetails.belongsTo('orderFulfillment');
-  library.OrderFulfillmentShippingDetails.hasOne('orderFulfillmentRecipient', { autosave: true });
+  library.OrderFulfillmentPickupDetails.hasOne('orderFulfillmentRecipient', { autosave: true });
 
   library.OrderFulfillmentPickupDetails.attributes('expiredAt', 'expiresAt', 'isCurbsidePickup', 'curbsideDetails', 'pickupAt', 'pickupWindowDuration', 'readyAt', 'scheduleType', 'placedAt');
 });
@@ -783,25 +783,25 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.OrderFulfillmentShippingDetails = function (_library$Base14) {
-    _inherits(OrderFulfillmentShippingDetails, _library$Base14);
+  library.OrderFulfillmentShipmentDetails = function (_library$Base14) {
+    _inherits(OrderFulfillmentShipmentDetails, _library$Base14);
 
-    function OrderFulfillmentShippingDetails() {
-      _classCallCheck(this, OrderFulfillmentShippingDetails);
+    function OrderFulfillmentShipmentDetails() {
+      _classCallCheck(this, OrderFulfillmentShipmentDetails);
 
-      return _possibleConstructorReturn(this, (OrderFulfillmentShippingDetails.__proto__ || Object.getPrototypeOf(OrderFulfillmentShippingDetails)).apply(this, arguments));
+      return _possibleConstructorReturn(this, (OrderFulfillmentShipmentDetails.__proto__ || Object.getPrototypeOf(OrderFulfillmentShipmentDetails)).apply(this, arguments));
     }
 
-    return OrderFulfillmentShippingDetails;
+    return OrderFulfillmentShipmentDetails;
   }(library.Base);
 
-  library.OrderFulfillmentShippingDetails.className = 'OrderFulfillmentShippingDetails';
-  library.OrderFulfillmentShippingDetails.queryName = 'order_fulfillments_shipping_details';
+  library.OrderFulfillmentShipmentDetails.className = 'OrderFulfillmentShipmentDetails';
+  library.OrderFulfillmentShipmentDetails.queryName = 'order_fulfillments_shipment_details';
 
-  library.OrderFulfillmentShippingDetails.belongsTo('orderFulfillment');
-  library.OrderFulfillmentShippingDetails.hasOne('orderFulfillmentRecipient', { autosave: true });
+  library.OrderFulfillmentShipmentDetails.belongsTo('orderFulfillment');
+  library.OrderFulfillmentShipmentDetails.hasOne('orderFulfillmentRecipient', { autosave: true });
 
-  library.OrderFulfillmentShippingDetails.attributes('carrier', 'shippingNote', 'shippingType');
+  library.OrderFulfillmentShipmentDetails.attributes('carrier', 'shippingNote', 'shippingType');
 });
 
 Occasion.Modules.push(function (library) {
