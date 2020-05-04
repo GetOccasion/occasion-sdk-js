@@ -8,7 +8,7 @@ abbrev@1:
 
 active-resource@GetOccasion/activeresource.js#track_local_changes:
   version "1.0.0-alpha.2"
-  resolved "https://codeload.github.com/GetOccasion/activeresource.js/tar.gz/24ee8a2cc622f5ba0e106f8935691714e4bed1c9"
+  resolved "https://codeload.github.com/GetOccasion/activeresource.js/tar.gz/9ebb09d237b8b3162c94eaf9b92b8c989347affb"
   dependencies:
     axios "^0.16.2"
     es6-promise "^4.1.1"
@@ -1789,7 +1789,7 @@ uglify-to-browserify@~1.0.0:
 
 underscore.inflection@getoccasion/underscore.inflection#es6-webpack-compat:
   version "1.3.3"
-  resolved "https://codeload.github.com/getoccasion/underscore.inflection/tar.gz/6cfaedb52c34c18078e8c1f7335d58c4b5c4bb55"
+  resolved "https://codeload.github.com/getoccasion/underscore.inflection/tar.gz/807eec9f6b4500ae6d2e3dc90f2f498fcf486b64"
 
 underscore.string@latest:
   version "3.3.5"

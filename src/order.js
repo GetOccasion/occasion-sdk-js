@@ -1,15 +1,10 @@
-Occasion.Modules.push(function(library) {
+Occasion.Modules.push(function (library) {
   library.Order = class Order extends library.Base {
     static construct(attributes) {
       var order = this.includes('currency').build(attributes)
 
       order.sessionIdentifier =
-        order.sessionIdentifier ||
-        Math.random()
-          .toString(36)
-          .substring(7) +
-          '-' +
-          Date.now()
+        order.sessionIdentifier || Math.random().toString(36).substring(7) + '-' + Date.now()
 
       order.upcomingEventsEmails = order.upcomingEventsEmails || true
 
@@ -24,20 +19,13 @@ Occasion.Modules.push(function(library) {
       }
 
       var promises = [
-        new Promise(function(resolve) {
+        new Promise(function (resolve) {
           resolve(order)
         })
       ]
 
       if (order.product() != null) {
-        promises.push(
-          order
-            .product()
-            .questions()
-            .includes('options')
-            .perPage(500)
-            .load()
-        )
+        promises.push(order.product().questions().includes('options').perPage(500).load())
 
         if (!order.product().requiresTimeSlotSelection) {
           promises.push(
@@ -53,7 +41,7 @@ Occasion.Modules.push(function(library) {
       }
 
       var _this = this
-      return Promise.all(promises).then(function(args) {
+      return Promise.all(promises).then(function (args) {
         order = args[0]
         var questions = args[1]
         var timeSlots = args[2]
@@ -85,7 +73,7 @@ Occasion.Modules.push(function(library) {
     editCharge(paymentMethod, amount) {
       var transaction = this.transactions()
         .target()
-        .detect(function(t) {
+        .detect(function (t) {
           return t.paymentMethod() == paymentMethod
         })
 
@@ -100,14 +88,12 @@ Occasion.Modules.push(function(library) {
     removeCharge(paymentMethod) {
       var transaction = this.transactions()
         .target()
-        .detect(function(t) {
+        .detect(function (t) {
           return t.paymentMethod() == paymentMethod
         })
 
       if (transaction) {
-        this.transactions()
-          .target()
-          .delete(transaction)
+        this.transactions().target().delete(transaction)
       }
     }
 
@@ -131,7 +117,7 @@ Occasion.Modules.push(function(library) {
               question
                 .options()
                 .target()
-                .detect(o => {
+                .detect((o) => {
                   return o.default
                 })
             )
@@ -180,12 +166,14 @@ Occasion.Modules.push(function(library) {
   library.Order.belongsTo('merchant')
   library.Order.belongsTo('product')
 
+  library.Order.hasOne('orderFulfillment', { autosave: true })
+
   library.Order.hasMany('answers', { autosave: true, inverseOf: 'order' })
   library.Order.hasMany('attendees', { autosave: true, inverseOf: 'order' })
   library.Order.hasMany('timeSlots')
   library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' })
 
-  library.Order.afterRequest(function() {
+  library.Order.afterRequest(function () {
     if (this.product() && !this.product().attendeeQuestions.empty()) {
       var diff = this.quantity - this.attendees().size()
 
@@ -194,9 +182,7 @@ Occasion.Modules.push(function(library) {
           if (diff > 0) {
             this.attendees().build()
           } else {
-            this.attendees()
-              .target()
-              .pop()
+            this.attendees().target().pop()
           }
         }
       }
@@ -224,22 +210,22 @@ Occasion.Modules.push(function(library) {
       'totalDiscountsGiftCards',
       'totalTaxesFees'
     ])
-      .select(attr => this[attr])
-      .each(attr => {
+      .select((attr) => this[attr])
+      .each((attr) => {
         this[attr] = new Decimal(this[attr])
       })
 
     if (this.outstandingBalance && !this.outstandingBalance.isZero()) {
       var giftCardTransactions = this.transactions()
         .target()
-        .select(t => t.paymentMethod() && t.paymentMethod().isA(library.GiftCard))
+        .select((t) => t.paymentMethod() && t.paymentMethod().isA(library.GiftCard))
       var remainingBalanceTransaction = this.transactions()
         .target()
-        .detect(t => !(t.paymentMethod() && t.paymentMethod().isA(library.GiftCard)))
+        .detect((t) => !(t.paymentMethod() && t.paymentMethod().isA(library.GiftCard)))
 
       if (this.outstandingBalance.isPositive()) {
         if (!giftCardTransactions.empty()) {
-          giftCardTransactions.each(t => {
+          giftCardTransactions.each((t) => {
             if (this.outstandingBalance.isZero()) return
 
             let amount = new Decimal(t.amount)
@@ -258,15 +244,13 @@ Occasion.Modules.push(function(library) {
 
             t.amount = amount.toString()
 
-            this.transactions()
-              .target()
-              .delete(t)
+            this.transactions().target().delete(t)
             t.__createClone({ cloner: this })
           })
         }
       } else {
         if (!giftCardTransactions.empty()) {
-          ActiveResource.Collection.build(giftCardTransactions.toArray().reverse()).each(t => {
+          ActiveResource.Collection.build(giftCardTransactions.toArray().reverse()).each((t) => {
             if (this.outstandingBalance.isZero()) return
 
             let amount = new Decimal(t.amount)
@@ -282,9 +266,7 @@ Occasion.Modules.push(function(library) {
             }
 
             t.amount = amount.toString()
-            this.transactions()
-              .target()
-              .delete(t)
+            this.transactions().target().delete(t)
             t.__createClone({ cloner: this })
           })
         }
@@ -293,16 +275,14 @@ Occasion.Modules.push(function(library) {
       if (!giftCardTransactions.empty()) {
         this.giftCardAmount = this.transactions()
           .target()
-          .select(t => t.paymentMethod() && t.paymentMethod().isA(library.GiftCard))
+          .select((t) => t.paymentMethod() && t.paymentMethod().isA(library.GiftCard))
           .inject(new Decimal(0), (total, transaction) => total.plus(transaction.amount))
       }
 
       if (remainingBalanceTransaction) {
         remainingBalanceTransaction.amount = this.outstandingBalance.toString()
 
-        this.transactions()
-          .target()
-          .delete(remainingBalanceTransaction)
+        this.transactions().target().delete(remainingBalanceTransaction)
         remainingBalanceTransaction.__createClone({ cloner: this })
       }
     }

@@ -610,6 +610,8 @@ Occasion.Modules.push(function (library) {
   library.Order.belongsTo('merchant');
   library.Order.belongsTo('product');
 
+  library.Order.hasOne('orderFulfillment', { autosave: true });
+
   library.Order.hasMany('answers', { autosave: true, inverseOf: 'order' });
   library.Order.hasMany('attendees', { autosave: true, inverseOf: 'order' });
   library.Order.hasMany('timeSlots');
@@ -715,8 +717,96 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.PaymentMethod = function (_library$Base11) {
-    _inherits(PaymentMethod, _library$Base11);
+  library.OrderFulfillment = function (_library$Base11) {
+    _inherits(OrderFulfillment, _library$Base11);
+
+    function OrderFulfillment() {
+      _classCallCheck(this, OrderFulfillment);
+
+      return _possibleConstructorReturn(this, (OrderFulfillment.__proto__ || Object.getPrototypeOf(OrderFulfillment)).apply(this, arguments));
+    }
+
+    return OrderFulfillment;
+  }(library.Base);
+
+  library.OrderFulfillment.className = 'OrderFulfillment';
+  library.OrderFulfillment.queryName = 'order_fulfillments';
+
+  library.OrderFulfillment.belongsTo('order');
+  library.OrderFulfillment.hasOne('orderFulfillmentShippingDetails', { autosave: true });
+  library.OrderFulfillment.hasOne('orderFulfillmentPickupDetails', { autosave: true });
+
+  library.OrderFulfillment.attributes('fulfillmentType');
+});
+
+Occasion.Modules.push(function (library) {
+  library.OrderFulfillmentPickupDetails = function (_library$Base12) {
+    _inherits(OrderFulfillmentPickupDetails, _library$Base12);
+
+    function OrderFulfillmentPickupDetails() {
+      _classCallCheck(this, OrderFulfillmentPickupDetails);
+
+      return _possibleConstructorReturn(this, (OrderFulfillmentPickupDetails.__proto__ || Object.getPrototypeOf(OrderFulfillmentPickupDetails)).apply(this, arguments));
+    }
+
+    return OrderFulfillmentPickupDetails;
+  }(library.Base);
+
+  library.OrderFulfillmentPickupDetails.className = 'OrderFulfillmentPickupDetails';
+  library.OrderFulfillmentPickupDetails.queryName = 'order_fulfillments_pickup_details';
+
+  library.OrderFulfillmentPickupDetails.belongsTo('orderFulfillment');
+  library.OrderFulfillmentShippingDetails.hasOne('orderFulfillmentRecipient', { autosave: true });
+
+  library.OrderFulfillmentPickupDetails.attributes('expiredAt', 'expiresAt', 'isCurbsidePickup', 'curbsideDetails', 'pickupAt', 'pickupWindowDuration', 'readyAt', 'scheduleType', 'placedAt');
+});
+
+Occasion.Modules.push(function (library) {
+  library.OrderFulfillmentRecipient = function (_library$Base13) {
+    _inherits(OrderFulfillmentRecipient, _library$Base13);
+
+    function OrderFulfillmentRecipient() {
+      _classCallCheck(this, OrderFulfillmentRecipient);
+
+      return _possibleConstructorReturn(this, (OrderFulfillmentRecipient.__proto__ || Object.getPrototypeOf(OrderFulfillmentRecipient)).apply(this, arguments));
+    }
+
+    return OrderFulfillmentRecipient;
+  }(library.Base);
+
+  library.OrderFulfillmentRecipient.className = 'OrderFulfillmentRecipient';
+  library.OrderFulfillmentRecipient.queryName = 'order_fulfillments';
+
+  library.OrderFulfillmentRecipient.belongsTo('orderFulfillmentDetails');
+
+  library.OrderFulfillmentRecipient.attributes('addressLine1', 'addressLine2', 'addressLine3', 'administrativeDistrictLevel1', 'administrativeDistrictLevel2', 'administrativeDistrictLevel3', 'country', 'displayName', 'emailAddress', 'firstName', 'lastName', 'locality', 'organization', 'phoneNumber', 'postalCode', 'sublocality', 'sublocality2', 'sublocality3');
+});
+
+Occasion.Modules.push(function (library) {
+  library.OrderFulfillmentShippingDetails = function (_library$Base14) {
+    _inherits(OrderFulfillmentShippingDetails, _library$Base14);
+
+    function OrderFulfillmentShippingDetails() {
+      _classCallCheck(this, OrderFulfillmentShippingDetails);
+
+      return _possibleConstructorReturn(this, (OrderFulfillmentShippingDetails.__proto__ || Object.getPrototypeOf(OrderFulfillmentShippingDetails)).apply(this, arguments));
+    }
+
+    return OrderFulfillmentShippingDetails;
+  }(library.Base);
+
+  library.OrderFulfillmentShippingDetails.className = 'OrderFulfillmentShippingDetails';
+  library.OrderFulfillmentShippingDetails.queryName = 'order_fulfillments_shipping_details';
+
+  library.OrderFulfillmentShippingDetails.belongsTo('orderFulfillment');
+  library.OrderFulfillmentShippingDetails.hasOne('orderFulfillmentRecipient', { autosave: true });
+
+  library.OrderFulfillmentShippingDetails.attributes('carrier', 'shippingNote', 'shippingType');
+});
+
+Occasion.Modules.push(function (library) {
+  library.PaymentMethod = function (_library$Base15) {
+    _inherits(PaymentMethod, _library$Base15);
 
     function PaymentMethod() {
       _classCallCheck(this, PaymentMethod);
@@ -734,8 +824,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Product = function (_library$Base12) {
-    _inherits(Product, _library$Base12);
+  library.Product = function (_library$Base16) {
+    _inherits(Product, _library$Base16);
 
     function Product() {
       _classCallCheck(this, Product);
@@ -792,8 +882,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Question = function (_library$Base13) {
-    _inherits(Question, _library$Base13);
+  library.Question = function (_library$Base17) {
+    _inherits(Question, _library$Base17);
 
     function Question() {
       _classCallCheck(this, Question);
@@ -814,8 +904,8 @@ Occasion.Modules.push(function (library) {
 
 Occasion.Modules.push(function (library) {
   // TODO: Remove ability to directly query redeemables
-  library.Redeemable = function (_library$Base14) {
-    _inherits(Redeemable, _library$Base14);
+  library.Redeemable = function (_library$Base18) {
+    _inherits(Redeemable, _library$Base18);
 
     function Redeemable() {
       _classCallCheck(this, Redeemable);
@@ -833,8 +923,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.State = function (_library$Base15) {
-    _inherits(State, _library$Base15);
+  library.State = function (_library$Base19) {
+    _inherits(State, _library$Base19);
 
     function State() {
       _classCallCheck(this, State);
@@ -852,8 +942,8 @@ Occasion.Modules.push(function (library) {
 Occasion.Modules.push(function (library) {
   var _class, _temp;
 
-  library.TimeSlot = (_temp = _class = function (_library$Base16) {
-    _inherits(TimeSlot, _library$Base16);
+  library.TimeSlot = (_temp = _class = function (_library$Base20) {
+    _inherits(TimeSlot, _library$Base20);
 
     function TimeSlot() {
       _classCallCheck(this, TimeSlot);
@@ -920,8 +1010,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Transaction = function (_library$Base17) {
-    _inherits(Transaction, _library$Base17);
+  library.Transaction = function (_library$Base21) {
+    _inherits(Transaction, _library$Base21);
 
     function Transaction() {
       _classCallCheck(this, Transaction);
@@ -942,8 +1032,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Venue = function (_library$Base18) {
-    _inherits(Venue, _library$Base18);
+  library.Venue = function (_library$Base22) {
+    _inherits(Venue, _library$Base22);
 
     function Venue() {
       _classCallCheck(this, Venue);
