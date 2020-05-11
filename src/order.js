@@ -166,7 +166,7 @@ Occasion.Modules.push(function (library) {
   library.Order.belongsTo('merchant')
   library.Order.belongsTo('product')
 
-  library.Order.hasOne('orderFulfillment', { autosave: true })
+  library.Order.hasOne('fulfillment', { autosave: true })
 
   library.Order.hasMany('answers', { autosave: true, inverseOf: 'order' })
   library.Order.hasMany('attendees', { autosave: true, inverseOf: 'order' })

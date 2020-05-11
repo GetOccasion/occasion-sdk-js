@@ -1,12 +1,12 @@
 Occasion.Modules.push(function (library) {
-  library.OrderFulfillmentRecipient = class OrderFulfillmentRecipient extends library.Base {}
+  library.Recipient = class Recipient extends library.Base {}
 
-  library.OrderFulfillmentRecipient.className = 'OrderFulfillmentRecipient'
-  library.OrderFulfillmentRecipient.queryName = 'order_fulfillments'
+  library.Recipient.className = 'Recipient'
+  library.Recipient.queryName = 'recipients'
 
-  library.OrderFulfillmentRecipient.belongsTo('orderFulfillmentDetails')
+  library.Recipient.belongsTo('details') // FIXME: Does this work?
 
-  library.OrderFulfillmentRecipient.attributes(
+  library.Recipient.attributes(
     'addressLine1',
     'addressLine2',
     'addressLine3',

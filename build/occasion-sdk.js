@@ -399,8 +399,31 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Label = function (_library$Base7) {
-    _inherits(Label, _library$Base7);
+  library.Fulfillment = function (_library$Base7) {
+    _inherits(Fulfillment, _library$Base7);
+
+    function Fulfillment() {
+      _classCallCheck(this, Fulfillment);
+
+      return _possibleConstructorReturn(this, (Fulfillment.__proto__ || Object.getPrototypeOf(Fulfillment)).apply(this, arguments));
+    }
+
+    return Fulfillment;
+  }(library.Base);
+
+  library.Fulfillment.className = 'Fulfillment';
+  library.Fulfillment.queryName = 'fulfillments';
+
+  library.Fulfillment.belongsTo('order');
+  library.Fulfillment.hasOne('shipmentDetails', { autosave: true });
+  library.Fulfillment.hasOne('pickupDetail', { autosave: true });
+
+  library.Fulfillment.attributes('fulfillmentType');
+});
+
+Occasion.Modules.push(function (library) {
+  library.Label = function (_library$Base8) {
+    _inherits(Label, _library$Base8);
 
     function Label() {
       _classCallCheck(this, Label);
@@ -418,8 +441,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Merchant = function (_library$Base8) {
-    _inherits(Merchant, _library$Base8);
+  library.Merchant = function (_library$Base9) {
+    _inherits(Merchant, _library$Base9);
 
     function Merchant() {
       _classCallCheck(this, Merchant);
@@ -439,8 +462,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Option = function (_library$Base9) {
-    _inherits(Option, _library$Base9);
+  library.Option = function (_library$Base10) {
+    _inherits(Option, _library$Base10);
 
     function Option() {
       _classCallCheck(this, Option);
@@ -459,8 +482,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Order = function (_library$Base10) {
-    _inherits(Order, _library$Base10);
+  library.Order = function (_library$Base11) {
+    _inherits(Order, _library$Base11);
 
     function Order() {
       _classCallCheck(this, Order);
@@ -610,7 +633,7 @@ Occasion.Modules.push(function (library) {
   library.Order.belongsTo('merchant');
   library.Order.belongsTo('product');
 
-  library.Order.hasOne('orderFulfillment', { autosave: true });
+  library.Order.hasOne('fulfillment', { autosave: true });
 
   library.Order.hasMany('answers', { autosave: true, inverseOf: 'order' });
   library.Order.hasMany('attendees', { autosave: true, inverseOf: 'order' });
@@ -618,7 +641,7 @@ Occasion.Modules.push(function (library) {
   library.Order.hasMany('transactions', { autosave: true, inverseOf: 'order' });
 
   library.Order.afterRequest(function () {
-    var _this13 = this;
+    var _this14 = this;
 
     if (this.product() && !this.product().attendeeQuestions.empty()) {
       var diff = this.quantity - this.attendees().size();
@@ -636,9 +659,9 @@ Occasion.Modules.push(function (library) {
 
     // Wrap these in Decimal
     ActiveResource.Collection.build(['buyerBookingFee', 'buyerDueToday', 'buyerDueTodayAfterGiftCards', 'buyerTotalWithoutGiftCards', 'couponAmount', 'dropInsDiscount', 'giftCardAmount', 'outstandingBalance', 'paymentDueOnEvent', 'price', 'quantity', 'serviceFee', 'subtotal', 'tax', 'taxPercentage', 'total', 'totalDiscount', 'totalDiscountsGiftCards', 'totalTaxesFees']).select(function (attr) {
-      return _this13[attr];
+      return _this14[attr];
     }).each(function (attr) {
-      _this13[attr] = new Decimal(_this13[attr]);
+      _this14[attr] = new Decimal(_this14[attr]);
     });
 
     if (this.outstandingBalance && !this.outstandingBalance.isZero()) {
@@ -652,7 +675,7 @@ Occasion.Modules.push(function (library) {
       if (this.outstandingBalance.isPositive()) {
         if (!giftCardTransactions.empty()) {
           giftCardTransactions.each(function (t) {
-            if (_this13.outstandingBalance.isZero()) return;
+            if (_this14.outstandingBalance.isZero()) return;
 
             var amount = new Decimal(t.amount);
             var giftCardValue = new Decimal(t.paymentMethod().value);
@@ -660,40 +683,40 @@ Occasion.Modules.push(function (library) {
 
             if (remainingGiftCardBalance.isZero()) return;
 
-            if (remainingGiftCardBalance.greaterThanOrEqualTo(_this13.outstandingBalance)) {
-              amount = amount.plus(_this13.outstandingBalance);
-              _this13.outstandingBalance = new Decimal(0);
+            if (remainingGiftCardBalance.greaterThanOrEqualTo(_this14.outstandingBalance)) {
+              amount = amount.plus(_this14.outstandingBalance);
+              _this14.outstandingBalance = new Decimal(0);
             } else {
               amount = remainingGiftCardBalance;
-              _this13.outstandingBalance = _this13.outstandingBalance.minus(remainingGiftCardBalance);
+              _this14.outstandingBalance = _this14.outstandingBalance.minus(remainingGiftCardBalance);
             }
 
             t.amount = amount.toString();
 
-            _this13.transactions().target().delete(t);
-            t.__createClone({ cloner: _this13 });
+            _this14.transactions().target().delete(t);
+            t.__createClone({ cloner: _this14 });
           });
         }
       } else {
         if (!giftCardTransactions.empty()) {
           ActiveResource.Collection.build(giftCardTransactions.toArray().reverse()).each(function (t) {
-            if (_this13.outstandingBalance.isZero()) return;
+            if (_this14.outstandingBalance.isZero()) return;
 
             var amount = new Decimal(t.amount);
 
-            if (amount.greaterThan(_this13.outstandingBalance.abs())) {
-              amount = amount.plus(_this13.outstandingBalance);
-              _this13.outstandingBalance = new Decimal(0);
+            if (amount.greaterThan(_this14.outstandingBalance.abs())) {
+              amount = amount.plus(_this14.outstandingBalance);
+              _this14.outstandingBalance = new Decimal(0);
             } else {
-              _this13.outstandingBalance = _this13.outstandingBalance.plus(amount);
+              _this14.outstandingBalance = _this14.outstandingBalance.plus(amount);
 
-              _this13.removeCharge(t.paymentMethod());
+              _this14.removeCharge(t.paymentMethod());
               return;
             }
 
             t.amount = amount.toString();
-            _this13.transactions().target().delete(t);
-            t.__createClone({ cloner: _this13 });
+            _this14.transactions().target().delete(t);
+            t.__createClone({ cloner: _this14 });
           });
         }
       }
@@ -717,96 +740,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.OrderFulfillment = function (_library$Base11) {
-    _inherits(OrderFulfillment, _library$Base11);
-
-    function OrderFulfillment() {
-      _classCallCheck(this, OrderFulfillment);
-
-      return _possibleConstructorReturn(this, (OrderFulfillment.__proto__ || Object.getPrototypeOf(OrderFulfillment)).apply(this, arguments));
-    }
-
-    return OrderFulfillment;
-  }(library.Base);
-
-  library.OrderFulfillment.className = 'OrderFulfillment';
-  library.OrderFulfillment.queryName = 'order_fulfillments';
-
-  library.OrderFulfillment.belongsTo('order');
-  library.OrderFulfillment.hasOne('orderFulfillmentShipmentDetails', { autosave: true });
-  library.OrderFulfillment.hasOne('orderFulfillmentPickupDetails', { autosave: true });
-
-  library.OrderFulfillment.attributes('fulfillmentType');
-});
-
-Occasion.Modules.push(function (library) {
-  library.OrderFulfillmentPickupDetails = function (_library$Base12) {
-    _inherits(OrderFulfillmentPickupDetails, _library$Base12);
-
-    function OrderFulfillmentPickupDetails() {
-      _classCallCheck(this, OrderFulfillmentPickupDetails);
-
-      return _possibleConstructorReturn(this, (OrderFulfillmentPickupDetails.__proto__ || Object.getPrototypeOf(OrderFulfillmentPickupDetails)).apply(this, arguments));
-    }
-
-    return OrderFulfillmentPickupDetails;
-  }(library.Base);
-
-  library.OrderFulfillmentPickupDetails.className = 'OrderFulfillmentPickupDetails';
-  library.OrderFulfillmentPickupDetails.queryName = 'order_fulfillments_pickup_details';
-
-  library.OrderFulfillmentPickupDetails.belongsTo('orderFulfillment');
-  library.OrderFulfillmentPickupDetails.hasOne('orderFulfillmentRecipient', { autosave: true });
-
-  library.OrderFulfillmentPickupDetails.attributes('expiredAt', 'expiresAt', 'isCurbsidePickup', 'curbsideDetails', 'pickupAt', 'pickupWindowDuration', 'readyAt', 'scheduleType', 'placedAt');
-});
-
-Occasion.Modules.push(function (library) {
-  library.OrderFulfillmentRecipient = function (_library$Base13) {
-    _inherits(OrderFulfillmentRecipient, _library$Base13);
-
-    function OrderFulfillmentRecipient() {
-      _classCallCheck(this, OrderFulfillmentRecipient);
-
-      return _possibleConstructorReturn(this, (OrderFulfillmentRecipient.__proto__ || Object.getPrototypeOf(OrderFulfillmentRecipient)).apply(this, arguments));
-    }
-
-    return OrderFulfillmentRecipient;
-  }(library.Base);
-
-  library.OrderFulfillmentRecipient.className = 'OrderFulfillmentRecipient';
-  library.OrderFulfillmentRecipient.queryName = 'order_fulfillments';
-
-  library.OrderFulfillmentRecipient.belongsTo('orderFulfillmentDetails');
-
-  library.OrderFulfillmentRecipient.attributes('addressLine1', 'addressLine2', 'addressLine3', 'administrativeDistrictLevel1', 'administrativeDistrictLevel2', 'administrativeDistrictLevel3', 'country', 'displayName', 'emailAddress', 'firstName', 'lastName', 'locality', 'organization', 'phoneNumber', 'postalCode', 'sublocality', 'sublocality2', 'sublocality3');
-});
-
-Occasion.Modules.push(function (library) {
-  library.OrderFulfillmentShipmentDetails = function (_library$Base14) {
-    _inherits(OrderFulfillmentShipmentDetails, _library$Base14);
-
-    function OrderFulfillmentShipmentDetails() {
-      _classCallCheck(this, OrderFulfillmentShipmentDetails);
-
-      return _possibleConstructorReturn(this, (OrderFulfillmentShipmentDetails.__proto__ || Object.getPrototypeOf(OrderFulfillmentShipmentDetails)).apply(this, arguments));
-    }
-
-    return OrderFulfillmentShipmentDetails;
-  }(library.Base);
-
-  library.OrderFulfillmentShipmentDetails.className = 'OrderFulfillmentShipmentDetails';
-  library.OrderFulfillmentShipmentDetails.queryName = 'order_fulfillments_shipment_details';
-
-  library.OrderFulfillmentShipmentDetails.belongsTo('orderFulfillment');
-  library.OrderFulfillmentShipmentDetails.hasOne('orderFulfillmentRecipient', { autosave: true });
-
-  library.OrderFulfillmentShipmentDetails.attributes('carrier', 'shippingNote', 'shippingType');
-});
-
-Occasion.Modules.push(function (library) {
-  library.PaymentMethod = function (_library$Base15) {
-    _inherits(PaymentMethod, _library$Base15);
+  library.PaymentMethod = function (_library$Base12) {
+    _inherits(PaymentMethod, _library$Base12);
 
     function PaymentMethod() {
       _classCallCheck(this, PaymentMethod);
@@ -824,8 +759,31 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Product = function (_library$Base16) {
-    _inherits(Product, _library$Base16);
+  library.PickupDetail = function (_library$Base13) {
+    _inherits(PickupDetail, _library$Base13);
+
+    function PickupDetail() {
+      _classCallCheck(this, PickupDetail);
+
+      return _possibleConstructorReturn(this, (PickupDetail.__proto__ || Object.getPrototypeOf(PickupDetail)).apply(this, arguments));
+    }
+
+    return PickupDetail;
+  }(library.Base);
+
+  library.PickupDetail.className = 'PickupDetail';
+  library.PickupDetail.queryName = 'pickup_details';
+
+  library.PickupDetail.belongsTo('fulfillment');
+  library.PickupDetail.hasOne('recipient', { autosave: true });
+  library.PickupDetail.hasMany('rates');
+
+  library.PickupDetail.attributes('expiredAt', 'expiresAt', 'isCurbsidePickup', 'curbsideDetails', 'pickupAt', 'pickupWindowDuration', 'readyAt', 'scheduleType', 'placedAt');
+});
+
+Occasion.Modules.push(function (library) {
+  library.Product = function (_library$Base14) {
+    _inherits(Product, _library$Base14);
 
     function Product() {
       _classCallCheck(this, Product);
@@ -882,8 +840,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Question = function (_library$Base17) {
-    _inherits(Question, _library$Base17);
+  library.Question = function (_library$Base15) {
+    _inherits(Question, _library$Base15);
 
     function Question() {
       _classCallCheck(this, Question);
@@ -900,6 +858,46 @@ Occasion.Modules.push(function (library) {
   library.Question.belongsTo('product');
   library.Question.hasMany('answers');
   library.Question.hasMany('options');
+});
+
+Occasion.Modules.push(function (library) {
+  library.Rate = function (_library$Base16) {
+    _inherits(Rate, _library$Base16);
+
+    function Rate() {
+      _classCallCheck(this, Rate);
+
+      return _possibleConstructorReturn(this, (Rate.__proto__ || Object.getPrototypeOf(Rate)).apply(this, arguments));
+    }
+
+    return Rate;
+  }(library.Base);
+
+  library.Rate.className = 'Rate';
+  library.Rate.queryName = 'rates';
+
+  library.Rate.attributes('fulfillment_uid', 'fee', 'eta', 'carrier', 'service', 'expires_at');
+});
+
+Occasion.Modules.push(function (library) {
+  library.Recipient = function (_library$Base17) {
+    _inherits(Recipient, _library$Base17);
+
+    function Recipient() {
+      _classCallCheck(this, Recipient);
+
+      return _possibleConstructorReturn(this, (Recipient.__proto__ || Object.getPrototypeOf(Recipient)).apply(this, arguments));
+    }
+
+    return Recipient;
+  }(library.Base);
+
+  library.Recipient.className = 'Recipient';
+  library.Recipient.queryName = 'recipients';
+
+  library.Recipient.belongsTo('details'); // FIXME: Does this work?
+
+  library.Recipient.attributes('addressLine1', 'addressLine2', 'addressLine3', 'administrativeDistrictLevel1', 'administrativeDistrictLevel2', 'administrativeDistrictLevel3', 'country', 'displayName', 'emailAddress', 'firstName', 'lastName', 'locality', 'organization', 'phoneNumber', 'postalCode', 'sublocality', 'sublocality2', 'sublocality3');
 });
 
 Occasion.Modules.push(function (library) {
@@ -923,8 +921,31 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.State = function (_library$Base19) {
-    _inherits(State, _library$Base19);
+  library.ShipmentDetail = function (_library$Base19) {
+    _inherits(ShipmentDetail, _library$Base19);
+
+    function ShipmentDetail() {
+      _classCallCheck(this, ShipmentDetail);
+
+      return _possibleConstructorReturn(this, (ShipmentDetail.__proto__ || Object.getPrototypeOf(ShipmentDetail)).apply(this, arguments));
+    }
+
+    return ShipmentDetail;
+  }(library.Base);
+
+  library.ShipmentDetail.className = 'ShipmentDetail';
+  library.ShipmentDetail.queryName = 'shipment_details';
+
+  library.ShipmentDetail.belongsTo('fulfillment');
+  library.ShipmentDetail.hasOne('recipient', { autosave: true });
+  library.ShipmentDetail.hasMany('rates');
+
+  library.ShipmentDetail.attributes('carrier', 'shippingNote', 'shippingType');
+});
+
+Occasion.Modules.push(function (library) {
+  library.State = function (_library$Base20) {
+    _inherits(State, _library$Base20);
 
     function State() {
       _classCallCheck(this, State);
@@ -942,8 +963,8 @@ Occasion.Modules.push(function (library) {
 Occasion.Modules.push(function (library) {
   var _class, _temp;
 
-  library.TimeSlot = (_temp = _class = function (_library$Base20) {
-    _inherits(TimeSlot, _library$Base20);
+  library.TimeSlot = (_temp = _class = function (_library$Base21) {
+    _inherits(TimeSlot, _library$Base21);
 
     function TimeSlot() {
       _classCallCheck(this, TimeSlot);
@@ -1010,8 +1031,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Transaction = function (_library$Base21) {
-    _inherits(Transaction, _library$Base21);
+  library.Transaction = function (_library$Base22) {
+    _inherits(Transaction, _library$Base22);
 
     function Transaction() {
       _classCallCheck(this, Transaction);
@@ -1032,8 +1053,8 @@ Occasion.Modules.push(function (library) {
 });
 
 Occasion.Modules.push(function (library) {
-  library.Venue = function (_library$Base22) {
-    _inherits(Venue, _library$Base22);
+  library.Venue = function (_library$Base23) {
+    _inherits(Venue, _library$Base23);
 
     function Venue() {
       _classCallCheck(this, Venue);
