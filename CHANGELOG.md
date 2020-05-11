@@ -1,13 +1,29 @@
-# 0.1.1
+## Unreleased
 
-- Change client initialization to options object
-  - `Occasion.Client({ token: ... })`
-  - Allow override of API url with `baseUrl` option
+## 0.2.4
 
-# 0.2.0
+- Decouple time slots from products
+- Add Fulfillments to SDK
 
-- Use `Content-Type: 'application/json'`
-- Only add answers in `Order.construct` for questions where `category != 'static'`
+## 0.2.3
+
+- Add `TimeSlot.constructCalendar(timeZone, month)`
+- Change `TimeSlot.constructCalendar` to accept either `month` as first arg with `options` as second, or
+  `options` as first arg
+  - Add `status` option for choosing what status timeslots the calendar consists of
+    - If `status !== 'bookable'`, allow `prevPage` to be requested on first page of calendar
+  - Change `timeZone` to be **mandatory** option
+- Change `constructCalendar` to always start at beginning of month provided
+- Add `Label` class
+- Remove support for `calculatePrice` and `retrieveInformation`
+- Add support for drop ins discount
+
+## 0.2.2
+
+- Add `Answer#valid()` for determining if each `formControl` permutation has a valid `value`
+- Add `Customer#complete()` and `Attendee#complete()` for determining if all fields are filled out for them
+- Add `TimeSlot#toString(format)` for outputting timeSlot.startsAt + duration to string based on a format argument
+- Improve `Pr
 
 ## 0.2.1
 
@@ -31,26 +47,15 @@
 - Wrap Order price-related attributes in Decimal.js objects
 - Rebalance changed outstandingBalance across gift card and other payment transactions
 
-## 0.2.2
+# 0.2.0
 
-- Add `Answer#valid()` for determining if each `formControl` permutation has a valid `value`
-- Add `Customer#complete()` and `Attendee#complete()` for determining if all fields are filled out for them
-- Add `TimeSlot#toString(format)` for outputting timeSlot.startsAt + duration to string based on a format argument
-- Improve `Product#constructCalendar` preloading so it continually preloads further months
+- Use `Content-Type: 'application/json'`
+- Only add answers in `Order.construct` for questions where `category != 'static'`
 
-## 0.2.3
+# 0.1.1
 
-- Add `TimeSlot.constructCalendar(timeZone, month)`
-- Change `TimeSlot.constructCalendar` to accept either `month` as first arg with `options` as second, or
-  `options` as first arg
-  - Add `status` option for choosing what status timeslots the calendar consists of
-    - If `status !== 'bookable'`, allow `prevPage` to be requested on first page of calendar
-  - Change `timeZone` to be **mandatory** option
-- Change `constructCalendar` to always start at beginning of month provided
-- Add `Label` class
-- Remove support for `calculatePrice` and `retrieveInformation`
-- Add support for drop ins discount
+- Change client initialization to options object
+  - `Occasion.Client({ token: ... })`
+  - Allow override of API url with `baseUrl` option
 
-## Master
-
-- Decouple time slots from products
+oduct#constructCalendar` preloading so it continually preloads further months

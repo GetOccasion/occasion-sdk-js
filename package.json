@@ -1,5 +1,5 @@
 {
-  "name": "occasion-sdk",
+  "name": "@getoccasion/sdk",
   "version": "0.2.3",
   "description": "An SDK library that enables access to Occasion's application, providing a rich DSL for creating and managing bookings.",
   "main": "build/occasion-sdk.js",
@@ -17,7 +17,7 @@
     "sdk",
     "bookings"
   ],
-  "author": "Peak Labs, LLC, DBA Occasion App",
+  "author": "Peak Labs LLC dba Occasion, Pelle ten Cate, Kieran Klaassen",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/GetOccasion/occasion-sdk-js/issues"
