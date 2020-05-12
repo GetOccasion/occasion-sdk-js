@@ -416,7 +416,7 @@ Occasion.Modules.push(function (library) {
 
   library.Fulfillment.belongsTo('order');
   library.Fulfillment.hasOne('shipmentDetails', { autosave: true });
-  library.Fulfillment.hasOne('pickupDetail', { autosave: true });
+  library.Fulfillment.hasOne('pickupDetails', { autosave: true });
 
   library.Fulfillment.attributes('fulfillmentType');
 });
@@ -566,6 +566,10 @@ Occasion.Modules.push(function (library) {
             zip: null,
             phone: null
           });
+        }
+
+        if (order.product().fulfills && order.fulfillment() == null) {
+          order.buildFulfillment();
         }
 
         var promises = [new Promise(function (resolve) {

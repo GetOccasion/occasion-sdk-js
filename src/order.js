@@ -18,6 +18,10 @@ Occasion.Modules.push(function (library) {
         })
       }
 
+      if (order.product().fulfills && order.fulfillment() == null) {
+        order.buildFulfillment()
+      }
+
       var promises = [
         new Promise(function (resolve) {
           resolve(order)
