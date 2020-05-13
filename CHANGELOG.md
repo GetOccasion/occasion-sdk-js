@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.2.5
+
+- If a product needs fulfillment, build an empty fulfillment on order initializiation
+
 ## 0.2.4
 
 - Decouple time slots from products
