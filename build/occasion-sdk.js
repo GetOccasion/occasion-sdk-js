@@ -410,14 +410,11 @@ Occasion.Modules.push(function (library) {
 
     return Fulfillment;
   }(library.Base);
-
   library.Fulfillment.className = 'Fulfillment';
   library.Fulfillment.queryName = 'fulfillments';
-
-  library.Fulfillment.belongsTo('order');
-  library.Fulfillment.hasOne('shipmentDetails', { autosave: true });
-  library.Fulfillment.hasOne('pickupDetails', { autosave: true });
-
+  library.Fulfillment.belongsTo('order', { inverseOf: 'fulfillment' });
+  library.Fulfillment.hasOne('shipmentDetails', { autosave: true, inverseOf: 'fulfillment' });
+  library.Fulfillment.hasOne('pickupDetails', { autosave: true, inverseOf: 'fulfillment' });
   library.Fulfillment.attributes('fulfillmentType');
 });
 
@@ -780,7 +777,7 @@ Occasion.Modules.push(function (library) {
   library.PickupDetail.className = 'PickupDetail';
   library.PickupDetail.queryName = 'pickup_details';
 
-  library.PickupDetail.belongsTo('fulfillment');
+  library.PickupDetail.belongsTo('fulfillment', { inverseOf: 'pickupDetails' });
   library.PickupDetail.hasOne('recipient', { autosave: true });
   library.PickupDetail.hasMany('rates');
 
@@ -942,8 +939,8 @@ Occasion.Modules.push(function (library) {
   library.ShipmentDetail.className = 'ShipmentDetail';
   library.ShipmentDetail.queryName = 'shipment_details';
 
-  library.ShipmentDetail.belongsTo('fulfillment');
-  library.ShipmentDetail.hasOne('recipient', { autosave: true });
+  library.ShipmentDetail.belongsTo('fulfillment', { inverseOf: 'shipmentDetails' });
+  library.ShipmentDetail.hasOne('recipient', { autosave: true, inverseOf: 'shipmentDetails' });
   library.ShipmentDetail.hasMany('rates');
 
   library.ShipmentDetail.attributes('carrier', 'shippingNote', 'shippingType');
