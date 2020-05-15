@@ -5,7 +5,6 @@ Occasion.Modules.push(function (library) {
   library.PickupDetail.queryName = 'pickup_details'
 
   library.PickupDetail.belongsTo('fulfillment', { inverseOf: 'pickupDetails' })
-  library.PickupDetail.hasOne('recipient', { autosave: true })
   library.PickupDetail.hasMany('rates')
 
   library.PickupDetail.attributes(

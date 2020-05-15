@@ -410,11 +410,15 @@ Occasion.Modules.push(function (library) {
 
     return Fulfillment;
   }(library.Base);
+
   library.Fulfillment.className = 'Fulfillment';
   library.Fulfillment.queryName = 'fulfillments';
+
   library.Fulfillment.belongsTo('order', { inverseOf: 'fulfillment' });
   library.Fulfillment.hasOne('shipmentDetails', { autosave: true, inverseOf: 'fulfillment' });
   library.Fulfillment.hasOne('pickupDetails', { autosave: true, inverseOf: 'fulfillment' });
+  library.Fulfillment.hasOne('recipient', { autosave: true, inverseOf: 'fulfillment' });
+
   library.Fulfillment.attributes('fulfillmentType');
 });
 
@@ -778,7 +782,6 @@ Occasion.Modules.push(function (library) {
   library.PickupDetail.queryName = 'pickup_details';
 
   library.PickupDetail.belongsTo('fulfillment', { inverseOf: 'pickupDetails' });
-  library.PickupDetail.hasOne('recipient', { autosave: true });
   library.PickupDetail.hasMany('rates');
 
   library.PickupDetail.attributes('expiredAt', 'expiresAt', 'isCurbsidePickup', 'curbsideDetails', 'pickupAt', 'pickupWindowDuration', 'readyAt', 'scheduleType', 'placedAt');
@@ -898,7 +901,7 @@ Occasion.Modules.push(function (library) {
   library.Recipient.className = 'Recipient';
   library.Recipient.queryName = 'recipients';
 
-  library.Recipient.belongsTo('details'); // FIXME: Does this work?
+  library.Recipient.belongsTo('fulfillment', { inverseOf: 'recipient' });
 
   library.Recipient.attributes('addressLine1', 'addressLine2', 'addressLine3', 'administrativeDistrictLevel1', 'administrativeDistrictLevel2', 'administrativeDistrictLevel3', 'country', 'displayName', 'emailAddress', 'firstName', 'lastName', 'locality', 'organization', 'phoneNumber', 'postalCode', 'sublocality', 'sublocality2', 'sublocality3');
 });
@@ -940,7 +943,6 @@ Occasion.Modules.push(function (library) {
   library.ShipmentDetail.queryName = 'shipment_details';
 
   library.ShipmentDetail.belongsTo('fulfillment', { inverseOf: 'shipmentDetails' });
-  library.ShipmentDetail.hasOne('recipient', { autosave: true, inverseOf: 'shipmentDetails' });
   library.ShipmentDetail.hasMany('rates');
 
   library.ShipmentDetail.attributes('carrier', 'shippingNote', 'shippingType');
