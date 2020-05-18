@@ -1,6 +1,6 @@
 {
   "name": "@getoccasion/sdk",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "An SDK library that enables access to Occasion's application, providing a rich DSL for creating and managing bookings.",
   "main": "build/occasion-sdk.js",
   "scripts": {
