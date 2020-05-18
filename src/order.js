@@ -2,10 +2,7 @@ Occasion.Modules.push(function (library) {
   library.Order = class Order extends library.Base {
     static construct(attributes) {
       var order = this.includes('currency', {
-        fulfillment: [
-          { pickupDetails: ['recipient', 'rates'] },
-          { shipmentDetails: ['recipient', 'rates'] }
-        ]
+        fulfillment: ['recipient', { pickupDetails: 'rates' }, { shipmentDetails: 'rates' }]
       }).build(attributes)
 
       order.sessionIdentifier =

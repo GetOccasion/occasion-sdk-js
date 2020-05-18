@@ -554,7 +554,7 @@ Occasion.Modules.push(function (library) {
       key: 'construct',
       value: function construct(attributes) {
         var order = this.includes('currency', {
-          fulfillment: [{ pickupDetails: ['recipient', 'rates'] }, { shipmentDetails: ['recipient', 'rates'] }]
+          fulfillment: ['recipient', { pickupDetails: 'rates' }, { shipmentDetails: 'rates' }]
         }).build(attributes);
 
         order.sessionIdentifier = order.sessionIdentifier || Math.random().toString(36).substring(7) + '-' + Date.now();
