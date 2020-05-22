@@ -1,4 +1,4 @@
-Occasion.Modules.push(function(library) {
+Occasion.Modules.push(function (library) {
   library.Product = class Product extends library.Base {
     constructCalendar(month, options = {}) {
       return Occasion.__constructCalendar(month, {
@@ -27,8 +27,8 @@ Occasion.Modules.push(function(library) {
   library.Product.hasOne('lastTimeSlot', { className: 'TimeSlot' })
   library.Product.hasOne('firstFilteredTimeSlot', { className: 'TimeSlot' })
 
-  library.Product.afterRequest(function() {
-    this.attendeeQuestions = ActiveResource.Collection.build(this.attendeeQuestions).map(q => {
+  library.Product.afterRequest(function () {
+    this.attendeeQuestions = ActiveResource.Collection.build(this.attendeeQuestions).map((q) => {
       return s.camelize(q, true)
     })
 

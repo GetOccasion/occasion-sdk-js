@@ -1,4 +1,4 @@
-Occasion.Modules.push(function(library) {
+Occasion.Modules.push(function (library) {
   library.Merchant = class Merchant extends library.Base {}
 
   library.Merchant.className = 'Merchant'

@@ -4,8 +4,6 @@ Occasion.Modules.push(function (library) {
   library.Recipient.className = 'Recipient'
   library.Recipient.queryName = 'recipients'
 
-  library.Recipient.belongsTo('fulfillment', { inverseOf: 'recipient' })
-
   library.Recipient.attributes(
     'addressLine1',
     'addressLine2',

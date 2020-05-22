@@ -417,7 +417,7 @@ Occasion.Modules.push(function (library) {
   library.Fulfillment.belongsTo('order', { inverseOf: 'fulfillment' });
   library.Fulfillment.hasOne('shipmentDetails', { autosave: true, inverseOf: 'fulfillment' });
   library.Fulfillment.hasOne('pickupDetails', { autosave: true, inverseOf: 'fulfillment' });
-  library.Fulfillment.hasOne('recipient', { autosave: true, inverseOf: 'fulfillment' });
+  library.Fulfillment.hasOne('recipient', { autosave: true });
 
   library.Fulfillment.attributes('fulfillmentType');
 });
@@ -900,8 +900,6 @@ Occasion.Modules.push(function (library) {
 
   library.Recipient.className = 'Recipient';
   library.Recipient.queryName = 'recipients';
-
-  library.Recipient.belongsTo('fulfillment', { inverseOf: 'recipient' });
 
   library.Recipient.attributes('addressLine1', 'addressLine2', 'addressLine3', 'administrativeDistrictLevel1', 'administrativeDistrictLevel2', 'administrativeDistrictLevel3', 'country', 'displayName', 'emailAddress', 'firstName', 'lastName', 'locality', 'organization', 'phoneNumber', 'postalCode', 'sublocality', 'sublocality2', 'sublocality3');
 });

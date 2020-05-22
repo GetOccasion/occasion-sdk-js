@@ -7,7 +7,7 @@ Occasion.Modules.push(function (library) {
   library.Fulfillment.belongsTo('order', { inverseOf: 'fulfillment' })
   library.Fulfillment.hasOne('shipmentDetails', { autosave: true, inverseOf: 'fulfillment' })
   library.Fulfillment.hasOne('pickupDetails', { autosave: true, inverseOf: 'fulfillment' })
-  library.Fulfillment.hasOne('recipient', { autosave: true, inverseOf: 'fulfillment' })
+  library.Fulfillment.hasOne('recipient', { autosave: true })
 
   library.Fulfillment.attributes('fulfillmentType')
 })
