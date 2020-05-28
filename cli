@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+const repl = require('coffeescript/repl')
+
+const SDK = require('./build/occasion-sdk.js')
+const util = require('util')
+
+let O = new SDK.Client({
+  baseUrl: 'http://localhost:3000/api/v1',
+  token: '3fab810787084bf188db835a76643778',
+  secret: '9de7f5986e9b4b55855ef38898c77671'
+})
+
+for (const key in O) {
+  global[key] = O[key]
+}
+
+repl.start({ prompt: 'oxncoffee> ', useGlobal: true })
