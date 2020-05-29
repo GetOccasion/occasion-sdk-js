@@ -5,7 +5,6 @@ Occasion.Modules.push(function (library) {
   library.PickupDetail.queryName = 'pickup_details'
 
   library.PickupDetail.belongsTo('fulfillment', { inverseOf: 'pickupDetails' })
-  library.PickupDetail.hasMany('rates')
 
   library.PickupDetail.attributes(
     'expiredAt',
@@ -16,6 +15,7 @@ Occasion.Modules.push(function (library) {
     'pickupWindowDuration',
     'readyAt',
     'scheduleType',
-    'placedAt'
+    'placedAt',
+    'dropoffAt'
   )
 })

@@ -554,7 +554,7 @@ Occasion.Modules.push(function (library) {
       key: 'construct',
       value: function construct(attributes) {
         var order = this.includes('currency', {
-          fulfillment: ['recipient', { pickupDetails: 'rates' }, { shipmentDetails: 'rates' }]
+          fulfillment: ['recipient', 'pickupDetails', 'shipmentDetails']
         }).build(attributes);
 
         order.sessionIdentifier = order.sessionIdentifier || Math.random().toString(36).substring(7) + '-' + Date.now();
@@ -640,7 +640,7 @@ Occasion.Modules.push(function (library) {
   library.Order.belongsTo('merchant');
   library.Order.belongsTo('product');
 
-  library.Order.hasOne('fulfillment', { autosave: true });
+  library.Order.hasOne('fulfillment', { autosave: true, inverseOf: 'order' });
 
   library.Order.hasMany('answers', { autosave: true, inverseOf: 'order' });
   library.Order.hasMany('attendees', { autosave: true, inverseOf: 'order' });
@@ -782,9 +782,8 @@ Occasion.Modules.push(function (library) {
   library.PickupDetail.queryName = 'pickup_details';
 
   library.PickupDetail.belongsTo('fulfillment', { inverseOf: 'pickupDetails' });
-  library.PickupDetail.hasMany('rates');
 
-  library.PickupDetail.attributes('expiredAt', 'expiresAt', 'isCurbsidePickup', 'curbsideDetails', 'pickupAt', 'pickupWindowDuration', 'readyAt', 'scheduleType', 'placedAt');
+  library.PickupDetail.attributes('expiredAt', 'expiresAt', 'isCurbsidePickup', 'curbsideDetails', 'pickupAt', 'pickupWindowDuration', 'readyAt', 'scheduleType', 'placedAt', 'dropoffAt');
 });
 
 Occasion.Modules.push(function (library) {

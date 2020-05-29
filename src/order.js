@@ -2,7 +2,7 @@ Occasion.Modules.push(function (library) {
   library.Order = class Order extends library.Base {
     static construct(attributes) {
       var order = this.includes('currency', {
-        fulfillment: ['recipient', { pickupDetails: 'rates' }, { shipmentDetails: 'rates' }]
+        fulfillment: ['recipient', 'pickupDetails', 'shipmentDetails']
       }).build(attributes)
 
       order.sessionIdentifier =
@@ -172,7 +172,7 @@ Occasion.Modules.push(function (library) {
   library.Order.belongsTo('merchant')
   library.Order.belongsTo('product')
 
-  library.Order.hasOne('fulfillment', { autosave: true })
+  library.Order.hasOne('fulfillment', { autosave: true, inverseOf: 'order' })
 
   library.Order.hasMany('answers', { autosave: true, inverseOf: 'order' })
   library.Order.hasMany('attendees', { autosave: true, inverseOf: 'order' })
