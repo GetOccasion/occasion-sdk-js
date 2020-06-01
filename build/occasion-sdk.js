@@ -942,7 +942,7 @@ Occasion.Modules.push(function (library) {
   library.ShipmentDetail.belongsTo('fulfillment', { inverseOf: 'shipmentDetails' });
   library.ShipmentDetail.hasMany('rates');
 
-  library.ShipmentDetail.attributes('carrier', 'shippingNote', 'shippingType');
+  library.ShipmentDetail.attributes('carrier', 'shippingNote', 'shippingType', 'easyPostRateUid');
 });
 
 Occasion.Modules.push(function (library) {
