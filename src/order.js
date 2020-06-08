@@ -103,6 +103,19 @@ Occasion.Modules.push(function (library) {
       }
     }
 
+    save(callback) {
+      if (this.association('fulfillment').loaded) {
+        const fulfillment = this.fulfillment()
+
+        if (fulfillment.fulfillmentType === 'shipment') {
+          fulfillment.association('pickupDetails').reset()
+        } else {
+          fulfillment.association('shipmentDetails').reset()
+        }
+      }
+      return super.save(callback)
+    }
+
     // @private
 
     // Called by Order.construct, which injects order
@@ -150,6 +163,7 @@ Occasion.Modules.push(function (library) {
     'buyerTotalWithoutGiftCards',
     'couponAmount',
     'dropInsDiscount',
+    'fulfillmentFee',
     'giftCardAmount',
     'outstandingBalance',
     'paymentDueOnEvent',
@@ -202,6 +216,7 @@ Occasion.Modules.push(function (library) {
       'buyerTotalWithoutGiftCards',
       'couponAmount',
       'dropInsDiscount',
+      'fulfillmentFee',
       'giftCardAmount',
       'outstandingBalance',
       'paymentDueOnEvent',
@@ -293,4 +308,6 @@ Occasion.Modules.push(function (library) {
       }
     }
   })
+
+  const __save = library.Order.prototype.save
 })

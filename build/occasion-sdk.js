@@ -16,6 +16,8 @@
 
 'use strict';
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -541,6 +543,20 @@ Occasion.Modules.push(function (library) {
           this.transactions().target().delete(transaction);
         }
       }
+    }, {
+      key: 'save',
+      value: function save(callback) {
+        if (this.association('fulfillment').loaded) {
+          var fulfillment = this.fulfillment();
+
+          if (fulfillment.fulfillmentType === 'shipment') {
+            fulfillment.association('pickupDetails').reset();
+          } else {
+            fulfillment.association('shipmentDetails').reset();
+          }
+        }
+        return _get(Order.prototype.__proto__ || Object.getPrototypeOf(Order.prototype), 'save', this).call(this, callback);
+      }
 
       // @private
 
@@ -632,7 +648,7 @@ Occasion.Modules.push(function (library) {
 
   library.Order.attributes('sessionIdentifier', 'status', 'upcomingEventsEmails', 'referrerToken');
 
-  library.Order.attributes('buyerBookingFee', 'buyerDueTodayAfterGiftCards', 'buyerDueToday', 'buyerTotalWithoutGiftCards', 'couponAmount', 'dropInsDiscount', 'giftCardAmount', 'outstandingBalance', 'paymentDueOnEvent', 'price', 'quantity', 'serviceFee', 'subtotal', 'tax', 'taxPercentage', 'totalDiscountsGiftCards', 'totalTaxesFees', 'total', 'totalDiscount', { readOnly: true });
+  library.Order.attributes('buyerBookingFee', 'buyerDueTodayAfterGiftCards', 'buyerDueToday', 'buyerTotalWithoutGiftCards', 'couponAmount', 'dropInsDiscount', 'fulfillmentFee', 'giftCardAmount', 'outstandingBalance', 'paymentDueOnEvent', 'price', 'quantity', 'serviceFee', 'subtotal', 'tax', 'taxPercentage', 'totalDiscountsGiftCards', 'totalTaxesFees', 'total', 'totalDiscount', { readOnly: true });
 
   library.Order.belongsTo('coupon');
   library.Order.belongsTo('currency');
@@ -665,7 +681,7 @@ Occasion.Modules.push(function (library) {
     }
 
     // Wrap these in Decimal
-    ActiveResource.Collection.build(['buyerBookingFee', 'buyerDueToday', 'buyerDueTodayAfterGiftCards', 'buyerTotalWithoutGiftCards', 'couponAmount', 'dropInsDiscount', 'giftCardAmount', 'outstandingBalance', 'paymentDueOnEvent', 'price', 'quantity', 'serviceFee', 'subtotal', 'tax', 'taxPercentage', 'total', 'totalDiscount', 'totalDiscountsGiftCards', 'totalTaxesFees']).select(function (attr) {
+    ActiveResource.Collection.build(['buyerBookingFee', 'buyerDueToday', 'buyerDueTodayAfterGiftCards', 'buyerTotalWithoutGiftCards', 'couponAmount', 'dropInsDiscount', 'fulfillmentFee', 'giftCardAmount', 'outstandingBalance', 'paymentDueOnEvent', 'price', 'quantity', 'serviceFee', 'subtotal', 'tax', 'taxPercentage', 'total', 'totalDiscount', 'totalDiscountsGiftCards', 'totalTaxesFees']).select(function (attr) {
       return _this14[attr];
     }).each(function (attr) {
       _this14[attr] = new Decimal(_this14[attr]);
@@ -744,6 +760,8 @@ Occasion.Modules.push(function (library) {
       }
     }
   });
+
+  var __save = library.Order.prototype.save;
 });
 
 Occasion.Modules.push(function (library) {
