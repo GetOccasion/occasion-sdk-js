@@ -9,5 +9,5 @@ Occasion.Modules.push(function (library) {
   library.Fulfillment.hasOne('pickupDetails', { autosave: true, inverseOf: 'fulfillment' })
   library.Fulfillment.hasOne('recipient', { autosave: true })
 
-  library.Fulfillment.attributes('fulfillmentType')
+  library.Fulfillment.attributes('fulfillmentType', 'triggerEvent')
 })
