@@ -546,7 +546,7 @@ Occasion.Modules.push(function (library) {
     }, {
       key: 'save',
       value: function save(callback) {
-        if (this.association('fulfillment').loaded) {
+        if (this.association('fulfillment').loaded && this.fulfillment()) {
           var fulfillment = this.fulfillment();
 
           if (fulfillment.fulfillmentType === 'shipment') {

@@ -104,7 +104,7 @@ Occasion.Modules.push(function (library) {
     }
 
     save(callback) {
-      if (this.association('fulfillment').loaded) {
+      if (this.association('fulfillment').loaded && this.fulfillment()) {
         const fulfillment = this.fulfillment()
 
         if (fulfillment.fulfillmentType === 'shipment') {
