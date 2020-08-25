@@ -546,7 +546,7 @@ Occasion.Modules.push(function (library) {
     }, {
       key: 'save',
       value: function save(callback) {
-        if (this.association('fulfillment').loaded && this.fulfillment()) {
+        if (this.association('fulfillment').loaded() && this.fulfillment()) {
           var fulfillment = this.fulfillment();
 
           if (fulfillment.fulfillmentType === 'shipment') {
@@ -554,7 +554,15 @@ Occasion.Modules.push(function (library) {
           } else {
             fulfillment.association('shipmentDetails').reset();
           }
+
+          ;['pickupDetails', 'shipmentDetails', 'recipient'].forEach(function (a) {
+            var association = fulfillment.association(a);
+            if (association.loaded() && association.target && !association.target.changedFields().empty()) {
+              fulfillment.state = 'initialized';
+            }
+          });
         }
+
         return _get(Order.prototype.__proto__ || Object.getPrototypeOf(Order.prototype), 'save', this).call(this, callback);
       }
 

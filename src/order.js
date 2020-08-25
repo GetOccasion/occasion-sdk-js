@@ -104,7 +104,7 @@ Occasion.Modules.push(function (library) {
     }
 
     save(callback) {
-      if (this.association('fulfillment').loaded && this.fulfillment()) {
+      if (this.association('fulfillment').loaded() && this.fulfillment()) {
         const fulfillment = this.fulfillment()
 
         if (fulfillment.fulfillmentType === 'shipment') {
@@ -112,7 +112,19 @@ Occasion.Modules.push(function (library) {
         } else {
           fulfillment.association('shipmentDetails').reset()
         }
+
+        ;['pickupDetails', 'shipmentDetails', 'recipient'].forEach((a) => {
+          const association = fulfillment.association(a)
+          if (
+            association.loaded() &&
+            association.target &&
+            !association.target.changedFields().empty()
+          ) {
+            fulfillment.state = 'initialized'
+          }
+        })
       }
+
       return super.save(callback)
     }
 
