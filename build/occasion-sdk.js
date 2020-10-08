@@ -1,16 +1,16 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
-    define(["active-resource","axios","decimal.js-light","moment","underscore","underscore.string","moment-timezone-with-data-2010-2020"], function (a0,b1,c2,d3,e4,f5,g6) {
+    define(["active-resource","axios","decimal.js-light","moment","underscore","underscore.string","moment-timezone"], function (a0,b1,c2,d3,e4,f5,g6) {
       return (root['Occasion'] = factory(a0,b1,c2,d3,e4,f5,g6));
     });
   } else if (typeof module === 'object' && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
     // like Node.
-    module.exports = factory(require("active-resource"),require("axios"),require("decimal.js-light"),require("moment"),require("underscore"),require("underscore.string"),require("moment-timezone-with-data-2010-2020"));
+    module.exports = factory(require("active-resource"),require("axios"),require("decimal.js-light"),require("moment"),require("underscore"),require("underscore.string"),require("moment-timezone"));
   } else {
-    root['Occasion'] = factory(root["active-resource"],root["axios"],root["decimal.js-light"],root["moment"],root["underscore"],root["underscore.string"],root["moment-timezone-with-data-2010-2020"]);
+    root['Occasion'] = factory(root["active-resource"],root["axios"],root["decimal.js-light"],root["moment"],root["underscore"],root["underscore.string"],root["moment-timezone"]);
   }
 }(this, function (ActiveResource, axios, Decimal, moment, _, s) {
 
@@ -1023,6 +1023,11 @@ Occasion.Modules.push(function (library) {
         }
 
         return output;
+      }
+    }, {
+      key: 'toDateString',
+      value: function toDateString() {
+        return this.startsAt.format('ddd ll');
       }
     }]);
 

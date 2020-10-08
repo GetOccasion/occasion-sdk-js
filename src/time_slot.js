@@ -1,6 +1,6 @@
-Occasion.Modules.push(function(library) {
+Occasion.Modules.push(function (library) {
   library.TimeSlot = class TimeSlot extends library.Base {
-    static constructCalendar = function() {
+    static constructCalendar = function () {
       let month, options
       if (moment.isMoment(arguments[0])) {
         month = arguments[0]
@@ -39,6 +39,10 @@ Occasion.Modules.push(function(library) {
 
       return output
     }
+
+    toDateString() {
+      return this.startsAt.format('ddd ll')
+    }
   }
 
   library.TimeSlot.className = 'TimeSlot'
@@ -48,7 +52,7 @@ Occasion.Modules.push(function(library) {
   library.TimeSlot.belongsTo('product')
   library.TimeSlot.belongsTo('venue')
 
-  library.TimeSlot.afterRequest(function() {
+  library.TimeSlot.afterRequest(function () {
     this.startsAt = moment.tz(this.startsAt, this.timeZone)
     this.duration = moment.duration(this.duration, 'minutes')
     this.endsAt = moment.tz(this.startsAt.clone().add(this.duration), this.timeZone)
