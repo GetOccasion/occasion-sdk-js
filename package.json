@@ -26,8 +26,7 @@
   "dependencies": {
     "active-resource": "GetOccasion/activeresource.js#track_local_changes",
     "decimal.js-light": "^2.4.1",
-    "moment": "^2.22.1",
-    "moment-timezone-with-data-2010-2020": "^0.4.0"
+    "moment-timezone": "^0.5.3"
   },
   "engine": "node >= 0.10",
   "devDependencies": {

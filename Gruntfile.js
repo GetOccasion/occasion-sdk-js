@@ -1,4 +1,4 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
   // configure the tasks
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -47,7 +47,7 @@ module.exports = function(grunt) {
               'moment',
               { underscore: '_' },
               { 'underscore.string': 's' },
-              { 'moment-timezone-with-data-2010-2020': null }
+              { 'moment-timezone': null }
             ]
           }
         }
@@ -68,7 +68,7 @@ module.exports = function(grunt) {
               'qs',
               { 'jasmine-jquery': null },
               { 'jasmine-promises': null },
-              { 'moment-timezone-with-data-2010-2020': null }
+              { 'moment-timezone': null }
             ]
           }
         }
@@ -160,8 +160,7 @@ module.exports = function(grunt) {
                   '/node_modules/underscore.inflection/lib/underscore.inflection',
                 'occasion-sdk': '/build/occasion-sdk',
                 moment: '/node_modules/moment/min/moment.min',
-                'moment-timezone-with-data-2010-2020':
-                  '/node_modules/moment-timezone-with-data-2010-2020/index',
+                'moment-timezone': '/node_modules/moment-timezone',
                 moxios: '/node_modules/moxios/dist/moxios.min',
                 jquery: '/node_modules/jquery/dist/jquery.min',
                 'jasmine-jquery': '/node_modules/jasmine-jquery/lib/jasmine-jquery',
