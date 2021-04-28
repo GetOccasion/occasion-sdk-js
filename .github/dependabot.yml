@@ -1,0 +1,16 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "07:00"
+    timezone: America/Chicago
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: grunt-contrib-uglify
+    versions:
+    - 5.0.0
+  - dependency-name: handlebars
+    versions:
+    - 4.7.6
